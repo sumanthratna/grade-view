@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'globals.dart' as globals;
+import 'globals.dart';
 
 class CoursePage extends StatelessWidget {
   static const String tag = 'course-page';
 
-  final globals.Course course;
+  final Course course;
 
   CoursePage({Key key, @required this.course}) : super(key: key);
 

@@ -148,12 +148,6 @@ class Course {
   }
 }
 
-class IncorrectPasswordException implements Exception {
-  String toString() {
-    return "Incorrect Password";
-  }
-}
-
 const String api = "https://sisapi.sites.tjhsst.edu";
 final storage = FlutterSecureStorage();
 User user;
