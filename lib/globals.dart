@@ -1,5 +1,6 @@
 library grade_view.globals;
 
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class User {
@@ -55,6 +56,73 @@ class Assignment {
 //     }
 }
 
+class Weighting {
+  String name;
+  double weight;
+  String letterGrade;
+  double percentage;
+  double achievedPoints; double maxPoints;
+
+  Weighting.fromJson(String name, Map json)
+    : this.name = name,
+      this.weight = double.parse(json['weight']),
+      this.letterGrade = json['letter_grade'],
+      this.percentage = double.parse(json['percentage']),
+      this.achievedPoints = double.parse(json['points'].replaceAll(',','')),
+      this.maxPoints = double.parse(json['points_possible'].replaceAll(',',''));
+}
+
+class Breakdown {
+  List<Weighting> weightings;
+
+  Breakdown() : super();
+
+  DataRow getDataRow(int index) {
+    assert(index >= 0);
+    final weighting = this.weightings[index];
+    return DataRow.byIndex(
+      index: index,
+      cells: <DataCell>[
+        DataCell(Text('${weighting.name}')),
+        DataCell(Text('${weighting.weight}%')),
+        // DataCell(Text('${weighting.achievedPoints}/${weighting.maxPoints}')),
+        DataCell(Text('${weighting.percentage}%')),
+        DataCell(Text('${weighting.letterGrade}'))
+      ]
+    );
+  }
+  List<DataRow> getDataRows() {
+    List<DataRow> out = <DataRow>[];
+    for (int i=0; i<weightings.length; i++) {
+      out.add(getDataRow(i));
+    }
+    return out;
+  }
+  List<DataColumn> getDataColumns() {
+    return <DataColumn>[
+      DataColumn(
+        label: const Text("Assignment\nType"),
+        onSort: (int index, bool sort){}
+      ),
+      DataColumn(
+        label: const Text("Weight"),
+        onSort: (int index, bool sort){}
+      ),
+      // DataColumn(
+      //   label: const Text("Points")
+      // ),
+      DataColumn(
+        label: const Text("Average"),
+        onSort: (int index, bool sort){}
+      ),
+      DataColumn(
+        label: const Text("Letter\nGrade"),
+        onSort: (int index, bool sort){}
+      )
+    ];
+  }
+}
+
 class Course {
   int period;
   String name;
@@ -62,9 +130,12 @@ class Course {
   String letterGrade; double percentage;
   List<Assignment> assignments;
   String teacher;
+  Breakdown breakdown;
 
   Course.fromJson(Map json) {
-    this.assignments = [];
+    this.assignments = <Assignment>[];
+    this.breakdown = Breakdown();
+    this.breakdown.weightings = <Weighting>[];
     this.period = json['period'];
     this.name = json['name'];
     this.location = json['location'];
@@ -72,8 +143,8 @@ class Course {
     this.percentage = double.tryParse(json['grades']['third_quarter']['percentage']);
     this.teacher = json['teacher'];
     json['assignments'].forEach((f) => this.assignments.add(Assignment.fromJson(f)));
-    // json.forEach((grade) => (this.grades.add(Assignment.fromJson(grade))));
-    // json.forEach((name,assignmentType,date) => Assignment.fromJson());
+    json['grades']['third_quarter']['breakdown'].forEach((k,v) => this.breakdown.weightings.add(Weighting.fromJson(k, v)));
+    this.breakdown.weightings.sort((Weighting a, Weighting b) => a.name=="TOTAL" ? double.maxFinite.toInt():a.name.compareTo(b.name));
   }
 }
 

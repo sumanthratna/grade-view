@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert'; //base64
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'globals.dart' as globals;
 

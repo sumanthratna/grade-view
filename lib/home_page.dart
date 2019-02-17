@@ -16,9 +16,9 @@ class _MainState extends State<HomePage> {
   void init() async {
     final courses = jsonDecode((await API.getGrades(globals.user.username, await globals.storage.read(key: 'password'))).body)['courses'];
     globals.user.courses = [];
-    courses.forEach((f) => globals.user.courses.add(globals.Course.fromJson(f as Map)));//globals.user.courses.add(globals.Course.fromJson(f as Map))); //globals.user.courses.add(globals.Course.fromJson(jsonDecode(v)))
+    courses.forEach((f) => globals.user.courses.add(globals.Course.fromJson(f as Map)));
     //cache grades
-    // print(globals.user.courses.toString());
+    setState(() {});
   }
 
   @protected
@@ -31,6 +31,10 @@ class _MainState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (globals.user.courses==null) {
+      return Center(child: CircularProgressIndicator(backgroundColor: Colors.white));
+    }
+
     final img = Hero(
       tag: 'hero',
       child: Padding(
@@ -59,14 +63,14 @@ class _MainState extends State<HomePage> {
       padding: const EdgeInsets.all(20.0),
       itemCount: globals.user.courses.length,
       itemBuilder: (BuildContext context, int index) {
-        final String courseName = globals.user.courses[index].name.split(" (")[0];
+        final String courseName = globals.user.courses[index].name.split(RegExp(r" \([0-9A-Z]+\)"))[0];
         return Container(
           padding: const EdgeInsets.all(10.0),
           child: Center(child: RichText(
             text: TextSpan(
               children: <TextSpan>[
                 TextSpan(text: courseName, style: TextStyle(fontWeight: FontWeight.bold)),
-                TextSpan(text: globals.user.courses[index].name.split(courseName)[1]),
+                TextSpan(text: globals.user.courses[index].name.split(courseName)[1], style: TextStyle(fontWeight: FontWeight.normal)),
               ],
               style: TextStyle(fontSize: 16.0, color: Colors.white)
             )
@@ -110,7 +114,8 @@ class _MainState extends State<HomePage> {
               context,
               MaterialPageRoute(builder: (context) => CoursePage(course: globals.user.courses[index]))
             );
-          });
+          }
+        );
       }
     );
 

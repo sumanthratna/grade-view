@@ -1,16 +1,11 @@
-# grade_view
+# FCPS SIS GradeView
 
-A new Flutter project.
+An app for FCPS SIS.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+## To-Do List:
+ - [ ] quarters during grade-fetching is hard-coded to 'third_quarter', fix this to be generic (get first element in dynamic)
+ - [ ] noInternet snackbar is being triggered even if login is successful
+ - [x] some assignment names are too long for cards in Course view
+ - [ ] prevent double-clicking login button
+ - [ ] show teacher email next to course id/name, open mail app on click
+ - [x] fix padding
