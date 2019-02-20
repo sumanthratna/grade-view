@@ -1,26 +1,30 @@
 os:
-  - linux
+- linux
 sudo: false
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+    - ubuntu-toolchain-r-test
     packages:
-      - libstdc++6
-      - fonts-droid
+    - libstdc++6
+    - fonts-droid
 git:
   depth: 1
 cache:
   directories:
-    - $HOME/.pub-cache
+  - "$HOME/.pub-cache"
 env:
+  matrix:
   - FLUTTER_VERSION=stable
   - FLUTTER_VERSION=dev
+  global: #username and password
+  - secure: IcvnEnCflxY9hgvu5WlHy+SFOIRzOGwH0i2OHLwa/2e71Stl/GJ0xra8/y/gU1sT5hiDevM4V2wXe2ltfjKcgVj3tKzFWPGTiO2W+nxViPYWquoDwko79Iz9E9jiJ3SKr26on7hPsSBo07BL2m9Liazz0ZAhy7GWHyVt/lC0CRizw0BS+lZxy2H1lnetKE7PrWOBXD5C6dAExzzMZsioOyDh9RB+jcNYgGqVQE2Lfs4ZEK3SVgl0qSMutG6ft0bMMv3mR+x9Fof8vwilwdhhnYgQEHGAf0LSNjH1bbkJ7ys5og6O1SI36SxlgbB2/yOtF3981CzCWddzXhKeQ80g/O3HR5FqjPQiLjYfjIzMvRuQgPI2dKh4dcwfwHHzxcu6PIyR9ChEw9k+OMQc/gDLz7ft35TjUwJTIkTL0DOZSs05Y11z7NTcroErpYjvbXrBlGAVb2uLJ3YlUd6b8C+zzskvS49tKFgrSn/B+yV8OP8UI40mzYY5/65DcgEYfnhlB/Pbl8teQNWgOFPLGr5ycO9bhs+NaipddnITFmPucFsI78wl7Dyw9/P7StljrgjNNPvm66JOwvdMbPXgPzl0LEjAvK21IW7vvbX6GUEtXdyxVoBg8dvI0H+MnEbY4L0k86LF+kVysx4T9uhCUZYlT7OAyMJ19t/dbnMy+/26/vg=
+  - secure: if/14aKmzciFvS6yPqjihQoHjj7wE9WfC983XxVqbOzT3MfNSc8wpaKy0MaleXA18Yfl/fSi+fsehFzTg38f0WCUPCgk8LV5Q8xR7uQO+kqEH9NYDGNnksZMmpjXXFDIhvJMUwOJFzO3VjLQYNvhf1timN64Oys/0P8PsdWPWNOWlbT01m4coGt8NAQ4AzfwWjGK46q2NI1e/cReeUqXJ4g2UM5LB5SctwqvTEDZ1PPM+Yt0XE4hsaG/3AaVYOKIWFNE1C4u69wwQ1z5KJUJ0shPzVomYNYbM4c28aXMaFCqqRcQ5AXHlZN+MTvQb2y5WOxKh95YfVXxLQ8KH//rFoptQYQVCfQWev/MNk69bDxoqfSkgYEJ2UZmWaoYxIZD9zUfj0KiRI54ETfNpoj1EtqCEGVnxSKFeuTf3NyX3/27gkIH4JE9nJ7T9XyJqPMKYOZQqzTxewnOUYHgHkt7ZWrzCcrO5qGEE4daa6rtvKhHJi1Z9p39KqBu1IhZowWP7onUykN+svWVy8WDTUJrdZA85PJNx6MLr73VngtVGh+9RLJnfIXtH0uJ505eG8Kf0i8HYhAtAu7Nb/fjp21Gj8FEYCHul0wQ0mYjqGm/WPOi7eZncafGCzpjFX+ud+V4hZA39GJluiy5LK5knz8zTACNJjSK40fN0Q/4Ml1L+lI=
 matrix:
   allow_failures:
-    - env: FLUTTER_VERSION=dev
+  - env: FLUTTER_VERSION=dev
 before_script:
-  - git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
-  - ./flutter/bin/flutter doctor
+- git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
+- "./flutter/bin/flutter doctor"
 script:
-  - ./flutter/bin/flutter build #change to test
+- "./flutter/bin/flutter build"

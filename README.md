@@ -9,4 +9,5 @@ An app for FCPS SIS.
  - [x] some assignment names are too long for cards in Course view
  - [ ] show teacher email next to course id/name, open mail app on click
  - [x] fix padding
- - [ ] add widget testing
+ - [x] add widget testing
+ - [ ] add integration tests
