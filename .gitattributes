@@ -1,4 +1,4 @@
-*.dart text
-
-lib/*.dart
-test/*.dart
+lib/*.dart linguist-vendored=false
+test/*.dart linguist-vendored=false
+ios/ linguist-vendored
+android/ linguist-vendored
