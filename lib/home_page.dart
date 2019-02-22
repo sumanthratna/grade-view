@@ -79,7 +79,7 @@ class _MainState extends State<HomePage> {
                   text: user.courses[index].name,
                   style: TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
-                  text: " "+user.courses[index].id,
+                  text: " " + user.courses[index].id,
                   style: TextStyle(fontWeight: FontWeight.normal)),
             ], style: TextStyle(fontSize: 16.0, color: Colors.white)))));
       },
