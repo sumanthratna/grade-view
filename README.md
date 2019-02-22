@@ -11,3 +11,7 @@ An app for FCPS SIS.
  - [x] fix padding
  - [x] add widget testing
  - [ ] add integration tests
+ - [ ] add bitrise integration
+ - [ ] implement push notifications
+ - [ ] cache grades and create graphs of grades over time
+ - [ ] don't store password longer than it needs to be stored
