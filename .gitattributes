@@ -1,4 +1,5 @@
-lib/*.dart linguist-vendored=false
-test/*.dart linguist-vendored=false
-ios/ linguist-vendored
-android/ linguist-vendored
+lib/*.dart linguist-generated=false
+test/*.dart linguist-generated=false
+ios/ linguist-generated
+android/ linguist-generated
+build/ linguist-generated

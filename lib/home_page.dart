@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
   static const String tag = 'home-page';
 
   @override
-  _MainState createState() => new _MainState();
+  _MainState createState() => _MainState();
 }
 
 class _MainState extends State<HomePage> {
@@ -35,41 +35,41 @@ class _MainState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (user.courses == null) {
       return Center(
-          child: CircularProgressIndicator(backgroundColor: Colors.white));
+          child: const CircularProgressIndicator());
     }
 
     final img = Hero(
         tag: 'img',
         child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Container(
                 child: user.photo,
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.white, width: 8.0)))));
 
     final welcome = Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Text(
         user.username,
-        style: TextStyle(fontSize: 28.0, color: Colors.white),
+        style: const TextStyle(fontSize: 28.0, color: Colors.white),
       ),
     );
 
     final school = Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Text(
         user.school,
-        style: TextStyle(fontSize: 16.0, color: Colors.white),
+        style: const TextStyle(fontSize: 16.0, color: Colors.white),
       ),
     );
 
     final classes = ListView.builder(
       padding: const EdgeInsets.all(20.0),
       itemCount: user.courses.length,
-      itemBuilder: (BuildContext context, int index) {
+      itemBuilder: (final BuildContext context, final int index) {
         return Container(
             padding: const EdgeInsets.all(10.0),
             child: Center(
@@ -102,7 +102,7 @@ class _MainState extends State<HomePage> {
 
     final gradesContent = ListView.builder(
         itemCount: user.courses.length,
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (final BuildContext context, final int index) {
           return Material(
               child: Card(
                   child: InkWell(
@@ -154,22 +154,22 @@ class _MainState extends State<HomePage> {
 
     final grades = Container(
       width: MediaQuery.of(context).size.width,
-      padding: EdgeInsets.all(28.0),
-      decoration: BoxDecoration(
-          gradient:
-              LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent])),
+      padding: const EdgeInsets.all(28.0),
+      decoration: const BoxDecoration(
+          gradient: const LinearGradient(
+              colors: [Colors.blue, Colors.lightBlueAccent])),
       child: Column(children: <Widget>[
-        Padding(
-            padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 5.0),
-            child: Text("Grades",
-                style: TextStyle(fontSize: 32.0, color: Colors.white))),
+        const Padding(
+            padding: const EdgeInsets.only(top: 40.0, bottom: 5.0),
+            child: const Text("Grades",
+                style: const TextStyle(fontSize: 32.0, color: Colors.white))),
         Expanded(child: gradesContent)
       ]),
     );
 
     return Scaffold(
       body: Swiper(
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (final BuildContext context, final int index) {
           switch (index) {
             case 0:
               return home;
@@ -178,8 +178,8 @@ class _MainState extends State<HomePage> {
           }
         },
         itemCount: 2,
-        pagination: SwiperPagination(),
-        control: SwiperControl(),
+        pagination: const SwiperPagination(),
+        control: const SwiperControl(),
       ),
     );
   }

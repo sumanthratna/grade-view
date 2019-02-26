@@ -12,22 +12,25 @@ class InputText extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType inputType;
   final bool autofocus;
+  final bool obscureText;
   final String helpText;
   const InputText(
-      {@required Key key,
-      @required this.controller,
-      @required this.inputType,
-      @required this.helpText,
-      @required this.autofocus})
+      {@required final Key key,
+      @required final this.controller,
+      @required final this.inputType,
+      @required final this.obscureText,
+      @required final this.helpText,
+      @required final this.autofocus})
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return TextFormField(
       key: this.key,
       controller: this.controller,
       keyboardType: this.inputType,
-      autofocus: true,
+      autofocus: this.autofocus,
+      obscureText: this.obscureText,
       decoration: InputDecoration(
         hintText: this.helpText,
         contentPadding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
@@ -40,19 +43,19 @@ class InputText extends StatelessWidget {
 class LoginPage extends StatelessWidget {
   static const String tag = 'login-page';
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final SnackBar incorrectPassword = const SnackBar(
+  static const SnackBar incorrectPassword = SnackBar(
       content: const Text('Incorrect Username or Password'),
       duration: const Duration(seconds: 5));
-  final SnackBar noInternet = const SnackBar(
+  static const SnackBar noInternet = SnackBar(
       content: const Text('No Internet Connection'),
       duration: const Duration(seconds: 10));
-  final SnackBar enterUsername = const SnackBar(
+  static const SnackBar enterUsername = SnackBar(
           content: const Text('Please Enter a Username'),
           duration: const Duration(seconds: 5)),
-      enterPassword = const SnackBar(
+      enterPassword = SnackBar(
           content: const Text('Please Enter a Password'),
           duration: const Duration(seconds: 5)),
-      enterBoth = const SnackBar(
+      enterBoth = SnackBar(
           content: const Text('Please Enter a Username and Password'),
           duration: const Duration(seconds: 5));
   final _usernameController = TextEditingController(),
@@ -74,6 +77,7 @@ class LoginPage extends StatelessWidget {
         controller: _usernameController,
         inputType: TextInputType.number,
         autofocus: true,
+        obscureText: false,
         helpText: 'Username');
 
     final password = InputText(
@@ -81,6 +85,7 @@ class LoginPage extends StatelessWidget {
         controller: _passwordController,
         inputType: TextInputType.text,
         autofocus: false,
+        obscureText: true,
         helpText: 'Password');
 
     final loginButton = Padding(
@@ -134,7 +139,6 @@ class LoginPage extends StatelessWidget {
                     await API.getUser(usernameInput, passwordInput);
                 print('status code ' + response.statusCode.toString());
                 if ((response.statusCode / 100).floor() == 2) {
-                  //response.statusCode.toString().startsWith('2')
                   user = User.fromJson(jsonDecode(response.body));
                   storage.write(key: "password", value: passwordInput);
                   _scaffoldKey.currentState.removeCurrentSnackBar();
@@ -142,7 +146,12 @@ class LoginPage extends StatelessWidget {
                   /* Navigator.of(context).pushNamedAndRemoveUntil(
                       HomePage.tag, ModalRoute.withName(HomePage.tag));*/
                 } else {
-                  throw IncorrectCredentialsException();
+                  if ((response.statusCode / 100).floor() == 4) {
+                    throw IncorrectCredentialsException();
+                  } else {
+                    //triggers the else in the catch
+                    throw Exception('Status code ' + response.statusCode);
+                  }
                 }
               } catch (e) {
                 if (e is NoUsernameException) {
@@ -162,8 +171,8 @@ class LoginPage extends StatelessWidget {
             },
             padding: const EdgeInsets.all(12),
             color: Colors.lightBlueAccent,
-            child:
-                const Text('Log In', style: TextStyle(color: Colors.white))));
+            child: const Text('Log In',
+                style: const TextStyle(color: Colors.white))));
 
     return Scaffold(
         key: _scaffoldKey,
@@ -179,18 +188,20 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 8.0),
               password,
               const SizedBox(height: 24.0),
-              loginButton
+              loginButton,
+              // const SizedBox(height: 180.0)
             ])));
   }
 
-  showSnackBar(SnackBar arg) {
+  showSnackBar(final SnackBar arg) {
     _scaffoldKey.currentState.removeCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(arg);
   }
 
-  showSnackbar(Exception e) {
+  showSnackbar(final Exception e) {
     _scaffoldKey.currentState.removeCurrentSnackBar();
-    _scaffoldKey.currentState.showSnackBar(
-        SnackBar(content: Text("Unexpected Error (" + e.toString() + ")")));
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text("Unexpected Error (" + e.toString() + ")"),
+        duration: const Duration(seconds: 10)));
   }
 }

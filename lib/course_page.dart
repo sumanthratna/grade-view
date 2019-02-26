@@ -7,25 +7,25 @@ import 'assignment_page.dart' show AssignmentPage;
 class CoursePage extends StatelessWidget {
   final Course course;
 
-  CoursePage({Key key, @required this.course}) : super(key: key);
+  CoursePage({final Key key, @required final this.course}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final backButton = Padding(
         child: Align(child: BackButton(), alignment: Alignment.centerLeft),
-        padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0));
+        padding: EdgeInsets.only(top: 10.0, bottom: 0.0));
 
     final courseInfo = Card(
         child: DataTable(
             rows: this.course.breakdown.getDataRows(),
             columns: this.course.breakdown.getDataColumns()),
-        margin: EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 15.0));
+        margin: EdgeInsets.only(left: 4.0, right: 4.0, bottom: 15.0));
 
     final courseGrades = ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         itemCount: this.course.assignments.length,
         shrinkWrap: true,
-        itemBuilder: (BuildContext context, int index) {
+        itemBuilder: (final BuildContext context, final int index) {
           return Card(
               child: InkWell(
                   onTap: () {
