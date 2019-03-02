@@ -4,9 +4,9 @@ class IncorrectCredentialsException implements Exception {
   }
 }
 
-class NoUsernameException implements Exception {
+class NoCredentialsException implements Exception {
   String toString() {
-    return "No Username";
+    return "No Username or Password";
   }
 }
 
@@ -16,8 +16,8 @@ class NoPasswordException implements Exception {
   }
 }
 
-class NoCredentialsException implements Exception {
+class NoUsernameException implements Exception {
   String toString() {
-    return "No Username or Password";
+    return "No Username";
   }
 }

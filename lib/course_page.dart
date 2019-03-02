@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'api.dart' show Course;
-
 import 'assignment_page.dart' show AssignmentPage;
 
 class CoursePage extends StatelessWidget {
@@ -11,19 +10,21 @@ class CoursePage extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    final backButton = Padding(
-        child: Align(child: BackButton(), alignment: Alignment.centerLeft),
-        padding: EdgeInsets.only(top: 10.0, bottom: 0.0));
+    final backButton = const Padding(
+        child: const Align(
+            child: const BackButton(color: Colors.white),
+            alignment: Alignment.centerLeft),
+        padding: const EdgeInsets.only(top: 10.0, bottom: 0.0));
 
     final courseInfo = Card(
         child: DataTable(
-            rows: this.course.breakdown.getDataRows(),
-            columns: this.course.breakdown.getDataColumns()),
-        margin: EdgeInsets.only(left: 4.0, right: 4.0, bottom: 15.0));
+            rows: course.breakdown.getDataRows(),
+            columns: course.breakdown.getDataColumns()),
+        margin: const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 15.0));
 
     final courseGrades = ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: this.course.assignments.length,
+        itemCount: course.assignments.length,
         shrinkWrap: true,
         itemBuilder: (final BuildContext context, final int index) {
           return Card(
@@ -32,8 +33,8 @@ class CoursePage extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AssignmentPage(
-                                assignment: this.course.assignments[index])));
+                            builder: (final context) => AssignmentPage(
+                                assignment: course.assignments[index])));
                   },
                   child: Container(
                       padding: const EdgeInsets.all(15.0),
@@ -41,9 +42,9 @@ class CoursePage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Flexible(
-                                child: Text(this.course.assignments[index].name,
+                                child: Text(course.assignments[index].name,
                                     softWrap: false,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 16.0,
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold),
@@ -51,18 +52,13 @@ class CoursePage extends StatelessWidget {
                                     maxLines: 1)),
                             Align(
                                 child: Text(
-                                    this
-                                            .course
-                                            .assignments[index]
-                                            .achievedPoints
+                                    "    " +
+                                        course.assignments[index].achievedPoints
                                             .toString() +
                                         "/" +
-                                        this
-                                            .course
-                                            .assignments[index]
-                                            .maxPoints
+                                        course.assignments[index].maxPoints
                                             .toString(),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 16.0, color: Colors.black)),
                                 alignment: Alignment.centerRight)
                           ]))));
@@ -84,7 +80,7 @@ class CoursePage extends StatelessWidget {
         ),
         child: Column(children: <Widget>[
           backButton,
-          Text(this.course.name,
+          Text(course.name,
               style: TextStyle(fontSize: 32.0, color: Colors.white)),
           Expanded(
               child: ListView(children: <Widget>[courseInfo, courseGrades]))
@@ -92,7 +88,7 @@ class CoursePage extends StatelessWidget {
     */
     final body = Container(
         width: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.all(28.0),
+        padding: const EdgeInsets.all(28.0),
         decoration: BoxDecoration(
           gradient: LinearGradient(colors: [
             Colors.blue,
@@ -101,8 +97,8 @@ class CoursePage extends StatelessWidget {
         ),
         child: Column(children: <Widget>[
           backButton,
-          Text(this.course.name,
-              style: TextStyle(fontSize: 32.0, color: Colors.white)),
+          Text(course.name,
+              style: const TextStyle(fontSize: 32.0, color: Colors.white)),
           Expanded(
               child: ListView(children: <Widget>[courseInfo, courseGrades]))
         ]));

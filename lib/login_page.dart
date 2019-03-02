@@ -26,13 +26,13 @@ class InputText extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     return TextFormField(
-      key: this.key,
-      controller: this.controller,
-      keyboardType: this.inputType,
-      autofocus: this.autofocus,
-      obscureText: this.obscureText,
+      key: key,
+      controller: controller,
+      keyboardType: inputType,
+      autofocus: autofocus,
+      obscureText: obscureText,
       decoration: InputDecoration(
-        hintText: this.helpText,
+        hintText: helpText,
         contentPadding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
@@ -42,22 +42,22 @@ class InputText extends StatelessWidget {
 
 class LoginPage extends StatelessWidget {
   static const String tag = 'login-page';
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  static const SnackBar incorrectPassword = SnackBar(
+  static const SnackBar incorrectCredentials = const SnackBar(
       content: const Text('Incorrect Username or Password'),
       duration: const Duration(seconds: 5));
-  static const SnackBar noInternet = SnackBar(
+  static const SnackBar noInternet = const SnackBar(
       content: const Text('No Internet Connection'),
       duration: const Duration(seconds: 10));
-  static const SnackBar enterUsername = SnackBar(
+  static const SnackBar enterUsername = const SnackBar(
           content: const Text('Please Enter a Username'),
           duration: const Duration(seconds: 5)),
-      enterPassword = SnackBar(
+      enterPassword = const SnackBar(
           content: const Text('Please Enter a Password'),
           duration: const Duration(seconds: 5)),
-      enterBoth = SnackBar(
+      enterBoth = const SnackBar(
           content: const Text('Please Enter a Username and Password'),
           duration: const Duration(seconds: 5));
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _usernameController = TextEditingController(),
       _passwordController = TextEditingController();
 
@@ -128,11 +128,9 @@ class LoginPage extends StatelessWidget {
                     passwordInput = _passwordController.text.trim();
                 if (usernameInput.isEmpty && passwordInput.isNotEmpty) {
                   throw NoUsernameException();
-                }
-                if (usernameInput.isNotEmpty && passwordInput.isEmpty) {
+                } else if (usernameInput.isNotEmpty && passwordInput.isEmpty) {
                   throw NoPasswordException();
-                }
-                if (passwordInput.isEmpty) {
+                } else if (usernameInput.isEmpty && passwordInput.isEmpty) {
                   throw NoCredentialsException();
                 }
                 final response =
@@ -150,7 +148,7 @@ class LoginPage extends StatelessWidget {
                     throw IncorrectCredentialsException();
                   } else {
                     //triggers the else in the catch
-                    throw Exception('Status code ' + response.statusCode);
+                    throw Exception('Status Code ' + response.statusCode);
                   }
                 }
               } catch (e) {
@@ -161,7 +159,7 @@ class LoginPage extends StatelessWidget {
                 } else if (e is NoCredentialsException) {
                   showSnackBar(enterBoth);
                 } else if (e is IncorrectCredentialsException) {
-                  showSnackBar(incorrectPassword);
+                  showSnackBar(incorrectCredentials);
                 } else if (e is SocketException) {
                   showSnackBar(noInternet);
                 } else {

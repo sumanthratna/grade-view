@@ -1,12 +1,10 @@
 import 'dart:convert' show jsonDecode;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart'
-    show Swiper, SwiperPagination, SwiperControl;
 import 'package:grade_view/api.dart' show API, Course;
 
 import 'course_page.dart' show CoursePage;
-import 'globals.dart';
+import 'globals.dart' show user, storage;
 
 class HomePage extends StatefulWidget {
   static const String tag = 'home-page';
@@ -16,29 +14,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _MainState extends State<HomePage> {
-  void init() async {
-    final courses = jsonDecode((await API.getGrades(
-            user.username, await storage.read(key: 'password')))
-        .body)['courses'];
-    user.courses = [];
-    courses.forEach((f) => user.courses.add(Course.fromJson(f as Map)));
-    //cache grades
-    setState(() {});
-  }
+  int _currentIndex = 0;
 
-  @protected
-  @mustCallSuper
-  @override
-  void initState() {
-    init();
-    super.initState();
-  }
-
+  final List<Widget> _screens = <Widget>[];
   @override
   Widget build(final BuildContext context) {
-    if (user.courses == null) {
-      return Center(
-          child: const CircularProgressIndicator());
+    if (user.courses == null || user.courses.isEmpty) {
+      return const Center(child: const CircularProgressIndicator());
     }
 
     final img = Hero(
@@ -77,15 +59,15 @@ class _MainState extends State<HomePage> {
                     text: TextSpan(children: <TextSpan>[
               TextSpan(
                   text: user.courses[index].name,
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(
                   text: " " + user.courses[index].id,
-                  style: TextStyle(fontWeight: FontWeight.normal)),
-            ], style: TextStyle(fontSize: 16.0, color: Colors.white)))));
+                  style: const TextStyle(fontWeight: FontWeight.normal)),
+            ], style: const TextStyle(fontSize: 16.0, color: Colors.white)))));
       },
     );
 
-    final home = Container(
+    final userScreen = Container(
       key: Key('base'),
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.all(28.0),
@@ -100,7 +82,7 @@ class _MainState extends State<HomePage> {
       ),
     );
 
-    final gradesContent = ListView.builder(
+    final grades = ListView.builder(
         itemCount: user.courses.length,
         itemBuilder: (final BuildContext context, final int index) {
           return Material(
@@ -115,7 +97,7 @@ class _MainState extends State<HomePage> {
                               child: RichText(
                                   text: TextSpan(
                                       text: user.courses[index].name,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 16.0,
                                           color: Colors.black,
                                           fontWeight: FontWeight.bold))),
@@ -124,7 +106,7 @@ class _MainState extends State<HomePage> {
                               child: RichText(
                                   text: TextSpan(
                                       text: user.courses[index].id,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 16.0,
                                           color: Colors.black))),
                               alignment: Alignment.centerLeft),
@@ -136,7 +118,7 @@ class _MainState extends State<HomePage> {
                                           user.courses[index].percentage
                                               .toString() +
                                           ")",
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontSize: 16.0,
                                           color: Colors.black))),
                               alignment: Alignment.centerRight)
@@ -145,14 +127,14 @@ class _MainState extends State<HomePage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) =>
+                          builder: (final context) =>
                               CoursePage(course: user.courses[index])));
                 },
               )),
               color: Colors.transparent);
         });
 
-    final grades = Container(
+    final gradesScreen = Container(
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.all(28.0),
       decoration: const BoxDecoration(
@@ -163,24 +145,56 @@ class _MainState extends State<HomePage> {
             padding: const EdgeInsets.only(top: 40.0, bottom: 5.0),
             child: const Text("Grades",
                 style: const TextStyle(fontSize: 32.0, color: Colors.white))),
-        Expanded(child: gradesContent)
+        Expanded(child: grades)
       ]),
     );
 
+    _screens.add(userScreen);
+    _screens.add(gradesScreen);
+
+    final navBar = BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        onTap: navigate,
+        currentIndex: _currentIndex,
+        items: const <BottomNavigationBarItem>[
+          const BottomNavigationBarItem(
+              icon: const Icon(Icons.person), title: const Text('Home')),
+          const BottomNavigationBarItem(
+              icon: const Icon(Icons.school), title: const Text('Grades'))
+        ]);
+
     return Scaffold(
-      body: Swiper(
-        itemBuilder: (final BuildContext context, final int index) {
-          switch (index) {
-            case 0:
-              return home;
-            case 1:
-              return grades;
-          }
-        },
-        itemCount: 2,
-        pagination: const SwiperPagination(),
-        control: const SwiperControl(),
-      ),
+      appBar: AppBar(
+          title: Text('Logout', style: TextStyle(color: Colors.white)),
+          iconTheme: IconThemeData(color: Colors.white),
+          centerTitle: false),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: navBar,
     );
+  }
+
+  void fetchUser() async {
+    user.courses = [];
+    final courses = jsonDecode((await API.getGrades(
+            user.username, await storage.read(key: 'password')))
+        .body)['courses'];
+    courses.forEach(
+        (f) => user.courses.add(Course.fromJson(f as Map<String, dynamic>)));
+    setState(() {});
+    //cache grades
+  }
+
+  @protected
+  @mustCallSuper
+  @override
+  void initState() {
+    fetchUser();
+    super.initState();
+  }
+
+  void navigate(final int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 }

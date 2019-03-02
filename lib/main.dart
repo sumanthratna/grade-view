@@ -6,12 +6,12 @@ void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
-    LoginPage.tag: (context) => LoginPage(),
-    HomePage.tag: (context) => HomePage(),
+    LoginPage.tag: (final context) => LoginPage(),
+    HomePage.tag: (final context) => HomePage(),
   };
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return MaterialApp(
       title: 'Kodeversitas',
       debugShowCheckedModeBanner: false,

@@ -4,7 +4,7 @@
 An app for FCPS SIS.
 
 ## To-Do List:
- - [ ] quarters during grade-fetching is hard-coded to 'third_quarter', fix this to be generic (get first element in dynamic)
+ - [ ] quarters during grade-fetching is hard-coded to `third_quarter`, fix this to be generic (get first element in dynamic)
  - [x] noInternet snackbar is being triggered even if login is successful
  - [x] some assignment names are too long for cards in Course view
  - [ ] show teacher email next to course id/name, open mail app on click
@@ -15,3 +15,9 @@ An app for FCPS SIS.
  - [ ] implement push notifications
  - [ ] cache grades and create graphs of grades over time
  - [ ] don't store password longer than it needs to be stored
+ - [ ] add screenshots to README
+ - [ ] implement methods for all API classes
+ - [ ] make `Breakdown` class extend `List<Weighting>` instead of 'having' one
+ - [ ] don't send username and password to API call methods as arguments
+ - [ ] double clicking login button causes courses to show up twice
+ - [ ] allow swiping in `HomePage` (use `TabBar`?)

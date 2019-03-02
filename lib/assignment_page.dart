@@ -12,7 +12,8 @@ class AssignmentPage extends StatelessWidget {
   Widget build(final BuildContext context) {
     final backButton = const Padding(
         child: const Align(
-            child: const BackButton(), alignment: Alignment.centerLeft),
+            child: const BackButton(color: Colors.white),
+            alignment: Alignment.centerLeft),
         padding: const EdgeInsets.only(top: 10.0, bottom: 0.0));
 
     final body = Container(
