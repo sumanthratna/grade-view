@@ -24,7 +24,8 @@ matrix:
   allow_failures:
   - env: FLUTTER_VERSION=dev
 before_script:
-- git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
+- "wget https://storage.googleapis.com/flutter_infra/releases/stable/linux/flutter_linux_v1.2.1-stable.tar.xz"
+- "tar xf flutter_linux_v1.2.1-stable.tar.xz"
 - "./flutter/bin/flutter doctor"
 script:
 - "./flutter/bin/flutter test"

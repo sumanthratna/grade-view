@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _MainState extends State<HomePage> {
-  int _currentIndex = 0;
+  int _currentIndex = 0; //for bottom navigation
 
   final List<Widget> _screens = <Widget>[];
   @override

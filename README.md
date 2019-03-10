@@ -21,3 +21,4 @@ An app for FCPS SIS.
  - [ ] don't send username and password to API call methods as arguments (create `API` object instead of calling static methods?)
  - [ ] double clicking login button causes courses to show up twice
  - [ ] allow swiping in `HomePage` (use `TabBar`?)
+ - [ ] use `FutureBuilder` when retrieving courses
