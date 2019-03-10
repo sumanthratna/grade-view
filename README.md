@@ -18,6 +18,6 @@ An app for FCPS SIS.
  - [ ] add screenshots to README
  - [ ] implement methods for all API classes
  - [ ] make `Breakdown` class extend `List<Weighting>` instead of 'having' one
- - [ ] don't send username and password to API call methods as arguments
+ - [ ] don't send username and password to API call methods as arguments (create `API` object instead of calling static methods?)
  - [ ] double clicking login button causes courses to show up twice
  - [ ] allow swiping in `HomePage` (use `TabBar`?)

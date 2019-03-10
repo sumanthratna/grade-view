@@ -160,12 +160,18 @@ class _MainState extends State<HomePage> {
           const BottomNavigationBarItem(
               icon: const Icon(Icons.person), title: const Text('Home')),
           const BottomNavigationBarItem(
-              icon: const Icon(Icons.school), title: const Text('Grades'))
+              icon: const Icon(Icons.school), title: const Text('Grades')),
+          // const BottomNavigationBarItem(
+          // icon: const Icon(Icons.show_chart), title: const Text('Charts'))
         ]);
 
     return Scaffold(
       appBar: AppBar(
-          title: Text('Logout', style: TextStyle(color: Colors.white)),
+          title: GestureDetector(
+              child: Text('Logout', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.of(context).pop();
+              }),
           iconTheme: IconThemeData(color: Colors.white),
           centerTitle: false),
       body: _screens[_currentIndex],

@@ -34,6 +34,7 @@ class CoursePage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                             builder: (final context) => AssignmentPage(
+                                course: course,
                                 assignment: course.assignments[index])));
                   },
                   child: Container(
@@ -98,6 +99,7 @@ class CoursePage extends StatelessWidget {
         child: Column(children: <Widget>[
           backButton,
           Text(course.name,
+              textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 32.0, color: Colors.white)),
           Expanded(
               child: ListView(children: <Widget>[courseInfo, courseGrades]))

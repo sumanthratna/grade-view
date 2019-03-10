@@ -5,16 +5,16 @@ import 'package:flutter/material.dart'
 import 'package:http/http.dart' as http show get;
 
 class API {
-  static const String base = "https://sisapi.sites.tjhsst.edu";
+  static const String _base = "https://sisapi.sites.tjhsst.edu";
   static Future getGrades(final String username, final String password) {
-    final String url = base + "/grades/";
+    final String url = _base + "/grades/";
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     return http.get(url, headers: {'Authorization': auth});
   }
 
   static Future getUser(final String username, final String password) {
-    final String url = base + "/user/";
+    final String url = _base + "/user/";
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     return http.get(url, headers: {'Authorization': auth});
@@ -135,14 +135,21 @@ class Course {
   final String teacher;
   Breakdown breakdown;
 
-  Course(final String period, final String name, final String id, final String location, final String letterGrade, final String percentage, final String teacher)
-    : period = int.parse(period),
-      name = name,
-      id = id,
-      location = location,
-      letterGrade = letterGrade,
-      percentage = double.parse(percentage),
-      teacher = teacher;
+  Course(
+      final String period,
+      final String name,
+      final String id,
+      final String location,
+      final String letterGrade,
+      final String percentage,
+      final String teacher)
+      : period = int.parse(period),
+        name = name,
+        id = id,
+        location = location,
+        letterGrade = letterGrade,
+        percentage = double.parse(percentage),
+        teacher = teacher;
 
   Course.fromJson(final Map<String, dynamic> json)
       : period = json['period'],
@@ -180,6 +187,10 @@ class Course {
         a.name == "TOTAL"
             ? double.maxFinite.toInt()
             : a.name.compareTo(b.name));
+  }
+
+  Map<String,String> toJson() {
+    return null; //TODO
   }
 }
 
