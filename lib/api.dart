@@ -1,3 +1,4 @@
+import 'dart:async' show Future;
 import 'dart:convert' show base64, base64Encode, utf8;
 
 import 'package:flutter/material.dart'
@@ -189,7 +190,7 @@ class Course {
             : a.name.compareTo(b.name));
   }
 
-  Map<String,String> toJson() {
+  Map<String, String> toJson() {
     return null; //TODO
   }
 }
