@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'api.dart' show Course;
 import 'assignment_page.dart' show AssignmentPage;
+import 'custom_widgets.dart' show Info;
 
 class CoursePage extends StatelessWidget {
   final Course course;
@@ -27,42 +28,20 @@ class CoursePage extends StatelessWidget {
         itemCount: course.assignments.length,
         shrinkWrap: true,
         itemBuilder: (final BuildContext context, final int index) {
-          return Card(
-              child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (final context) => AssignmentPage(
-                                course: course,
-                                assignment: course.assignments[index])));
-                  },
-                  child: Container(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Flexible(
-                                child: Text(course.assignments[index].name,
-                                    softWrap: false,
-                                    style: const TextStyle(
-                                        fontSize: 16.0,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                    overflow: TextOverflow.fade,
-                                    maxLines: 1)),
-                            Align(
-                                child: Text(
-                                    "    " +
-                                        course.assignments[index].achievedPoints
-                                            .toString() +
-                                        "/" +
-                                        course.assignments[index].maxPoints
-                                            .toString(),
-                                    style: const TextStyle(
-                                        fontSize: 16.0, color: Colors.black)),
-                                alignment: Alignment.centerRight)
-                          ]))));
+          return Info(
+              left: course.assignments[index].name,
+              right: " " +
+                  course.assignments[index].achievedPoints.toString() +
+                  "/" +
+                  course.assignments[index].maxPoints.toString(),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (final context) => AssignmentPage(
+                            course: course,
+                            assignment: course.assignments[index])));
+              });
         });
     /* looks weird
     final body = Dismissible(

@@ -4,41 +4,11 @@ import 'dart:io' show SocketException;
 import 'package:flutter/material.dart';
 import 'package:grade_view/api.dart' show API, User;
 import 'package:grade_view/home_page.dart' show HomePage;
+import 'package:http/http.dart' show Response;
 
-import 'exceptions.dart';
+import 'custom_exceptions.dart';
+import 'custom_widgets.dart' show InputText;
 import 'globals.dart';
-
-class InputText extends StatelessWidget {
-  final TextEditingController controller;
-  final TextInputType inputType;
-  final bool autofocus;
-  final bool obscureText;
-  final String helpText;
-  const InputText(
-      {@required final Key key,
-      @required final this.controller,
-      @required final this.inputType,
-      @required final this.obscureText,
-      @required final this.helpText,
-      @required final this.autofocus})
-      : super(key: key);
-
-  @override
-  Widget build(final BuildContext context) {
-    return TextFormField(
-      key: key,
-      controller: controller,
-      keyboardType: inputType,
-      autofocus: autofocus,
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: helpText,
-        contentPadding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
-      ),
-    );
-  }
-}
 
 class LoginPage extends StatelessWidget {
   static const String tag = 'login-page';
@@ -133,12 +103,12 @@ class LoginPage extends StatelessWidget {
                 } else if (usernameInput.isEmpty && passwordInput.isEmpty) {
                   throw NoCredentialsException();
                 }
-                final response =
+                final Response response =
                     await API.getUser(usernameInput, passwordInput);
                 print('status code ' + response.statusCode.toString());
                 if ((response.statusCode / 100).floor() == 2) {
                   user = User.fromJson(jsonDecode(response.body));
-                  storage.write(key: "password", value: passwordInput);
+                  storage.write(key: "gradeviewpassword", value: passwordInput);
                   _scaffoldKey.currentState.removeCurrentSnackBar();
                   Navigator.of(context).pushNamed(HomePage.tag);
                   /* Navigator.of(context).pushNamedAndRemoveUntil(
@@ -148,7 +118,8 @@ class LoginPage extends StatelessWidget {
                     throw IncorrectCredentialsException();
                   } else {
                     //triggers the else in the catch
-                    throw Exception('Status Code ' + response.statusCode);
+                    throw Exception(
+                        'Status Code ' + response.statusCode.toString());
                   }
                 }
               } catch (e) {
@@ -191,12 +162,12 @@ class LoginPage extends StatelessWidget {
             ])));
   }
 
-  showSnackBar(final SnackBar arg) {
+  void showSnackBar(final SnackBar arg) {
     _scaffoldKey.currentState.removeCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(arg);
   }
 
-  showSnackbar(final Exception e) {
+  void showSnackbar(final Exception e) {
     _scaffoldKey.currentState.removeCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text("Unexpected Error (" + e.toString() + ")"),

@@ -1,24 +1,92 @@
 import 'dart:async' show Future;
-import 'dart:convert' show base64, base64Encode, utf8;
+import 'dart:convert' show base64, base64Encode, utf8, jsonDecode;
+import 'dart:io' show Platform;
+import 'dart:math' show Random;
 
 import 'package:flutter/material.dart'
     show Text, Image, DataRow, DataColumn, DataCell;
-import 'package:http/http.dart' as http show get;
+// import 'package:device_id/device_id.dart' show DeviceId;
+import 'package:http/http.dart' as http show get, post, put;
+import 'package:http/http.dart' show Response;
+
+import 'globals.dart' show firebaseMessaging, storage;
 
 class API {
   static const String _base = "https://sisapi.sites.tjhsst.edu";
-  static Future getGrades(final String username, final String password) {
+  static Future<Response> getGrades(
+      final String username, final String password) {
     final String url = _base + "/grades/";
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     return http.get(url, headers: {'Authorization': auth});
   }
 
-  static Future getUser(final String username, final String password) {
+  static Future<Response> getUser(
+      final String username, final String password) {
     final String url = _base + "/user/";
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     return http.get(url, headers: {'Authorization': auth});
+  }
+
+  static Future<bool> registerDevice(
+      final String username, final String password) async {
+    final String url = _base + "/devices/";
+    final String auth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    final String registrationID =
+        await storage.read(key: 'gradeviewfirebaseregistrationid') ??
+            await firebaseMessaging.getToken();
+    final Response check =
+        await http.get(url, headers: {'Authorization': auth});
+    if (check.body.contains(registrationID)) {
+      setActivationForDevice(username, password, true);
+    }
+    await storage.write(
+        key: 'gradeviewfirebaseregistrationid',
+        value: await firebaseMessaging.getToken());
+    final Map<String, dynamic> device = {
+      'id': Random()..nextInt(1000),
+      'name': username,
+      'registration_id':
+          await storage.read(key: 'gradeviewfirebaseregistrationid'),
+      'device_id': 4, //await DeviceId.getID,
+      'active': true,
+      'type': (Platform.isIOS ? 'ios' : (Platform.isAndroid ? 'android' : null))
+    };
+    final Response response =
+        await http.post(url, headers: {'Authorization': auth}, body: device);
+    return ((response.statusCode / 100).floor() == 2);
+  }
+
+  static Future<bool> setActivationForDevice(
+      final String username, final String password, final bool activate) async {
+    final String registrationID =
+        await storage.read(key: 'gradeviewfirebaseregistrationid') ??
+            await firebaseMessaging.getToken();
+    final String url = _base + "/devices/" + registrationID;
+    final String auth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    final Map<String, dynamic> params = {
+      'registration_id': registrationID,
+      'active': activate,
+    };
+    final Response response =
+        await http.put(url, headers: {'Authorizaton': auth}, body: params);
+    return ((response.statusCode / 100).floor() == 2);
+  }
+
+  static Future<bool> getActivationForDevice(
+      final String username, final String password) async {
+    final String registrationID =
+        await storage.read(key: 'gradeviewfirebaseregistrationid') ??
+            await firebaseMessaging.getToken();
+    final String url = _base + "/devices/" + registrationID;
+    final String auth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    final Response response =
+        await http.get(url, headers: {'Authorization': auth});
+    return jsonDecode(response.body)['active'].toString() == 'true';
   }
 }
 
@@ -32,24 +100,21 @@ class Assignment {
   String notes;
 
   Assignment(
-      final String name,
-      final String assignmentType,
+      final this.name,
+      final this.assignmentType,
       final String date,
       final String dueDate,
       final String achievedScore,
       final String maxScore,
       final String achievedPoints,
       final String maxPoints,
-      final String notes)
-      : name = name,
-        assignmentType = assignmentType,
-        date = DateTime.parse(date),
+      final this.notes)
+      : date = DateTime.parse(date),
         dueDate = DateTime.parse(dueDate),
         achievedScore = double.parse(achievedScore),
         maxScore = double.parse(maxScore),
         achievedPoints = double.parse(achievedPoints),
-        maxPoints = double.parse(maxPoints),
-        notes = notes;
+        maxPoints = double.parse(maxPoints);
 
   Assignment.fromJson(final Map<String, dynamic> json) {
     name = json['name'];
@@ -117,7 +182,7 @@ class Breakdown {
   }
 
   List<DataRow> getDataRows() {
-    List<DataRow> out = new List<DataRow>(weightings.length);
+    List<DataRow> out = List<DataRow>(weightings.length);
     for (int i = 0; i < weightings.length; i++) {
       out[i] = getDataRow(i);
     }
@@ -138,19 +203,14 @@ class Course {
 
   Course(
       final String period,
-      final String name,
-      final String id,
-      final String location,
-      final String letterGrade,
+      final this.name,
+      final this.id,
+      final this.location,
+      final this.letterGrade,
       final String percentage,
-      final String teacher)
+      final this.teacher)
       : period = int.parse(period),
-        name = name,
-        id = id,
-        location = location,
-        letterGrade = letterGrade,
-        percentage = double.parse(percentage),
-        teacher = teacher;
+        percentage = double.parse(percentage);
 
   Course.fromJson(final Map<String, dynamic> json)
       : period = json['period'],
@@ -161,29 +221,19 @@ class Course {
             .substring(json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")))
             .trim(),
         location = json['location'],
-        letterGrade = json['grades']['third_quarter']['letter'], //TODO
-        percentage =
-            double.parse(json['grades']['third_quarter']['percentage']), //TODO
+        letterGrade =
+            json['grades'][json['grades'].keys.first]['letter'], //TODO
+        percentage = double.parse(
+            json['grades'][json['grades'].keys.first]['percentage']), //TODO
         teacher = json['teacher'] {
     assignments = <Assignment>[];
     breakdown = Breakdown();
     breakdown.weightings = <Weighting>[];
-    // period = json['period'];
-    // name = json['name']
-    //     .toString()
-    //     .substring(0, json['name'].toString().indexOf(RegExp(r"\([0-9A-Z]+\)")))
-    //     .trim();
-    // id = json['name']
-    //     .substring(json['name'].toString().indexOf(name) + name.length)
-    //     .trim();
-    // location = json['location'];
-    // letterGrade = json['grades']['third_quarter']['letter'];
-    // percentage = double.tryParse(json['grades']['third_quarter']['percentage']);
-    // teacher = json['teacher'];
     json['assignments']
         .forEach((final f) => assignments.add(Assignment.fromJson(f)));
-    json['grades']['third_quarter']['breakdown'].forEach((final k, final v) =>
-        breakdown.weightings.add(Weighting.fromJson(k, v)));
+    json['grades'][json['grades'].keys.first]['breakdown'].forEach(
+        (final k, final v) =>
+            breakdown.weightings.add(Weighting.fromJson(k, v)));
     breakdown.weightings.sort((final Weighting a, final Weighting b) =>
         a.name == "TOTAL"
             ? double.maxFinite.toInt()
@@ -191,7 +241,15 @@ class Course {
   }
 
   Map<String, String> toJson() {
-    return null; //TODO
+    return {
+      'period': period.toString(),
+      'name': name,
+      'id': id,
+      'location': location,
+      'letterGrade': letterGrade,
+      'percentage': percentage.toString(),
+      'teacher': teacher
+    };
   }
 }
 
@@ -203,11 +261,8 @@ class User {
   List<Course> courses;
   //name
 
-  User(final String username, final String school, final String grade,
-      final String photo)
-      : username = username,
-        school = school,
-        grade = int.parse(grade),
+  User(final this.username, final this.school, final grade, final String photo)
+      : grade = int.parse(grade),
         photo = Image.memory(base64.decode(photo), scale: 0.6);
 
   User.fromJson(final Map<String, dynamic> json)
@@ -229,15 +284,13 @@ class Weighting {
   final double achievedPoints, maxPoints;
 
   Weighting(
-      final String name,
+      final this.name,
       final String weight,
-      final String letterGrade,
+      final this.letterGrade,
       final String percentage,
       final String achievedPoints,
       final String maxPoints)
-      : name = name,
-        weight = double.parse(weight),
-        letterGrade = letterGrade,
+      : weight = double.parse(weight),
         percentage = double.parse(percentage),
         achievedPoints = double.parse(achievedPoints),
         maxPoints = double.parse(maxPoints);

@@ -14,7 +14,7 @@ An app for FCPS SIS.
  - [ ] add bitrise integration
  - [ ] implement push notifications
  - [ ] cache grades and create graphs of grades over time
- - [ ] don't store password longer than it needs to be stored
+ - [x] don't store password longer than it needs to be stored
  - [ ] add screenshots to README
  - [ ] implement methods for all API classes
  - [ ] make `Breakdown` class extend `List<Weighting>` instead of 'having' one
@@ -22,3 +22,5 @@ An app for FCPS SIS.
  - [ ] double clicking login button causes courses to show up twice
  - [ ] allow swiping in `HomePage` (use `TabBar`?)
  - [ ] use `FutureBuilder` when retrieving courses
+ - [ ] fix `DataTable` on small devices
+ - [ ] make `getUser` and `getGrades` methods in `API` return `Future<bool>`
