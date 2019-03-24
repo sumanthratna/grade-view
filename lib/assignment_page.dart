@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'api.dart' show Course, Assignment;
 import 'custom_widgets.dart' show Info;
+import 'globals.dart' show decoration;
 
 class AssignmentPage extends StatelessWidget {
   final Course course;
@@ -46,12 +47,7 @@ class AssignmentPage extends StatelessWidget {
     final body = Container(
         width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(28.0),
-        decoration: const BoxDecoration(
-          gradient: const LinearGradient(colors: [
-            Colors.blue,
-            Colors.lightBlueAccent,
-          ]),
-        ),
+        decoration: decoration,
         child: Column(children: <Widget>[
           backButton,
           Center(
@@ -61,10 +57,45 @@ class AssignmentPage extends StatelessWidget {
           Expanded(child: assignmentInfo)
         ]));
 
-    return Scaffold(body: body);
+    return Scaffold(body: body, floatingActionButton: _getDeleteFab(context));
   }
 
-  String _formatDate(DateTime arg) {
+  void _delete(final BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+                title: const Text('Delete Assignment'),
+                content: const Text(
+                    'Are you sure you want to delete this assignment? This action cannot be undone.'),
+                actions: <FlatButton>[
+                  FlatButton(
+                      child: const Text('No'),
+                      onPressed: () => Navigator.pop(context)),
+                  FlatButton(
+                      child: const Text('Yes'),
+                      onPressed: () {
+                        course.assignments = List.from(course.assignments)
+                          ..remove(assignment);
+                        //TODO recalculate breakdown
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      })
+                ]));
+  }
+
+  Widget _getDeleteFab(final BuildContext context) {
+    if (assignment.real) {
+      return Container();
+    }
+    return FloatingActionButton(
+        tooltip: 'Remove this Assignment',
+        heroTag: 'remove',
+        child: const Icon(Icons.delete, color: Colors.white),
+        onPressed: () => _delete(context),
+        backgroundColor: Colors.red);
+  }
+
+  String _formatDate(final DateTime arg) {
     return arg.month.toString() +
         "/" +
         arg.day.toString() +

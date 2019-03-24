@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
 
+class DropdownFormField extends StatefulWidget {
+  final List<DropdownMenuItem> items;
+  final void Function(String) onSaved;
+  final String Function(String) validator;
+  final InputDecoration decoration;
+
+  DropdownFormField(
+      {final Key key,
+      @required final this.items,
+      @required final this.onSaved,
+      @required final this.validator,
+      @required final this.decoration})
+      : super(key: key);
+
+  @override
+  State<DropdownFormField> createState() => _DropdownFormFieldState();
+}
+
 class Info extends StatelessWidget {
   final String left, right;
-  final Function onTap;
+  final VoidCallback onTap;
   Info(
-      {Key key,
-      @required this.left,
-      @required this.right,
-      @required this.onTap})
+      {final Key key,
+      @required final this.left,
+      @required final this.right,
+      @required final this.onTap})
       : super(key: key);
   @override
   Widget build(final BuildContext context) {
@@ -39,14 +57,14 @@ class Info extends StatelessWidget {
 
 class InputText extends StatelessWidget {
   final TextEditingController controller;
-  final TextInputType inputType;
+  final TextInputType keyboardType;
   final bool autofocus;
   final bool obscureText;
   final String helpText;
   const InputText(
-      {@required final Key key,
+      {final Key key,
       @required final this.controller,
-      @required final this.inputType,
+      @required final this.keyboardType,
       @required final this.obscureText,
       @required final this.helpText,
       @required final this.autofocus})
@@ -57,7 +75,7 @@ class InputText extends StatelessWidget {
     return TextFormField(
       key: key,
       controller: controller,
-      keyboardType: inputType,
+      keyboardType: keyboardType,
       autofocus: autofocus,
       obscureText: obscureText,
       decoration: InputDecoration(
@@ -65,6 +83,39 @@ class InputText extends StatelessWidget {
         contentPadding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
+    );
+  }
+}
+
+class LogoutBar extends StatelessWidget implements PreferredSizeWidget {
+  final VoidCallback onTap;
+  final AppBar appBar;
+
+  LogoutBar({final Key key, @required this.onTap, @required this.appBar})
+      : super(key: key);
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(final BuildContext context) {
+    return GestureDetector(onTap: onTap, child: appBar);
+  }
+}
+
+class _DropdownFormFieldState extends State<DropdownFormField> {
+  String _value;
+
+  @override
+  Widget build(final BuildContext context) {
+    return DropdownButtonFormField<String>(
+      value: _value,
+      items: widget.items,
+      onSaved: widget.onSaved,
+      decoration: widget.decoration,
+      validator: widget.validator,
+      onChanged: (final String value) {
+        setState(() => _value = value);
+      },
     );
   }
 }

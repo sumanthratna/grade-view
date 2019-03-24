@@ -5,31 +5,38 @@ import 'package:flutter/material.dart';
 import 'package:grade_view/api.dart' show API, User;
 import 'package:grade_view/home_page.dart' show HomePage;
 import 'package:http/http.dart' show Response;
+import 'package:modal_progress_hud/modal_progress_hud.dart'
+    show ModalProgressHUD;
 
 import 'custom_exceptions.dart';
 import 'custom_widgets.dart' show InputText;
-import 'globals.dart';
+import 'globals.dart' show user, storage;
 
-class LoginPage extends StatelessWidget {
-  static const String tag = 'login-page';
-  static const SnackBar incorrectCredentials = const SnackBar(
-      content: const Text('Incorrect Username or Password'),
-      duration: const Duration(seconds: 5));
-  static const SnackBar noInternet = const SnackBar(
-      content: const Text('No Internet Connection'),
-      duration: const Duration(seconds: 10));
-  static const SnackBar enterUsername = const SnackBar(
-          content: const Text('Please Enter a Username'),
-          duration: const Duration(seconds: 5)),
-      enterPassword = const SnackBar(
-          content: const Text('Please Enter a Password'),
-          duration: const Duration(seconds: 5)),
-      enterBoth = const SnackBar(
-          content: const Text('Please Enter a Username and Password'),
-          duration: const Duration(seconds: 5));
+class LoginPage extends StatefulWidget {
+  static const String tag = '/';
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  static const SnackBar incorrectCredentials = SnackBar(
+      content: Text('Incorrect Username or Password'),
+      duration: Duration(seconds: 5));
+  static const SnackBar noInternet = SnackBar(
+      content: Text('No Internet Connection'), duration: Duration(seconds: 10));
+  static const SnackBar enterUsername = SnackBar(
+          content: Text('Please Enter a Username'),
+          duration: Duration(seconds: 5)),
+      enterPassword = SnackBar(
+          content: Text('Please Enter a Password'),
+          duration: Duration(seconds: 5)),
+      enterBoth = SnackBar(
+          content: Text('Please Enter a Username and Password'),
+          duration: Duration(seconds: 5));
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final _usernameController = TextEditingController(),
+  final TextEditingController _usernameController = TextEditingController(),
       _passwordController = TextEditingController();
+  bool _loginButtonEnabled = true, _loading = false;
 
   @override
   Widget build(final BuildContext context) {
@@ -45,7 +52,7 @@ class LoginPage extends StatelessWidget {
     final username = InputText(
         key: const Key('username'),
         controller: _usernameController,
-        inputType: TextInputType.number,
+        keyboardType: TextInputType.number,
         autofocus: true,
         obscureText: false,
         helpText: 'Username');
@@ -53,7 +60,7 @@ class LoginPage extends StatelessWidget {
     final password = InputText(
         key: const Key('password'),
         controller: _passwordController,
-        inputType: TextInputType.text,
+        keyboardType: TextInputType.text,
         autofocus: false,
         obscureText: true,
         helpText: 'Password');
@@ -92,85 +99,125 @@ class LoginPage extends StatelessWidget {
       }
     },
      */
-            onPressed: () async {
-              try {
-                final String usernameInput = _usernameController.text.trim(),
-                    passwordInput = _passwordController.text.trim();
-                if (usernameInput.isEmpty && passwordInput.isNotEmpty) {
-                  throw NoUsernameException();
-                } else if (usernameInput.isNotEmpty && passwordInput.isEmpty) {
-                  throw NoPasswordException();
-                } else if (usernameInput.isEmpty && passwordInput.isEmpty) {
-                  throw NoCredentialsException();
-                }
-                final Response response =
-                    await API.getUser(usernameInput, passwordInput);
-                print('status code ' + response.statusCode.toString());
-                if ((response.statusCode / 100).floor() == 2) {
-                  user = User.fromJson(jsonDecode(response.body));
-                  storage.write(key: "gradeviewpassword", value: passwordInput);
-                  _scaffoldKey.currentState.removeCurrentSnackBar();
-                  Navigator.of(context).pushNamed(HomePage.tag);
-                  /* Navigator.of(context).pushNamedAndRemoveUntil(
+            onPressed: _loginButtonEnabled
+                ? () async {
+                    setState(() {
+                      _loginButtonEnabled = false;
+                      _loading = true;
+                    });
+                    try {
+                      final String usernameInput =
+                              _usernameController.text.trim(),
+                          passwordInput = _passwordController.text.trim();
+                      if (usernameInput.isEmpty && passwordInput.isNotEmpty) {
+                        throw NoUsernameException();
+                      } else if (usernameInput.isNotEmpty &&
+                          passwordInput.isEmpty) {
+                        throw NoPasswordException();
+                      } else if (usernameInput.isEmpty &&
+                          passwordInput.isEmpty) {
+                        throw NoCredentialsException();
+                      }
+                      final Response response =
+                          await API.getUser(usernameInput, passwordInput);
+                      print('status code ' + response.statusCode.toString());
+                      if ((response.statusCode / 100).floor() == 2) {
+                        user = User.fromJson(jsonDecode(response.body));
+                        storage.write(
+                            key: "gradeviewpassword", value: passwordInput);
+                        _scaffoldKey.currentState.removeCurrentSnackBar();
+                        Navigator.push(context, MaterialPageRoute(builder: (final BuildContext context) => HomePage()))
+                            .then((onValue) {
+                          setState(() {
+                            _loginButtonEnabled = true;
+                            _loading = false;
+                          });
+                        });
+                        /* Navigator.of(context).pushNamedAndRemoveUntil(
                       HomePage.tag, ModalRoute.withName(HomePage.tag));*/
-                } else {
-                  if ((response.statusCode / 100).floor() == 4) {
-                    throw IncorrectCredentialsException();
-                  } else {
-                    //triggers the else in the catch
-                    throw Exception(
-                        'Status Code ' + response.statusCode.toString());
+                      } else {
+                        if ((response.statusCode / 100).floor() == 4) {
+                          throw IncorrectCredentialsException();
+                        } else {
+                          //triggers the else in the catch
+                          throw Exception(
+                              'Status Code ' + response.statusCode.toString());
+                        }
+                      }
+                    } catch (e) {
+                      setState(() {
+                        _loginButtonEnabled = true;
+                        _loading = false;
+                      });
+                      if (e is NoUsernameException) {
+                        showSnackBar(enterUsername);
+                      } else if (e is NoPasswordException) {
+                        showSnackBar(enterPassword);
+                      } else if (e is NoCredentialsException) {
+                        showSnackBar(enterBoth);
+                      } else if (e is IncorrectCredentialsException) {
+                        showSnackBar(incorrectCredentials);
+                      } else if (e is SocketException) {
+                        showSnackBar(noInternet);
+                      } else {
+                        showSnackBar(e);
+                      }
+                    }
                   }
-                }
-              } catch (e) {
-                if (e is NoUsernameException) {
-                  showSnackBar(enterUsername);
-                } else if (e is NoPasswordException) {
-                  showSnackBar(enterPassword);
-                } else if (e is NoCredentialsException) {
-                  showSnackBar(enterBoth);
-                } else if (e is IncorrectCredentialsException) {
-                  showSnackBar(incorrectCredentials);
-                } else if (e is SocketException) {
-                  showSnackBar(noInternet);
-                } else {
-                  showSnackBar(e);
-                }
-              }
-            },
+                : null,
             padding: const EdgeInsets.all(12),
             color: Colors.lightBlueAccent,
-            child: const Text('Log In',
-                style: const TextStyle(color: Colors.white))));
+            child:
+                const Text('Log In', style: TextStyle(color: Colors.white))));
 
     return Scaffold(
         key: _scaffoldKey,
         backgroundColor: Colors.white,
-        body: Center(
-            child: ListView(
-                shrinkWrap: true,
-                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                children: <Widget>[
-              logo,
-              const SizedBox(height: 48.0),
-              username,
-              const SizedBox(height: 8.0),
-              password,
-              const SizedBox(height: 24.0),
-              loginButton,
-              // const SizedBox(height: 180.0)
-            ])));
+        body: ModalProgressHUD(
+            child: Center(
+                child: ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                    children: <Widget>[
+                  logo,
+                  const SizedBox(height: 48.0),
+                  username,
+                  const SizedBox(height: 8.0),
+                  password,
+                  const SizedBox(height: 24.0),
+                  loginButton,
+                  // const SizedBox(height: 180.0)
+                ])),
+            inAsyncCall: _loading));
   }
 
-  void showSnackBar(final SnackBar arg) {
-    _scaffoldKey.currentState.removeCurrentSnackBar();
-    _scaffoldKey.currentState.showSnackBar(arg);
+  @override
+  void dispose() {
+    super.dispose();
   }
 
-  void showSnackbar(final Exception e) {
+  @protected
+  @override
+  @mustCallSuper
+  void initState() {
+    super.initState();
+    setState(() {
+      _loginButtonEnabled = true;
+    });
+  }
+
+  void showSnackBar(final dynamic arg) {
     _scaffoldKey.currentState.removeCurrentSnackBar();
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text("Unexpected Error (" + e.toString() + ")"),
-        duration: const Duration(seconds: 10)));
+    if (arg is SnackBar) {
+      _scaffoldKey.currentState.showSnackBar(arg);
+    } else if (arg is Exception) {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+          content: Text(arg.toString()),
+          duration: const Duration(seconds: 10)));
+    } else {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+          content: Text(arg.toString()),
+          duration: const Duration(seconds: 10)));
+    }
   }
 }

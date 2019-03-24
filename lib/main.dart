@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart' show LoginPage;
-import 'home_page.dart' show HomePage;
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  final routes = <String, WidgetBuilder>{
-    LoginPage.tag: (final context) => LoginPage(),
-    HomePage.tag: (final context) => HomePage(),
-  };
 
   @override
   Widget build(final BuildContext context) {
@@ -20,7 +15,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Nunito',
       ),
       home: LoginPage(),
-      routes: routes,
+      initialRoute: LoginPage.tag,
     );
   }
 }

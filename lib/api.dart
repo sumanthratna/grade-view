@@ -5,7 +5,6 @@ import 'dart:math' show Random;
 
 import 'package:flutter/material.dart'
     show Text, Image, DataRow, DataColumn, DataCell;
-// import 'package:device_id/device_id.dart' show DeviceId;
 import 'package:http/http.dart' as http show get, post, put;
 import 'package:http/http.dart' show Response;
 
@@ -13,6 +12,19 @@ import 'globals.dart' show firebaseMessaging, storage;
 
 class API {
   static const String _base = "https://sisapi.sites.tjhsst.edu";
+  static Future<bool> getActivationForDevice(
+      final String username, final String password) async {
+    final String registrationID =
+        await storage.read(key: 'gradeviewfirebaseregistrationid') ??
+            await firebaseMessaging.getToken();
+    final String url = _base + "/devices/" + registrationID;
+    final String auth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+    final Response response =
+        await http.get(url, headers: {'Authorization': auth});
+    return jsonDecode(response.body)['active'].toString() == 'true';
+  }
+
   static Future<Response> getGrades(
       final String username, final String password) {
     final String url = _base + "/grades/";
@@ -56,7 +68,7 @@ class API {
     };
     final Response response =
         await http.post(url, headers: {'Authorization': auth}, body: device);
-    return ((response.statusCode / 100).floor() == 2);
+    return Future.value((response.statusCode / 100).floor() == 2);
   }
 
   static Future<bool> setActivationForDevice(
@@ -73,20 +85,7 @@ class API {
     };
     final Response response =
         await http.put(url, headers: {'Authorizaton': auth}, body: params);
-    return ((response.statusCode / 100).floor() == 2);
-  }
-
-  static Future<bool> getActivationForDevice(
-      final String username, final String password) async {
-    final String registrationID =
-        await storage.read(key: 'gradeviewfirebaseregistrationid') ??
-            await firebaseMessaging.getToken();
-    final String url = _base + "/devices/" + registrationID;
-    final String auth =
-        'Basic ' + base64Encode(utf8.encode('$username:$password'));
-    final Response response =
-        await http.get(url, headers: {'Authorization': auth});
-    return jsonDecode(response.body)['active'].toString() == 'true';
+    return Future.value((response.statusCode / 100).floor() == 2);
   }
 }
 
@@ -98,23 +97,19 @@ class Assignment {
   double achievedScore, maxScore;
   double achievedPoints, maxPoints;
   String notes;
+  bool real = true;
 
   Assignment(
       final this.name,
       final this.assignmentType,
-      final String date,
-      final String dueDate,
-      final String achievedScore,
-      final String maxScore,
-      final String achievedPoints,
-      final String maxPoints,
-      final this.notes)
-      : date = DateTime.parse(date),
-        dueDate = DateTime.parse(dueDate),
-        achievedScore = double.parse(achievedScore),
-        maxScore = double.parse(maxScore),
-        achievedPoints = double.parse(achievedPoints),
-        maxPoints = double.parse(maxPoints);
+      final this.date,
+      final this.dueDate,
+      final this.achievedScore,
+      final this.maxScore,
+      final this.achievedPoints,
+      final this.maxPoints,
+      final this.notes,
+      {final this.real});
 
   Assignment.fromJson(final Map<String, dynamic> json) {
     name = json['name'];
@@ -143,6 +138,10 @@ class Assignment {
       'max_points': maxPoints.toString(),
       'notes': notes
     };
+  }
+
+  String toString() {
+    return toJson().toString();
   }
 }
 
@@ -185,6 +184,14 @@ class Breakdown {
     List<DataRow> out = List<DataRow>(weightings.length);
     for (int i = 0; i < weightings.length; i++) {
       out[i] = getDataRow(i);
+    }
+    return out;
+  }
+
+  Map<String, double> toJson() {
+    Map<String, double> out = Map<String, double>();
+    for (final Weighting weighting in weightings) {
+      out[weighting.name] = weighting.percentage;
     }
     return out;
   }
@@ -251,6 +258,10 @@ class Course {
       'teacher': teacher
     };
   }
+
+  String toString() {
+    return toJson().toString();
+  }
 }
 
 class User {
@@ -273,6 +284,10 @@ class User {
 
   Map<String, String> toJson() {
     return {'username': username, 'school': school, 'grade': grade.toString()};
+  }
+
+  String toString() {
+    return toJson().toString();
   }
 }
 
@@ -312,5 +327,9 @@ class Weighting {
       'achieved_points': achievedPoints.toString(),
       'max_points': maxPoints.toString()
     };
+  }
+
+  String toString() {
+    return toJson().toString();
   }
 }

@@ -2,38 +2,37 @@ import 'dart:convert' show jsonDecode;
 
 import 'package:flutter/material.dart';
 import 'package:grade_view/api.dart' show API, Course;
+import 'package:modal_progress_hud/modal_progress_hud.dart'
+    show ModalProgressHUD;
 
-import 'api.dart';
+import 'api.dart' show API, Course;
 import 'course_page.dart' show CoursePage;
-import 'custom_widgets.dart' show Info;
-import 'globals.dart' show user, storage;
+import 'custom_widgets.dart' show Info, LogoutBar;
+import 'globals.dart' show user, storage, decoration;
 
 class HomePage extends StatefulWidget {
-  static const String tag = 'home-page';
-
   @override
-  _MainState createState() => _MainState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MainState extends State<HomePage> {
+class _HomePageState extends State<HomePage> {
   int _currentIndex = 0; //for bottom navigation
-  bool _active = false; //for device
+  bool _firebaseDeviceActive = false; //for device
+  bool _loading = true;
 
   final List<Widget> _screens = <Widget>[];
+
   @override
   Widget build(final BuildContext context) {
     if (user.courses == null || user.courses.isEmpty) {
-      return const Center(child: const CircularProgressIndicator());
+      return Container(decoration: decoration);
     }
 
     final img = Hero(
         tag: 'img',
         child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Container(
-                child: user.photo,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 8.0)))));
+            child: Container(child: user.photo, decoration: decoration)));
 
     final welcome = Padding(
       padding: const EdgeInsets.all(8.0),
@@ -59,14 +58,17 @@ class _MainState extends State<HomePage> {
             padding: const EdgeInsets.all(10.0),
             child: Center(
                 child: RichText(
-                    text: TextSpan(children: <TextSpan>[
-              TextSpan(
-                  text: user.courses[index].name,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(
-                  text: " " + user.courses[index].id,
-                  style: const TextStyle(fontWeight: FontWeight.normal)),
-            ], style: const TextStyle(fontSize: 16.0, color: Colors.white)))));
+                    text: TextSpan(
+                        style: const TextStyle(
+                            fontSize: 16.0, color: Colors.white),
+                        children: <TextSpan>[
+                  TextSpan(
+                      text: user.courses[index].name,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(
+                      text: " " + user.courses[index].id,
+                      style: const TextStyle(fontWeight: FontWeight.normal)),
+                ]))));
       },
     );
 
@@ -74,12 +76,7 @@ class _MainState extends State<HomePage> {
       key: const Key('base'),
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.all(28.0),
-      decoration: const BoxDecoration(
-        gradient: const LinearGradient(colors: [
-          Colors.blue,
-          Colors.lightBlueAccent,
-        ]),
-      ),
+      decoration: decoration,
       child: Column(
         children: <Widget>[img, welcome, school, Expanded(child: classes)],
       ),
@@ -98,7 +95,8 @@ class _MainState extends State<HomePage> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (final context) =>
+                        settings: RouteSettings(name: 'course-page'),
+                        builder: (final BuildContext context) =>
                             CoursePage(course: user.courses[index])));
               });
         });
@@ -106,22 +104,20 @@ class _MainState extends State<HomePage> {
     final gradesScreen = Container(
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.all(28.0),
-      decoration: const BoxDecoration(
-          gradient: const LinearGradient(
-              colors: [Colors.blue, Colors.lightBlueAccent])),
+      decoration: decoration,
       child: Column(children: <Widget>[
         const Padding(
-            padding: const EdgeInsets.only(top: 40.0, bottom: 5.0),
-            child: const Text("Grades",
-                style: const TextStyle(fontSize: 32.0, color: Colors.white))),
+            padding: EdgeInsets.only(top: 40.0, bottom: 5.0),
+            child: Text("Grades",
+                style: TextStyle(fontSize: 32.0, color: Colors.white))),
         Expanded(child: grades)
       ]),
     );
 
     final settings = SwitchListTile(
         title: const Text("Enable push notifications",
-            style: const TextStyle(color: Colors.white)),
-        value: _active,
+            style: TextStyle(color: Colors.white)),
+        value: _firebaseDeviceActive,
         onChanged: (final bool newValue) async {
           if (newValue) {
             await API.registerDevice(
@@ -135,14 +131,12 @@ class _MainState extends State<HomePage> {
     final settingsScreen = Container(
         width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(28.0),
-        decoration: const BoxDecoration(
-            gradient: const LinearGradient(
-                colors: [Colors.blue, Colors.lightBlueAccent])),
+        decoration: decoration,
         child: Column(children: <Widget>[
           const Padding(
-              padding: const EdgeInsets.only(top: 40.0, bottom: 5.0),
-              child: const Text("Settings",
-                  style: const TextStyle(fontSize: 32.0, color: Colors.white))),
+              padding: EdgeInsets.only(top: 40.0, bottom: 5.0),
+              child: Text("Settings",
+                  style: TextStyle(fontSize: 32.0, color: Colors.white))),
           settings
         ]));
 
@@ -155,43 +149,49 @@ class _MainState extends State<HomePage> {
         onTap: navigate,
         currentIndex: _currentIndex,
         items: const <BottomNavigationBarItem>[
-          const BottomNavigationBarItem(
-              icon: const Icon(Icons.person), title: const Text('Home')),
-          const BottomNavigationBarItem(
-              icon: const Icon(Icons.school), title: const Text('Grades')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person), title: Text('Home')),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.school), title: Text('Grades')),
           // const BottomNavigationBarItem(
           // icon: const Icon(Icons.show_chart), title: const Text('Charts')),
-          const BottomNavigationBarItem(
-              icon: const Icon(Icons.settings), title: const Text('Settings'))
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), title: Text('Settings'))
         ]);
 
-    return Scaffold(
-      appBar: AppBar(
-          title: GestureDetector(
-              child: Text('Logout', style: TextStyle(color: Colors.white)),
+    return ModalProgressHUD(
+        color: Colors.white,
+        inAsyncCall: _loading,
+        child: Scaffold(
+          appBar: LogoutBar(
+              appBar: AppBar(
+                  title: const Text('Logout',
+                      style: TextStyle(color: Colors.white)),
+                  iconTheme: const IconThemeData(color: Colors.white),
+                  centerTitle: false),
               onTap: () {
-                Navigator.of(context).pop();
+                Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
               }),
-          iconTheme: const IconThemeData(color: Colors.white),
-          centerTitle: false),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: navBar,
-    );
+          body: _screens[_currentIndex],
+          bottomNavigationBar: navBar,
+        ));
   }
 
   void fetchActive() async {
-    _active = await API.getActivationForDevice(
+    _firebaseDeviceActive = await API.getActivationForDevice(
         user.username, await storage.read(key: 'gradeviewpassword'));
   }
 
   void fetchUser() async {
     user.courses = [];
-    final courses = jsonDecode((await API.getGrades(
+    final unparsed = jsonDecode((await API.getGrades(
             user.username, await storage.read(key: 'gradeviewpassword')))
         .body)['courses'];
-    courses.forEach(
-        (f) => user.courses.add(Course.fromJson(f as Map<String, dynamic>)));
-    setState(() {});
+    unparsed.forEach((final f) =>
+        user.courses.add(Course.fromJson(f as Map<String, dynamic>)));
+    setState(() {
+      _loading = false;
+    });
     //cache grades
     await storage.delete(key: 'gradeviewpassword');
   }
