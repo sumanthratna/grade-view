@@ -1,4 +1,5 @@
 import 'dart:async' show Future;
+import 'dart:collection' show ListBase;
 import 'dart:convert' show base64, base64Encode, utf8, jsonDecode;
 import 'dart:io' show Platform;
 import 'dart:math' show Random;
@@ -9,6 +10,9 @@ import 'package:http/http.dart' as http show get, post, put;
 import 'package:http/http.dart' show Response;
 
 import 'globals.dart' show firebaseMessaging, storage;
+
+int mantissaLength(final String arg) =>
+    (arg.length - arg.lastIndexOf(RegExp(r"\.")));
 
 class API {
   static const String _base = "https://sisapi.sites.tjhsst.edu";
@@ -145,8 +149,34 @@ class Assignment {
   }
 }
 
-class Breakdown {
-  List<Weighting> weightings;
+class Breakdown extends ListBase<Weighting> {
+  List<Weighting> _weightings;
+
+  Breakdown() : _weightings = [];
+
+  int get length => _weightings.length;
+  set length(final int length) => _weightings.length = length;
+  Weighting operator [](final dynamic arg) {
+    if (arg is int) {
+      /// The argument is an index
+      return _weightings[arg];
+    } else if (arg is String) {
+      /// The argument is the name of the desired Weighting.
+      /// Creates map-like behavior.
+      return _weightings[
+          _weightings.map((final Weighting f) => f.name).toList().indexOf(arg)];
+    } else {
+      return null;
+    }
+  }
+  void operator []=(final int index, Weighting value) =>
+      _weightings[index] = value;
+
+  void add(Weighting value) => _weightings.add(value);
+  void addAll(Iterable<Weighting> all) => _weightings.addAll(all);
+
+  // /// This creates map-like behavior (inefficient).
+  // Weighting operator [](final String name) => _weightings[_weightings.map((final Weighting f) => f.name).toList().indexOf(name)];
 
   List<DataColumn> getDataColumns() {
     return <DataColumn>[
@@ -170,7 +200,7 @@ class Breakdown {
 
   DataRow getDataRow(final int index) {
     assert(index >= 0);
-    final weighting = weightings[index];
+    final weighting = _weightings[index];
     return DataRow.byIndex(index: index, cells: <DataCell>[
       DataCell(Text('${weighting.name}'), onTap: () {}),
       DataCell(Text('${weighting.percentage}%'), onTap: () {}),
@@ -181,8 +211,8 @@ class Breakdown {
   }
 
   List<DataRow> getDataRows() {
-    List<DataRow> out = List<DataRow>(weightings.length);
-    for (int i = 0; i < weightings.length; i++) {
+    List<DataRow> out = List<DataRow>(_weightings.length);
+    for (int i = 0; i < _weightings.length; i++) {
       out[i] = getDataRow(i);
     }
     return out;
@@ -190,10 +220,14 @@ class Breakdown {
 
   Map<String, double> toJson() {
     Map<String, double> out = Map<String, double>();
-    for (final Weighting weighting in weightings) {
+    for (final Weighting weighting in _weightings) {
       out[weighting.name] = weighting.percentage;
     }
     return out;
+  }
+
+  String toString() {
+    return toJson().toString();
   }
 }
 
@@ -207,6 +241,7 @@ class Course {
   List<Assignment> assignments;
   final String teacher;
   Breakdown breakdown;
+  final int courseMantissaLength;
 
   Course(
       final String period,
@@ -217,7 +252,8 @@ class Course {
       final String percentage,
       final this.teacher)
       : period = int.parse(period),
-        percentage = double.parse(percentage);
+        percentage = double.parse(percentage),
+        courseMantissaLength = mantissaLength(percentage.toString());
 
   Course.fromJson(final Map<String, dynamic> json)
       : period = json['period'],
@@ -228,23 +264,22 @@ class Course {
             .substring(json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")))
             .trim(),
         location = json['location'],
-        letterGrade =
-            json['grades'][json['grades'].keys.first]['letter'], //TODO
+        letterGrade = json['grades'][json['grades'].keys.first]['letter'],
         percentage = double.parse(
-            json['grades'][json['grades'].keys.first]['percentage']), //TODO
-        teacher = json['teacher'] {
-    assignments = <Assignment>[];
-    breakdown = Breakdown();
-    breakdown.weightings = <Weighting>[];
+            json['grades'][json['grades'].keys.first]['percentage']),
+        teacher = json['teacher'],
+        courseMantissaLength = mantissaLength(
+            json['grades'][json['grades'].keys.first]['percentage']),
+        assignments = <Assignment>[],
+        breakdown = Breakdown() {
     json['assignments']
         .forEach((final f) => assignments.add(Assignment.fromJson(f)));
     json['grades'][json['grades'].keys.first]['breakdown'].forEach(
-        (final k, final v) =>
-            breakdown.weightings.add(Weighting.fromJson(k, v)));
-    breakdown.weightings.sort((final Weighting a, final Weighting b) =>
-        a.name == "TOTAL"
-            ? double.maxFinite.toInt()
-            : a.name.compareTo(b.name));
+        (final String k, final dynamic v) =>
+            breakdown.add(Weighting.fromJson(k, v as Map<String, dynamic>)));
+    breakdown.sort((final Weighting a, final Weighting b) => a.name == "TOTAL"
+        ? double.maxFinite.toInt()
+        : a.name.compareTo(b.name));
   }
 
   Map<String, String> toJson() {

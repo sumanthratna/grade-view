@@ -1,13 +1,10 @@
 import 'dart:convert' show jsonDecode;
 
 import 'package:flutter/material.dart';
-import 'package:grade_view/api.dart' show API, Course;
-import 'package:modal_progress_hud/modal_progress_hud.dart'
-    show ModalProgressHUD;
 
 import 'api.dart' show API, Course;
 import 'course_page.dart' show CoursePage;
-import 'custom_widgets.dart' show Info, LogoutBar;
+import 'custom_widgets.dart' show LogoutBar, LoadingIndicator, Info;
 import 'globals.dart' show user, storage, decoration;
 
 class HomePage extends StatefulWidget {
@@ -18,21 +15,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0; //for bottom navigation
   bool _firebaseDeviceActive = false; //for device
-  bool _loading = true;
 
   final List<Widget> _screens = <Widget>[];
 
   @override
   Widget build(final BuildContext context) {
     if (user.courses == null || user.courses.isEmpty) {
-      return Container(decoration: decoration);
+      return const LoadingIndicator();
     }
-
     final img = Hero(
         tag: 'img',
         child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Container(child: user.photo, decoration: decoration)));
+            child: Container(
+                child: user.photo,
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 8.0)))));
 
     final welcome = Padding(
       padding: const EdgeInsets.all(8.0),
@@ -159,22 +157,20 @@ class _HomePageState extends State<HomePage> {
               icon: Icon(Icons.settings), title: Text('Settings'))
         ]);
 
-    return ModalProgressHUD(
-        color: Colors.white,
-        inAsyncCall: _loading,
-        child: Scaffold(
-          appBar: LogoutBar(
-              appBar: AppBar(
-                  title: const Text('Logout',
-                      style: TextStyle(color: Colors.white)),
-                  iconTheme: const IconThemeData(color: Colors.white),
-                  centerTitle: false),
-              onTap: () {
-                Navigator.popUntil(context, ModalRoute.withName(Navigator.defaultRouteName));
-              }),
-          body: _screens[_currentIndex],
-          bottomNavigationBar: navBar,
-        ));
+    return Scaffold(
+      appBar: LogoutBar(
+          appBar: AppBar(
+              title:
+                  const Text('Logout', style: TextStyle(color: Colors.white)),
+              iconTheme: const IconThemeData(color: Colors.white),
+              centerTitle: false),
+          onTap: () {
+            Navigator.popUntil(
+                context, ModalRoute.withName(Navigator.defaultRouteName));
+          }),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: navBar,
+    );
   }
 
   void fetchActive() async {
@@ -183,15 +179,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   void fetchUser() async {
-    user.courses = [];
     final unparsed = jsonDecode((await API.getGrades(
             user.username, await storage.read(key: 'gradeviewpassword')))
         .body)['courses'];
+    user.courses = [];
     unparsed.forEach((final f) =>
         user.courses.add(Course.fromJson(f as Map<String, dynamic>)));
-    setState(() {
-      _loading = false;
-    });
+    setState(() => user.courses = List<Course>.from(user.courses));
     //cache grades
     await storage.delete(key: 'gradeviewpassword');
   }
@@ -210,4 +204,7 @@ class _HomePageState extends State<HomePage> {
       _currentIndex = index;
     });
   }
+
+  void refreshUserCoursesList() =>
+      setState(() => user.courses = List<Course>.from(user.courses));
 }

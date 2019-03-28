@@ -9,6 +9,7 @@
 .buildlog/
 .history
 .svn/
+FIREBASE_SECRET.bat
 
 # IntelliJ related
 *.iml

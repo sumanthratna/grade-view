@@ -127,14 +127,12 @@ class _LoginPageState extends State<LoginPage> {
                             key: "gradeviewpassword", value: passwordInput);
                         _scaffoldKey.currentState.removeCurrentSnackBar();
                         Navigator.push(context, MaterialPageRoute(builder: (final BuildContext context) => HomePage()))
-                            .then((onValue) {
+                            .then((final dynamic onValue) {
                           setState(() {
                             _loginButtonEnabled = true;
                             _loading = false;
                           });
                         });
-                        /* Navigator.of(context).pushNamedAndRemoveUntil(
-                      HomePage.tag, ModalRoute.withName(HomePage.tag));*/
                       } else {
                         if ((response.statusCode / 100).floor() == 4) {
                           throw IncorrectCredentialsException();

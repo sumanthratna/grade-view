@@ -87,6 +87,23 @@ class InputText extends StatelessWidget {
   }
 }
 
+class LoadingIndicator extends StatelessWidget {
+  const LoadingIndicator({final Key key}) : super(key: key);
+
+  @override
+  Widget build(final BuildContext context) {
+    return Stack(children: <Widget>[
+      Container(),
+      const Opacity(
+          child: ModalBarrier(dismissible: false, color: Colors.transparent),
+          opacity: 0.3),
+      const Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+    ]);
+  }
+}
+
 class LogoutBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onTap;
   final AppBar appBar;
@@ -98,7 +115,7 @@ class LogoutBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(final BuildContext context) {
-    return GestureDetector(onTap: onTap, child: appBar);
+    return InkWell(onTap: onTap, child: appBar);
   }
 }
 

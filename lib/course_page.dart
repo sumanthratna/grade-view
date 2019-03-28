@@ -11,10 +11,22 @@ import 'globals.dart' show decoration;
 class AddGradeForm extends StatefulWidget {
   final Course course;
 
-  const AddGradeForm({@required final this.course});
+  const AddGradeForm({final Key key, @required final this.course})
+      : super(key: key);
 
   @override
   State<AddGradeForm> createState() => _AddGradeFormState();
+}
+
+class CalculateRequiredScoreForm extends StatefulWidget {
+  final Course course;
+
+  const CalculateRequiredScoreForm({final Key key, @required final this.course})
+      : super(key: key);
+
+  @override
+  State<CalculateRequiredScoreForm> createState() =>
+      _CalculateRequiredScoreFormState();
 }
 
 class CoursePage extends StatelessWidget {
@@ -26,11 +38,9 @@ class CoursePage extends StatelessWidget {
     showDialog(
         context: context,
         barrierDismissible: true,
-        builder: (final BuildContext context) {
-          return AlertDialog(
-              title: const Text('Add Grade'),
-              content: AddGradeForm(course: course));
-        });
+        builder: (final BuildContext context) => AlertDialog(
+            title: const Text('Add Grade'),
+            content: AddGradeForm(course: course)));
   }
 
   @override
@@ -62,7 +72,7 @@ class CoursePage extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      settings: RouteSettings(name: 'assignment-page'),
+                        settings: RouteSettings(name: 'assignment-page'),
                         builder: (final BuildContext context) => AssignmentPage(
                             course: course,
                             assignment: course.assignments[index])));
@@ -121,7 +131,14 @@ class CoursePage extends StatelessWidget {
         ]));
   }
 
-  void calculateForGrade(final BuildContext context) {}
+  void calculateForGrade(final BuildContext context) {
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (final BuildContext context) => AlertDialog(
+            title: const Text('Calculate Required Score'),
+            content: CalculateRequiredScoreForm(course: course)));
+  }
 }
 
 class _AddGradeFormState extends State<AddGradeForm> {
@@ -162,7 +179,7 @@ class _AddGradeFormState extends State<AddGradeForm> {
               decoration: const InputDecoration(
                 labelText: 'Assignment Type*',
               ),
-              items: (List<Weighting>.from(widget.course.breakdown.weightings)
+              items: (List<Weighting>.from(widget.course.breakdown)
                       .map((final Weighting f) => f.name)
                       .toList()
                         ..remove("TOTAL"))
@@ -185,7 +202,7 @@ class _AddGradeFormState extends State<AddGradeForm> {
             decoration: const InputDecoration(labelText: 'Achieved Score'),
             validator: (final String value) {
               if (value.isNotEmpty && double.tryParse(value) == null) {
-                return 'Please Enter a Valid doubleber';
+                return 'Please Enter a Valid Number';
               }
             },
             onSaved: (final String value) =>
@@ -195,7 +212,7 @@ class _AddGradeFormState extends State<AddGradeForm> {
               decoration: const InputDecoration(labelText: 'Maximum Score'),
               validator: (final String value) {
                 if (value.isNotEmpty && double.tryParse(value) == null) {
-                  return 'Please Enter a Valid doubleber';
+                  return 'Please Enter a Valid Number';
                 }
               },
               onSaved: (final String value) =>
@@ -207,7 +224,7 @@ class _AddGradeFormState extends State<AddGradeForm> {
                   return 'Please Enter a Value';
                 }
                 if (double.tryParse(value) == null) {
-                  return 'Please Enter a Valid doubleber';
+                  return 'Please Enter a Valid Number';
                 }
               },
               onSaved: (final String value) =>
@@ -219,7 +236,7 @@ class _AddGradeFormState extends State<AddGradeForm> {
                   return 'Please Enter a Value';
                 }
                 if (double.tryParse(value) == null) {
-                  return 'Please Enter a Valid doubleber';
+                  return 'Please Enter a Valid Number';
                 }
               },
               onSaved: (final String value) =>
@@ -232,26 +249,101 @@ class _AddGradeFormState extends State<AddGradeForm> {
               onPressed: () {
                 if (_formKey.currentState.validate()) {
                   _formKey.currentState.save();
+                  Assignment newAssignment = Assignment(
+                      _assignmentName,
+                      _assignmentType,
+                      _assignmentDate ?? DateTime.now(),
+                      _assignmentDueDate ?? DateTime.now(),
+                      _assignmentAchievedScore ?? _assignmentAchievedPoints,
+                      _assignmentMaxScore ?? _assignmentMaxPoints,
+                      _assignmentAchievedPoints,
+                      _assignmentMaxPoints,
+                      _assignmentNotes ?? '',
+                      real: false);
                   widget.course.assignments =
                       List.from(widget.course.assignments)
-                        ..insert(
-                            0,
-                            Assignment(
-                                _assignmentName,
-                                _assignmentType,
-                                _assignmentDate ?? DateTime.now(),
-                                _assignmentDueDate ?? DateTime.now(),
-                                _assignmentAchievedScore ??
-                                    _assignmentAchievedPoints,
-                                _assignmentMaxScore ?? _assignmentMaxPoints,
-                                _assignmentAchievedPoints,
-                                _assignmentMaxPoints,
-                                _assignmentNotes ?? '',
-                                real: false));
+                        ..insert(0, newAssignment);
                   //TODO recalculate breakdown
                   Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          settings: RouteSettings(name: 'assignment-page'),
+                          builder: (final BuildContext context) =>
+                              AssignmentPage(
+                                  course: widget.course,
+                                  assignment: newAssignment)));
                 }
               })
         ])));
+  }
+}
+
+class _CalculateRequiredScoreFormState
+    extends State<CalculateRequiredScoreForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  double _desiredGrade;
+  String _assignmentType;
+
+  @override
+  Widget build(final BuildContext context) {
+    return Form(
+        key: _formKey,
+        child: IntrinsicHeight(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+              TextFormField(
+                  autofocus: true,
+                  validator: (final String value) {
+                    if (value.isEmpty) {
+                      return 'Please Enter a Value';
+                    }
+                    if (value.isNotEmpty && double.tryParse(value) == null) {
+                      return 'Please Enter a Valid Number';
+                    }
+                  },
+                  onSaved: (final String value) =>
+                      _desiredGrade = double.tryParse(value),
+                  decoration:
+                      const InputDecoration(labelText: 'Desired Score*')),
+              DropdownFormField(
+                  validator: (final String value) {
+                    if (value.isEmpty) {
+                      return 'Please Select a Value';
+                    }
+                  },
+                  onSaved: (final String value) => _assignmentType = value,
+                  decoration: const InputDecoration(
+                    labelText: 'Assignment Type*',
+                  ),
+                  items: (widget.course.breakdown
+                          .map((final Weighting f) => f.name)
+                          .toList()
+                            ..remove("TOTAL"))
+                      .map((final String f) =>
+                          DropdownMenuItem<String>(value: f, child: Text(f)))
+                      .toList()),
+              TextFormField(
+                  autofocus: true,
+                  validator: (final String value) {
+                    if (value.isNotEmpty && double.tryParse(value) == null) {
+                      return 'Please Enter a Valid Number';
+                    }
+                  },
+                  onSaved: (final String value) =>
+                      _desiredGrade = double.tryParse(value),
+                  decoration: const InputDecoration(
+                      labelText: 'Point Value of Assignment')),
+              RaisedButton(
+                  child: const Text('Submit'),
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      _formKey.currentState.save();
+                      Navigator.pop(context);
+                    }
+                  }),
+            ])));
   }
 }
