@@ -1,5 +1,4 @@
 lib/*.dart linguist-generated=false
 test/*.dart linguist-generated=false
-ios/ linguist-generated
-android/ linguist-generated
-build/ linguist-generated
+ios/** linguist-generated
+android/** linguist-generated

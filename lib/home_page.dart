@@ -12,18 +12,20 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0; //for bottom navigation
-  bool _firebaseDeviceActive = false; //for device
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  bool _firebaseDeviceActive = false;
 
   final List<Widget> _screens = <Widget>[];
+  TabController _tabController;
 
   @override
   Widget build(final BuildContext context) {
     if (user.courses == null || user.courses.isEmpty) {
       return const LoadingIndicator();
     }
-    final img = Hero(
+
+    final Widget img = Hero(
         tag: 'img',
         child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -32,7 +34,7 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.white, width: 8.0)))));
 
-    final welcome = Padding(
+    final Widget welcome = Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
         user.username,
@@ -40,7 +42,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    final school = Padding(
+    final Widget school = Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
         user.school,
@@ -48,7 +50,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    final classes = ListView.builder(
+    final Widget classes = ListView.builder(
       padding: const EdgeInsets.all(20.0),
       itemCount: user.courses.length,
       itemBuilder: (final BuildContext context, final int index) {
@@ -70,7 +72,7 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    final userScreen = Container(
+    final Widget userScreen = Container(
       key: const Key('base'),
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.all(28.0),
@@ -80,7 +82,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    final grades = ListView.builder(
+    final Widget grades = ListView.builder(
         itemCount: user.courses.length,
         itemBuilder: (final BuildContext context, final int index) {
           return Info(
@@ -89,17 +91,15 @@ class _HomePageState extends State<HomePage> {
                   " (" +
                   user.courses[index].percentage.toString() +
                   ")",
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        settings: RouteSettings(name: 'course-page'),
-                        builder: (final BuildContext context) =>
-                            CoursePage(course: user.courses[index])));
-              });
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      settings: RouteSettings(name: 'course-page'),
+                      builder: (final BuildContext context) =>
+                          CoursePage(course: user.courses[index]))));
         });
 
-    final gradesScreen = Container(
+    final Widget gradesScreen = Container(
       width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.all(28.0),
       decoration: decoration,
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       ]),
     );
 
-    final settings = SwitchListTile(
+    final Widget settings = SwitchListTile(
         title: const Text("Enable push notifications",
             style: TextStyle(color: Colors.white)),
         value: _firebaseDeviceActive,
@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
           }
         });
 
-    final settingsScreen = Container(
+    final Widget settingsScreen = Container(
         width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(28.0),
         decoration: decoration,
@@ -142,21 +142,6 @@ class _HomePageState extends State<HomePage> {
     _screens.add(gradesScreen);
     _screens.add(settingsScreen);
 
-    final navBar = BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        onTap: navigate,
-        currentIndex: _currentIndex,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person), title: Text('Home')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.school), title: Text('Grades')),
-          // const BottomNavigationBarItem(
-          // icon: const Icon(Icons.show_chart), title: const Text('Charts')),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), title: Text('Settings'))
-        ]);
-
     return Scaffold(
       appBar: LogoutBar(
           appBar: AppBar(
@@ -164,19 +149,27 @@ class _HomePageState extends State<HomePage> {
                   const Text('Logout', style: TextStyle(color: Colors.white)),
               iconTheme: const IconThemeData(color: Colors.white),
               centerTitle: false),
-          onTap: () {
-            Navigator.popUntil(
-                context, ModalRoute.withName(Navigator.defaultRouteName));
-          }),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: navBar,
+          onTap: () => Navigator.popUntil(
+              context, ModalRoute.withName(Navigator.defaultRouteName))),
+      body: TabBarView(children: _screens, controller: _tabController),
+      bottomNavigationBar: TabBar(controller: _tabController, tabs: const <Tab>[
+        Tab(icon: Icon(Icons.person), text: 'Home'),
+        Tab(icon: Icon(Icons.school), text: 'Grades'),
+        /*Tab(icon: Icon(Icons.show_chart), text: 'Charts')*/
+        Tab(icon: Icon(Icons.settings), text: 'Settings')
+      ]),
     );
   }
 
-  void fetchActive() async {
-    _firebaseDeviceActive = await API.getActivationForDevice(
-        user.username, await storage.read(key: 'gradeviewpassword'));
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
+
+  void fetchActive() async =>
+      _firebaseDeviceActive = await API.getActivationForDevice(
+          user.username, await storage.read(key: 'gradeviewpassword'));
 
   void fetchUser() async {
     final unparsed = jsonDecode((await API.getGrades(
@@ -196,15 +189,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     fetchUser();
     fetchActive();
+    setupTabController();
     super.initState();
-  }
-
-  void navigate(final int index) {
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   void refreshUserCoursesList() =>
       setState(() => user.courses = List<Course>.from(user.courses));
+
+  void setupTabController() =>
+      _tabController = TabController(vsync: this, length: 3);
 }

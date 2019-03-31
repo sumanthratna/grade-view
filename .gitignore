@@ -10,6 +10,7 @@
 .history
 .svn/
 FIREBASE_SECRET.bat
+ios/Runner/GoogleService-Info.plist
 
 # IntelliJ related
 *.iml

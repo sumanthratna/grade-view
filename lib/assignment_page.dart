@@ -16,13 +16,13 @@ class AssignmentPage extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    final backButton = const Padding(
+    final Widget backButton = const Padding(
         child: const Align(
             child: const BackButton(color: Colors.white),
             alignment: Alignment.centerLeft),
         padding: const EdgeInsets.only(top: 10.0, bottom: 0.0));
 
-    final assignmentInfo = ListView(children: <Widget>[
+    final Widget assignmentInfo = ListView(children: <Widget>[
       Info(
           left: "Score",
           right: assignment.achievedScore.toString() +
@@ -44,7 +44,7 @@ class AssignmentPage extends StatelessWidget {
           right: _formatDate(assignment.dueDate),
           onTap: () {})
     ]);
-    final body = Container(
+    final Widget body = Container(
         width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(28.0),
         decoration: decoration,
@@ -60,46 +60,40 @@ class AssignmentPage extends StatelessWidget {
     return Scaffold(body: body, floatingActionButton: _getDeleteFab(context));
   }
 
-  void _delete(final BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-                title: const Text('Delete Assignment'),
-                content: const Text(
-                    'Are you sure you want to delete this assignment? This action cannot be undone.'),
-                actions: <FlatButton>[
-                  FlatButton(
-                      child: const Text('No'),
-                      onPressed: () => Navigator.pop(context)),
-                  FlatButton(
-                      child: const Text('Yes'),
-                      onPressed: () {
-                        course.assignments = List.from(course.assignments)
-                          ..remove(assignment);
-                        //TODO recalculate breakdown
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      })
-                ]));
-  }
+  void _delete(final BuildContext context) => showDialog(
+      context: context,
+      builder: (final BuildContext context) => AlertDialog(
+              title: const Text('Delete Assignment'),
+              content: const Text(
+                  'Are you sure you want to delete this assignment? This action cannot be undone.'),
+              actions: <FlatButton>[
+                FlatButton(
+                    child: const Text('No'),
+                    onPressed: () => Navigator.pop(context)),
+                FlatButton(
+                    child: const Text('Yes'),
+                    onPressed: () {
+                      course.assignments = List.from(course.assignments)
+                        ..remove(assignment);
+                      //TODO recalculate breakdown
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    })
+              ]));
 
-  Widget _getDeleteFab(final BuildContext context) {
-    if (assignment.real) {
-      return Container();
-    }
-    return FloatingActionButton(
-        tooltip: 'Remove this Assignment',
-        heroTag: 'remove',
-        child: const Icon(Icons.delete, color: Colors.white),
-        onPressed: () => _delete(context),
-        backgroundColor: Colors.red);
-  }
+  String _formatDate(final DateTime arg) =>
+      arg.month.toString() +
+      "/" +
+      arg.day.toString() +
+      "/" +
+      arg.year.toString();
 
-  String _formatDate(final DateTime arg) {
-    return arg.month.toString() +
-        "/" +
-        arg.day.toString() +
-        "/" +
-        arg.year.toString();
-  }
+  Widget _getDeleteFab(final BuildContext context) => assignment.real
+      ? Container()
+      : FloatingActionButton(
+          tooltip: 'Remove this Assignment',
+          heroTag: 'remove',
+          child: const Icon(Icons.delete, color: Colors.white),
+          onPressed: () => _delete(context),
+          backgroundColor: Colors.red);
 }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class DropdownFormField extends StatefulWidget {
   final List<DropdownMenuItem> items;
-  final void Function(String) onSaved;
-  final String Function(String) validator;
+  final FormFieldSetter<String> onSaved;
+  final FormFieldValidator<String> validator;
   final InputDecoration decoration;
 
   DropdownFormField(
@@ -20,39 +20,39 @@ class DropdownFormField extends StatefulWidget {
 
 class Info extends StatelessWidget {
   final String left, right;
-  final VoidCallback onTap;
+  final GestureTapCallback onTap;
+
   Info(
       {final Key key,
       @required final this.left,
       @required final this.right,
       @required final this.onTap})
       : super(key: key);
+
   @override
-  Widget build(final BuildContext context) {
-    return Card(
-        child: InkWell(
-            onTap: onTap,
-            child: Container(
-                padding: const EdgeInsets.all(15.0),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Flexible(
-                          child: Text(left,
-                              softWrap: false,
-                              style: const TextStyle(
-                                  fontSize: 16.0,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.fade,
-                              maxLines: 1)),
-                      Align(
-                          child: Text(right,
-                              style: const TextStyle(
-                                  fontSize: 16.0, color: Colors.black)),
-                          alignment: Alignment.centerRight)
-                    ]))));
-  }
+  Widget build(final BuildContext context) => Card(
+      child: InkWell(
+          onTap: onTap,
+          child: Container(
+              padding: const EdgeInsets.all(15.0),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Flexible(
+                        child: Text(left,
+                            softWrap: false,
+                            style: const TextStyle(
+                                fontSize: 16.0,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.fade,
+                            maxLines: 1)),
+                    Align(
+                        child: Text(right,
+                            style: const TextStyle(
+                                fontSize: 16.0, color: Colors.black)),
+                        alignment: Alignment.centerRight)
+                  ]))));
 }
 
 class InputText extends StatelessWidget {
@@ -71,68 +71,60 @@ class InputText extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(final BuildContext context) {
-    return TextFormField(
-      key: key,
-      controller: controller,
-      keyboardType: keyboardType,
-      autofocus: autofocus,
-      obscureText: obscureText,
-      decoration: InputDecoration(
-        hintText: helpText,
-        contentPadding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
-      ),
-    );
-  }
+  Widget build(final BuildContext context) => TextFormField(
+        key: key,
+        controller: controller,
+        keyboardType: keyboardType,
+        autofocus: autofocus,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          hintText: helpText,
+          contentPadding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
+        ),
+      );
 }
 
 class LoadingIndicator extends StatelessWidget {
   const LoadingIndicator({final Key key}) : super(key: key);
 
   @override
-  Widget build(final BuildContext context) {
-    return Stack(children: <Widget>[
-      Container(),
-      const Opacity(
-          child: ModalBarrier(dismissible: false, color: Colors.transparent),
-          opacity: 0.3),
-      const Center(
-          child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
-    ]);
-  }
+  Widget build(final BuildContext context) => Stack(children: <Widget>[
+        Container(),
+        const Opacity(
+            child: ModalBarrier(dismissible: false, color: Colors.transparent),
+            opacity: 0.3),
+        const Center(
+            child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+      ]);
 }
 
 class LogoutBar extends StatelessWidget implements PreferredSizeWidget {
-  final VoidCallback onTap;
+  final GestureTapCallback onTap;
   final AppBar appBar;
 
   LogoutBar({final Key key, @required this.onTap, @required this.appBar})
       : super(key: key);
+
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
-  Widget build(final BuildContext context) {
-    return InkWell(onTap: onTap, child: appBar);
-  }
+  Widget build(final BuildContext context) =>
+      InkWell(onTap: onTap, child: appBar);
 }
 
 class _DropdownFormFieldState extends State<DropdownFormField> {
   String _value;
 
   @override
-  Widget build(final BuildContext context) {
-    return DropdownButtonFormField<String>(
-      value: _value,
-      items: widget.items,
-      onSaved: widget.onSaved,
-      decoration: widget.decoration,
-      validator: widget.validator,
-      onChanged: (final String value) {
-        setState(() => _value = value);
-      },
-    );
-  }
+  Widget build(final BuildContext context) => DropdownButtonFormField<String>(
+        value: _value,
+        items: widget.items,
+        onSaved: widget.onSaved,
+        decoration: widget.decoration,
+        validator: widget.validator,
+        onChanged: (final String value) => setState(() => _value = value),
+      );
 }

@@ -27,9 +27,9 @@ final leave path/to//grade-view
 ```
 If you use the above `ondir` script, you should create a file `FIREBASE_SECRET.bat` inside of `grade-view` that looks like:
 ```bash
-FIREBASE_SECRET=MyApiK3y
+FIREBASE_SECRET=MyFireba5eK3y
 ```
-Once again, you shouldn't have access to the correct value of `MyApiK3y`.
+Once again, you shouldn't have access to the correct value of `MyFireba5eK3y`.
 
 ## To-Do List:
  - [x] quarters during grade-fetching is hard-coded to `third_quarter`, fix this to be generic (get first element in dynamic)
@@ -48,8 +48,10 @@ Once again, you shouldn't have access to the correct value of `MyApiK3y`.
  - [x] make `Breakdown` class extend `List<Weighting>` instead of 'having' one
  - [ ] don't send username and password to API call methods as arguments
  - [x] double clicking login button causes courses to show up twice
- - [ ] allow swiping in `HomePage` (use `TabBar`?)
+ - [x] allow swiping in `HomePage` (use `TabBar`?)
  - [ ] fix `DataTable` on small devices
  - [ ] make `getUser` and `getGrades` methods in `API` return `Future<bool>`
  - [ ] `IntrinsicHeight` in `build` in forms in `lib/course_page.dart` is expensive (`O(n^2)`)
  - [ ] before gradebook closes for quarter ending, fetch grades
+ - [ ] use BLoC pattern
+ - [ ] snackbar tests show `status code 400` but all tests pass (bug?)

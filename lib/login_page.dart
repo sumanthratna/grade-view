@@ -14,6 +14,7 @@ import 'globals.dart' show user, storage;
 
 class LoginPage extends StatefulWidget {
   static const String tag = '/';
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -40,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(final BuildContext context) {
-    final logo = Hero(
+    final Widget logo = Hero(
       tag: 'logo',
       child: CircleAvatar(
         backgroundColor: Colors.transparent,
@@ -49,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
 
-    final username = InputText(
+    final Widget username = InputText(
         key: const Key('username'),
         controller: _usernameController,
         keyboardType: TextInputType.number,
@@ -57,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: false,
         helpText: 'Username');
 
-    final password = InputText(
+    final Widget password = InputText(
         key: const Key('password'),
         controller: _passwordController,
         keyboardType: TextInputType.text,
@@ -65,8 +66,8 @@ class _LoginPageState extends State<LoginPage> {
         obscureText: true,
         helpText: 'Password');
 
-    final loginButton = Padding(
-        key: const Key('log in'),
+    final Widget loginButton = Padding(
+        key: const Key('log-in'),
         padding: const EdgeInsets.symmetric(vertical: 16.0),
         child: RaisedButton(
             shape: RoundedRectangleBorder(
@@ -126,8 +127,11 @@ class _LoginPageState extends State<LoginPage> {
                         storage.write(
                             key: "gradeviewpassword", value: passwordInput);
                         _scaffoldKey.currentState.removeCurrentSnackBar();
-                        Navigator.push(context, MaterialPageRoute(builder: (final BuildContext context) => HomePage()))
-                            .then((final dynamic onValue) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (final BuildContext context) =>
+                                    HomePage())).then((final dynamic onValue) {
                           setState(() {
                             _loginButtonEnabled = true;
                             _loading = false;
@@ -143,6 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       }
                     } catch (e) {
+                      print(e);
                       setState(() {
                         _loginButtonEnabled = true;
                         _loading = false;
@@ -189,19 +194,12 @@ class _LoginPageState extends State<LoginPage> {
             inAsyncCall: _loading));
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   @protected
   @override
   @mustCallSuper
   void initState() {
     super.initState();
-    setState(() {
-      _loginButtonEnabled = true;
-    });
+    setState(() => _loginButtonEnabled = true);
   }
 
   void showSnackBar(final dynamic arg) {

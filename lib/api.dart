@@ -12,7 +12,7 @@ import 'package:http/http.dart' show Response;
 import 'globals.dart' show firebaseMessaging, storage;
 
 int mantissaLength(final String arg) =>
-    (arg.length - arg.lastIndexOf(RegExp(r"\.")));
+    (arg.length - arg.lastIndexOf(RegExp(r"\.")) - 1);
 
 class API {
   static const String _base = "https://sisapi.sites.tjhsst.edu";
@@ -115,9 +115,10 @@ class Assignment {
       final this.notes,
       {final this.real});
 
-  Assignment.fromJson(final Map<String, dynamic> json) {
-    name = json['name'];
-    assignmentType = json['assignment_type'];
+  Assignment.fromJson(final Map<String, dynamic> json)
+      : name = json['name'],
+        assignmentType = json['assignment_type'],
+        notes = json['notes'] {
     date = DateTime.parse(json['date']);
     dueDate = DateTime.parse(json['due_date']);
     final score = json['score'].split(' out of ');
@@ -127,26 +128,21 @@ class Assignment {
     achievedPoints = double.tryParse(points[0]);
     maxPoints = double.tryParse(
         points.length == 2 ? points[1] : points[0].split(' ')[0]);
-    notes = json['notes'];
   }
 
-  Map<String, String> toJson() {
-    return {
-      'name': name,
-      'assignment_type': assignmentType,
-      'date': date.toString(),
-      'due_date': dueDate.toString(),
-      'achieved_score': achievedScore.toString(),
-      'max_score': maxScore.toString(),
-      'achieved_points': achievedPoints.toString(),
-      'max_points': maxPoints.toString(),
-      'notes': notes
-    };
-  }
+  Map<String, String> toJson() => {
+        'name': name,
+        'assignment_type': assignmentType,
+        'date': date.toString(),
+        'due_date': dueDate.toString(),
+        'achieved_score': achievedScore.toString(),
+        'max_score': maxScore.toString(),
+        'achieved_points': achievedPoints.toString(),
+        'max_points': maxPoints.toString(),
+        'notes': notes
+      };
 
-  String toString() {
-    return toJson().toString();
-  }
+  String toString() => toJson().toString();
 }
 
 class Breakdown extends ListBase<Weighting> {
@@ -169,34 +165,30 @@ class Breakdown extends ListBase<Weighting> {
       return null;
     }
   }
+
   void operator []=(final int index, Weighting value) =>
       _weightings[index] = value;
 
   void add(Weighting value) => _weightings.add(value);
   void addAll(Iterable<Weighting> all) => _weightings.addAll(all);
 
-  // /// This creates map-like behavior (inefficient).
-  // Weighting operator [](final String name) => _weightings[_weightings.map((final Weighting f) => f.name).toList().indexOf(name)];
-
-  List<DataColumn> getDataColumns() {
-    return <DataColumn>[
-      DataColumn(
-          label: const Text("Assignment\nType"),
-          onSort: (final int index, final bool sort) {}),
-      DataColumn(
-          label: const Text("Average"),
-          onSort: (final int index, final bool sort) {}),
-      // DataColumn(
-      //   label: const Text("Points")
-      // ),
-      DataColumn(
-          label: const Text("Weight"),
-          onSort: (final int index, final bool sort) {}),
-      DataColumn(
-          label: const Text("Letter\nGrade"),
-          onSort: (final int index, final bool sort) {})
-    ];
-  }
+  List<DataColumn> getDataColumns() => <DataColumn>[
+        DataColumn(
+            label: const Text("Assignment\nType"),
+            onSort: (final int index, final bool sort) {}),
+        DataColumn(
+            label: const Text("Average"),
+            onSort: (final int index, final bool sort) {}),
+        // DataColumn(
+        //   label: const Text("Points")
+        // ),
+        DataColumn(
+            label: const Text("Weight"),
+            onSort: (final int index, final bool sort) {}),
+        DataColumn(
+            label: const Text("Letter\nGrade"),
+            onSort: (final int index, final bool sort) {})
+      ];
 
   DataRow getDataRow(final int index) {
     assert(index >= 0);
@@ -226,9 +218,7 @@ class Breakdown extends ListBase<Weighting> {
     return out;
   }
 
-  String toString() {
-    return toJson().toString();
-  }
+  String toString() => toJson().toString();
 }
 
 class Course {
@@ -282,21 +272,17 @@ class Course {
         : a.name.compareTo(b.name));
   }
 
-  Map<String, String> toJson() {
-    return {
-      'period': period.toString(),
-      'name': name,
-      'id': id,
-      'location': location,
-      'letterGrade': letterGrade,
-      'percentage': percentage.toString(),
-      'teacher': teacher
-    };
-  }
+  Map<String, String> toJson() => {
+        'period': period.toString(),
+        'name': name,
+        'id': id,
+        'location': location,
+        'letterGrade': letterGrade,
+        'percentage': percentage.toString(),
+        'teacher': teacher
+      };
 
-  String toString() {
-    return toJson().toString();
-  }
+  String toString() => toJson().toString();
 }
 
 class User {
@@ -317,13 +303,10 @@ class User {
         grade = json['grade'],
         photo = Image.memory(base64.decode(json['photo']), scale: 0.6);
 
-  Map<String, String> toJson() {
-    return {'username': username, 'school': school, 'grade': grade.toString()};
-  }
+  Map<String, String> toJson() =>
+      {'username': username, 'school': school, 'grade': grade.toString()};
 
-  String toString() {
-    return toJson().toString();
-  }
+  String toString() => toJson().toString();
 }
 
 class Weighting {
@@ -353,18 +336,14 @@ class Weighting {
         achievedPoints = double.parse(json['points'].replaceAll(',', '')),
         maxPoints = double.parse(json['points_possible'].replaceAll(',', ''));
 
-  Map<String, String> toJson() {
-    return {
-      'name': name,
-      'weight': weight.toString(),
-      'letter_grade': letterGrade,
-      'percentage': percentage.toString(),
-      'achieved_points': achievedPoints.toString(),
-      'max_points': maxPoints.toString()
-    };
-  }
+  Map<String, String> toJson() => {
+        'name': name,
+        'weight': weight.toString(),
+        'letter_grade': letterGrade,
+        'percentage': percentage.toString(),
+        'achieved_points': achievedPoints.toString(),
+        'max_points': maxPoints.toString()
+      };
 
-  String toString() {
-    return toJson().toString();
-  }
+  String toString() => toJson().toString();
 }

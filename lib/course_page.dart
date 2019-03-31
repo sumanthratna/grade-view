@@ -34,50 +34,49 @@ class CoursePage extends StatelessWidget {
 
   CoursePage({final Key key, @required final this.course}) : super(key: key);
 
-  void addGrade(final BuildContext context) {
+  void addGrade(final BuildContext context) =>
     showDialog(
         context: context,
         barrierDismissible: true,
         builder: (final BuildContext context) => AlertDialog(
             title: const Text('Add Grade'),
             content: AddGradeForm(course: course)));
-  }
 
   @override
   Widget build(final BuildContext context) {
-    const backButton = Padding(
+    const Widget backButton = Padding(
         child: Align(
             child: BackButton(color: Colors.white),
             alignment: Alignment.centerLeft),
         padding: EdgeInsets.only(top: 10.0, bottom: 0.0));
 
-    final courseInfo = Card(
+    final Widget courseInfo = Card(
         child: DataTable(
             rows: course.breakdown.getDataRows(),
             columns: course.breakdown.getDataColumns()),
         margin: const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 15.0));
 
-    final courseGrades = ListView.builder(
+    final Widget courseGrades = ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         itemCount: course.assignments.length,
         shrinkWrap: true,
-        itemBuilder: (final BuildContext context, final int index) {
-          return Info(
+        itemBuilder: (final BuildContext context, final int index) =>
+          Info(
               left: course.assignments[index].name,
               right: " " +
                   course.assignments[index].achievedPoints.toString() +
                   "/" +
                   course.assignments[index].maxPoints.toString(),
-              onTap: () {
+              onTap: () =>
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         settings: RouteSettings(name: 'assignment-page'),
                         builder: (final BuildContext context) => AssignmentPage(
                             course: course,
-                            assignment: course.assignments[index])));
-              });
-        });
+                            assignment: course.assignments[index])))
+              )
+        );
     /* looks weird
     final body = Dismissible(
       key: Key('body'),
@@ -97,7 +96,7 @@ class CoursePage extends StatelessWidget {
               child: ListView(children: <Widget>[courseInfo, courseGrades]))
         ])));
     */
-    final body = Container(
+    final Widget body = Container(
         width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(28.0),
         decoration: decoration,
@@ -131,14 +130,13 @@ class CoursePage extends StatelessWidget {
         ]));
   }
 
-  void calculateForGrade(final BuildContext context) {
+  void calculateForGrade(final BuildContext context) =>
     showDialog(
         context: context,
         barrierDismissible: true,
         builder: (final BuildContext context) => AlertDialog(
             title: const Text('Calculate Required Score'),
             content: CalculateRequiredScoreForm(course: course)));
-  }
 }
 
 class _AddGradeFormState extends State<AddGradeForm> {
@@ -153,8 +151,8 @@ class _AddGradeFormState extends State<AddGradeForm> {
   String _assignmentNotes;
 
   @override
-  Widget build(final BuildContext context) {
-    return Form(
+  Widget build(final BuildContext context) =>
+    Form(
         key: _formKey,
         child: IntrinsicHeight(
             child:
@@ -276,7 +274,6 @@ class _AddGradeFormState extends State<AddGradeForm> {
                 }
               })
         ])));
-  }
 }
 
 class _CalculateRequiredScoreFormState
@@ -287,8 +284,8 @@ class _CalculateRequiredScoreFormState
   String _assignmentType;
 
   @override
-  Widget build(final BuildContext context) {
-    return Form(
+  Widget build(final BuildContext context) =>
+    Form(
         key: _formKey,
         child: IntrinsicHeight(
             child: Column(
@@ -345,5 +342,4 @@ class _CalculateRequiredScoreFormState
                     }
                   }),
             ])));
-  }
 }
