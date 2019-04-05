@@ -5,14 +5,14 @@ import 'dart:io' show Platform;
 import 'dart:math' show Random;
 
 import 'package:flutter/material.dart'
-    show Text, Image, DataRow, DataColumn, DataCell;
+    show Text, Image, DataRow, DataColumn, DataCell, required;
 import 'package:http/http.dart' as http show get, post, put;
 import 'package:http/http.dart' show Response;
 
 import 'globals.dart' show firebaseMessaging, storage;
 
 int mantissaLength(final String arg) =>
-    (arg.length - arg.lastIndexOf(RegExp(r"\.")) - 1);
+    arg != null ? (arg.length - arg.lastIndexOf(RegExp(r"\.")) - 1) : -1;
 
 class API {
   static const String _base = "https://sisapi.sites.tjhsst.edu";
@@ -26,7 +26,7 @@ class API {
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     final Response response =
         await http.get(url, headers: {'Authorization': auth});
-    return jsonDecode(response.body)['active'].toString() == 'true';
+    return jsonDecode(response.body)['active'] == true;
   }
 
   static Future<Response> getGrades(
@@ -104,19 +104,19 @@ class Assignment {
   bool real = true;
 
   Assignment(
-      final this.name,
-      final this.assignmentType,
-      final this.date,
-      final this.dueDate,
-      final this.achievedScore,
-      final this.maxScore,
-      final this.achievedPoints,
-      final this.maxPoints,
-      final this.notes,
-      {final this.real});
+      {@required final this.name,
+      @required final this.assignmentType,
+      @required final this.date,
+      @required final this.dueDate,
+      @required final this.achievedScore,
+      @required final this.maxScore,
+      @required final this.achievedPoints,
+      @required final this.maxPoints,
+      @required final this.notes,
+      final this.real});
 
   Assignment.fromJson(final Map<String, dynamic> json)
-      : name = json['name'],
+      : name = json['full_name'],
         assignmentType = json['assignment_type'],
         notes = json['notes'] {
     date = DateTime.parse(json['date']);
@@ -148,17 +148,17 @@ class Assignment {
 class Breakdown extends ListBase<Weighting> {
   List<Weighting> _weightings;
 
-  Breakdown() : _weightings = [];
+  Breakdown() : _weightings = <Weighting>[];
 
   int get length => _weightings.length;
   set length(final int length) => _weightings.length = length;
   Weighting operator [](final dynamic arg) {
     if (arg is int) {
-      /// The argument is an index
+      /// The argument is an index.
       return _weightings[arg];
     } else if (arg is String) {
-      /// The argument is the name of the desired Weighting.
-      /// Creates map-like behavior.
+      /// The argument is the name of the desired [Weighting].
+      /// Creates `map`-like behavior.
       return _weightings[
           _weightings.map((final Weighting f) => f.name).toList().indexOf(arg)];
     } else {
@@ -179,9 +179,7 @@ class Breakdown extends ListBase<Weighting> {
         DataColumn(
             label: const Text("Average"),
             onSort: (final int index, final bool sort) {}),
-        // DataColumn(
-        //   label: const Text("Points")
-        // ),
+        DataColumn(label: const Text("Points")),
         DataColumn(
             label: const Text("Weight"),
             onSort: (final int index, final bool sort) {}),
@@ -197,7 +195,7 @@ class Breakdown extends ListBase<Weighting> {
       DataCell(Text('${weighting.name}'), onTap: () {}),
       DataCell(Text('${weighting.percentage}%'), onTap: () {}),
       DataCell(Text('${weighting.weight}%'), onTap: () {}),
-      // DataCell(Text('${weighting.achievedPoints}/${weighting.maxPoints}')),
+      DataCell(Text('${weighting.achievedPoints}/${weighting.maxPoints}')),
       DataCell(Text('${weighting.letterGrade}'), onTap: () {})
     ]);
   }
@@ -234,42 +232,60 @@ class Course {
   final int courseMantissaLength;
 
   Course(
-      final String period,
-      final this.name,
-      final this.id,
-      final this.location,
-      final this.letterGrade,
-      final String percentage,
-      final this.teacher)
+      {@required final String period,
+      @required final this.name,
+      @required final this.id,
+      @required final this.location,
+      @required final this.letterGrade,
+      @required final String percentage,
+      @required final this.teacher})
       : period = int.parse(period),
         percentage = double.parse(percentage),
         courseMantissaLength = mantissaLength(percentage.toString());
 
   Course.fromJson(final Map<String, dynamic> json)
       : period = json['period'],
-        name = json['name']
-            .substring(0, json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")))
-            .trim(),
-        id = json['name']
-            .substring(json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")))
-            .trim(),
+        name = json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")) >= 0
+            ? json['name']
+                .substring(0, json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")))
+                .trim()
+            : json['name'],
+        id = json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")) >= 0
+            ? json['name']
+                .substring(json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")))
+                .trim()
+            : '',
         location = json['location'],
-        letterGrade = json['grades'][json['grades'].keys.first]['letter'],
-        percentage = double.parse(
-            json['grades'][json['grades'].keys.first]['percentage']),
+        letterGrade = json['grades'] != null
+            ? json['grades'][json['grades']?.keys?.first]['letter']
+            : null,
+        percentage = json['grades'] != null
+            ? double.tryParse(
+                json['grades'][json['grades']?.keys?.first]['percentage'])
+            : null,
         teacher = json['teacher'],
-        courseMantissaLength = mantissaLength(
-            json['grades'][json['grades'].keys.first]['percentage']),
+        courseMantissaLength = json['grades'] != null
+            ? mantissaLength(
+                json['grades'][json['grades']?.keys?.first]['percentage'])
+            : null,
         assignments = <Assignment>[],
         breakdown = Breakdown() {
-    json['assignments']
-        .forEach((final f) => assignments.add(Assignment.fromJson(f)));
-    json['grades'][json['grades'].keys.first]['breakdown'].forEach(
-        (final String k, final dynamic v) =>
-            breakdown.add(Weighting.fromJson(k, v as Map<String, dynamic>)));
-    breakdown.sort((final Weighting a, final Weighting b) => a.name == "TOTAL"
-        ? double.maxFinite.toInt()
-        : a.name.compareTo(b.name));
+    if (json['assignments'] != null) {
+      json['assignments']
+          .forEach((final f) => assignments.add(Assignment.fromJson(f)));
+
+      /// TODO: Change to
+      /// ```dart
+      /// .forEach((final f) => breakdown.add(Weighting.fromJson(f)));
+      /// ```
+      /// Not implemented yet because it hasn't been tested.
+      json['grades'][json['grades']?.keys?.first]['breakdown'].forEach(
+          (final String k, final dynamic v) =>
+              breakdown.add(Weighting.fromJson(k, v as Map<String, dynamic>)));
+      breakdown.sort((final Weighting a, final Weighting b) => a.name == "TOTAL"
+          ? double.maxFinite.toInt()
+          : a.name.compareTo(b.name));
+    }
   }
 
   Map<String, String> toJson() => {
@@ -277,7 +293,7 @@ class Course {
         'name': name,
         'id': id,
         'location': location,
-        'letterGrade': letterGrade,
+        'letter_grade': letterGrade,
         'percentage': percentage.toString(),
         'teacher': teacher
       };
@@ -286,6 +302,7 @@ class Course {
 }
 
 class User {
+  final String name;
   final String username;
   final String school;
   final int grade;
@@ -293,15 +310,25 @@ class User {
   List<Course> courses;
   //name
 
-  User(final this.username, final this.school, final grade, final String photo)
+  User(
+      {@required final this.name,
+      @required final this.username,
+      @required final this.school,
+      final grade,
+      final String photo})
       : grade = int.parse(grade),
         photo = Image.memory(base64.decode(photo), scale: 0.6);
 
   User.fromJson(final Map<String, dynamic> json)
-      : username = json['username'],
+      : name = json['name'],
+        username = json['username'],
         school = json['school_name'],
         grade = json['grade'],
-        photo = Image.memory(base64.decode(json['photo']), scale: 0.6);
+        photo = Image.memory(base64.decode(json['photo']), scale: 0.6) {
+    courses = <Course>[];
+    (json['schedule'] as List<dynamic>).forEach((final dynamic f) =>
+        courses.add(Course.fromJson(f as Map<String, dynamic>)));
+  }
 
   Map<String, String> toJson() =>
       {'username': username, 'school': school, 'grade': grade.toString()};
@@ -317,12 +344,12 @@ class Weighting {
   final double achievedPoints, maxPoints;
 
   Weighting(
-      final this.name,
-      final String weight,
-      final this.letterGrade,
-      final String percentage,
-      final String achievedPoints,
-      final String maxPoints)
+      {@required final this.name,
+      @required final String weight,
+      @required final this.letterGrade,
+      @required final String percentage,
+      @required final String achievedPoints,
+      @required final String maxPoints})
       : weight = double.parse(weight),
         percentage = double.parse(percentage),
         achievedPoints = double.parse(achievedPoints),

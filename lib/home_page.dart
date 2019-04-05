@@ -1,6 +1,50 @@
 import 'dart:convert' show jsonDecode;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        StatefulWidget,
+        State,
+        SingleTickerProviderStateMixin,
+        GlobalKey,
+        ScaffoldState,
+        Widget,
+        TabController,
+        protected,
+        BuildContext,
+        Hero,
+        Padding,
+        EdgeInsets,
+        Container,
+        BoxDecoration,
+        Border,
+        Colors,
+        Text,
+        TextStyle,
+        ListView,
+        Center,
+        RichText,
+        TextSpan,
+        FontWeight,
+        Key,
+        MediaQuery,
+        Column,
+        Expanded,
+        Navigator,
+        MaterialPageRoute,
+        RouteSettings,
+        SwitchListTile,
+        Scaffold,
+        AppBar,
+        IconThemeData,
+        ModalRoute,
+        TabBarView,
+        TabBar,
+        Tab,
+        Icon,
+        Icons,
+        mustCallSuper,
+        SnackBar,
+        WidgetsBinding;
 
 import 'api.dart' show API, Course;
 import 'course_page.dart' show CoursePage;
@@ -14,9 +58,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   bool _firebaseDeviceActive = false;
 
-  final List<Widget> _screens = <Widget>[];
+  bool _successDuringGradesFetch = false;
+
+  final List<Widget> _tabs = <Widget>[];
   TabController _tabController;
 
   @override
@@ -65,8 +113,9 @@ class _HomePageState extends State<HomePage>
                   TextSpan(
                       text: user.courses[index].name,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const TextSpan(text: " "),
                   TextSpan(
-                      text: " " + user.courses[index].id,
+                      text: user.courses[index].id,
                       style: const TextStyle(fontWeight: FontWeight.normal)),
                 ]))));
       },
@@ -87,10 +136,12 @@ class _HomePageState extends State<HomePage>
         itemBuilder: (final BuildContext context, final int index) {
           return Info(
               left: user.courses[index].name,
-              right: user.courses[index].letterGrade +
-                  " (" +
-                  user.courses[index].percentage.toString() +
-                  ")",
+              right: _successDuringGradesFetch
+                  ? (user.courses[index].letterGrade +
+                      " (" +
+                      user.courses[index].percentage.toString() +
+                      ")")
+                  : user.courses[index].teacher,
               onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -105,7 +156,7 @@ class _HomePageState extends State<HomePage>
       decoration: decoration,
       child: Column(children: <Widget>[
         const Padding(
-            padding: EdgeInsets.only(top: 40.0, bottom: 5.0),
+            padding: EdgeInsets.only(bottom: 16.0),
             child: Text("Grades",
                 style: TextStyle(fontSize: 32.0, color: Colors.white))),
         Expanded(child: grades)
@@ -116,15 +167,11 @@ class _HomePageState extends State<HomePage>
         title: const Text("Enable push notifications",
             style: TextStyle(color: Colors.white)),
         value: _firebaseDeviceActive,
-        onChanged: (final bool newValue) async {
-          if (newValue) {
-            await API.registerDevice(
-                user.username, await storage.read(key: 'gradeviewpassword'));
-          } else {
-            await API.setActivationForDevice(user.username,
-                await storage.read(key: 'gradeviewpassword'), false);
-          }
-        });
+        onChanged: (final bool newValue) async => newValue
+            ? await API.registerDevice(
+                user.username, await storage.read(key: 'gradeviewpassword'))
+            : await API.setActivationForDevice(user.username,
+                await storage.read(key: 'gradeviewpassword'), false));
 
     final Widget settingsScreen = Container(
         width: MediaQuery.of(context).size.width,
@@ -132,17 +179,18 @@ class _HomePageState extends State<HomePage>
         decoration: decoration,
         child: Column(children: <Widget>[
           const Padding(
-              padding: EdgeInsets.only(top: 40.0, bottom: 5.0),
+              padding: EdgeInsets.only(bottom: 16.0),
               child: Text("Settings",
                   style: TextStyle(fontSize: 32.0, color: Colors.white))),
           settings
         ]));
 
-    _screens.add(userScreen);
-    _screens.add(gradesScreen);
-    _screens.add(settingsScreen);
+    _tabs.add(userScreen);
+    _tabs.add(gradesScreen);
+    _tabs.add(settingsScreen);
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: LogoutBar(
           appBar: AppBar(
               title:
@@ -151,16 +199,21 @@ class _HomePageState extends State<HomePage>
               centerTitle: false),
           onTap: () => Navigator.popUntil(
               context, ModalRoute.withName(Navigator.defaultRouteName))),
-      body: TabBarView(children: _screens, controller: _tabController),
-      bottomNavigationBar: TabBar(controller: _tabController, tabs: const <Tab>[
-        Tab(icon: Icon(Icons.person), text: 'Home'),
-        Tab(icon: Icon(Icons.school), text: 'Grades'),
-        /*Tab(icon: Icon(Icons.show_chart), text: 'Charts')*/
-        Tab(icon: Icon(Icons.settings), text: 'Settings')
-      ]),
+      body: TabBarView(children: _tabs, controller: _tabController),
+      bottomNavigationBar: TabBar(
+          controller: _tabController,
+          indicatorWeight: 3.0,
+          tabs: const <Tab>[
+            Tab(icon: Icon(Icons.person), text: 'Home'),
+            Tab(icon: Icon(Icons.school), text: 'Grades'),
+            /*Tab(icon: Icon(Icons.show_chart), text: 'Charts')*/
+            Tab(icon: Icon(Icons.settings), text: 'Settings')
+          ]),
     );
   }
 
+  @protected
+  @mustCallSuper
   @override
   void dispose() {
     _tabController.dispose();
@@ -172,25 +225,31 @@ class _HomePageState extends State<HomePage>
           user.username, await storage.read(key: 'gradeviewpassword'));
 
   void fetchUser() async {
-    final unparsed = jsonDecode((await API.getGrades(
+    final unparsedGrades = jsonDecode((await API.getGrades(
             user.username, await storage.read(key: 'gradeviewpassword')))
         .body)['courses'];
-    user.courses = [];
-    unparsed.forEach((final f) =>
-        user.courses.add(Course.fromJson(f as Map<String, dynamic>)));
-    setState(() => user.courses = List<Course>.from(user.courses));
-    //cache grades
-    await storage.delete(key: 'gradeviewpassword');
+    if (unparsedGrades == null) {
+      _successDuringGradesFetch = false;
+    } else {
+      _successDuringGradesFetch = true;
+      user.courses = [];
+      unparsedGrades.forEach((final f) =>
+          user.courses.add(Course.fromJson(f as Map<String, dynamic>)));
+      setState(() => user.courses = List<Course>.from(user.courses));
+      await storage.delete(key: 'gradeviewpassword');
+    }
   }
 
   @protected
   @mustCallSuper
   @override
   void initState() {
+    super.initState();
     fetchUser();
     fetchActive();
+    WidgetsBinding.instance.addPostFrameCallback(
+        (final Duration timestamp) => showUnableToFetchGradesSnackBar);
     setupTabController();
-    super.initState();
   }
 
   void refreshUserCoursesList() =>
@@ -198,4 +257,13 @@ class _HomePageState extends State<HomePage>
 
   void setupTabController() =>
       _tabController = TabController(vsync: this, length: 3);
+
+  void showUnableToFetchGradesSnackBar() {
+    print(_successDuringGradesFetch);
+    if (!_successDuringGradesFetch) {
+      _scaffoldKey.currentState.removeCurrentSnackBar();
+      _scaffoldKey.currentState.showSnackBar(
+          const SnackBar(content: Text('Unable to Fetch Grades')));
+    }
+  }
 }

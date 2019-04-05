@@ -1,4 +1,48 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        StatefulWidget,
+        DropdownMenuItem,
+        FormFieldSetter,
+        FormFieldValidator,
+        InputDecoration,
+        Key,
+        required,
+        State,
+        StatelessWidget,
+        GestureTapCallback,
+        Widget,
+        BuildContext,
+        Card,
+        InkWell,
+        Container,
+        Row,
+        EdgeInsets,
+        MainAxisAlignment,
+        Flexible,
+        Text,
+        TextStyle,
+        Colors,
+        FontWeight,
+        TextOverflow,
+        Align,
+        Alignment,
+        TextEditingController,
+        TextInputType,
+        TextFormField,
+        OutlineInputBorder,
+        BorderRadius,
+        Stack,
+        Opacity,
+        ModalBarrier,
+        Center,
+        CircularProgressIndicator,
+        AlwaysStoppedAnimation,
+        Color,
+        PreferredSizeWidget,
+        AppBar,
+        Size,
+        kToolbarHeight,
+        DropdownButtonFormField;
 
 class DropdownFormField extends StatefulWidget {
   final List<DropdownMenuItem> items;
@@ -104,7 +148,8 @@ class LogoutBar extends StatelessWidget implements PreferredSizeWidget {
   final GestureTapCallback onTap;
   final AppBar appBar;
 
-  LogoutBar({final Key key, @required this.onTap, @required this.appBar})
+  LogoutBar(
+      {final Key key, @required final this.onTap, @required final this.appBar})
       : super(key: key);
 
   @override

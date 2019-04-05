@@ -1,7 +1,37 @@
 import 'dart:convert' show jsonDecode;
 import 'dart:io' show SocketException;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        StatefulWidget,
+        State,
+        SnackBar,
+        Text,
+        GlobalKey,
+        ScaffoldState,
+        TextEditingController,
+        Widget,
+        BuildContext,
+        Hero,
+        CircleAvatar,
+        Colors,
+        Image,
+        Key,
+        TextInputType,
+        Padding,
+        EdgeInsets,
+        RaisedButton,
+        RoundedRectangleBorder,
+        BorderRadius,
+        Navigator,
+        MaterialPageRoute,
+        TextStyle,
+        Scaffold,
+        Center,
+        ListView,
+        SizedBox,
+        protected,
+        mustCallSuper;
 import 'package:grade_view/api.dart' show API, User;
 import 'package:grade_view/home_page.dart' show HomePage;
 import 'package:http/http.dart' show Response;
@@ -20,11 +50,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  static const SnackBar incorrectCredentials = SnackBar(
-      content: Text('Incorrect Username or Password'),
-      duration: Duration(seconds: 5));
-  static const SnackBar noInternet = SnackBar(
-      content: Text('No Internet Connection'), duration: Duration(seconds: 10));
   static const SnackBar enterUsername = SnackBar(
           content: Text('Please Enter a Username'),
           duration: Duration(seconds: 5)),
@@ -33,11 +58,18 @@ class _LoginPageState extends State<LoginPage> {
           duration: Duration(seconds: 5)),
       enterBoth = SnackBar(
           content: Text('Please Enter a Username and Password'),
-          duration: Duration(seconds: 5));
+          duration: Duration(seconds: 5)),
+      incorrectCredentials = SnackBar(
+          content: Text('Incorrect Username or Password'),
+          duration: Duration(seconds: 5)),
+      noInternet = SnackBar(
+          content: Text('No Internet Connection'),
+          duration: Duration(seconds: 10));
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _usernameController = TextEditingController(),
       _passwordController = TextEditingController();
-  bool _loginButtonEnabled = true, _loading = false;
+  bool _loginButtonEnabled = true;
+  bool _loading = false;
 
   @override
   Widget build(final BuildContext context) {
@@ -141,12 +173,21 @@ class _LoginPageState extends State<LoginPage> {
                         if ((response.statusCode / 100).floor() == 4) {
                           throw IncorrectCredentialsException();
                         } else {
-                          //triggers the else in the catch
+                          /// Triggers the `else` in the `catch`.
                           throw Exception(
                               'Status Code ' + response.statusCode.toString());
                         }
                       }
                     } catch (e) {
+                      /// TODO: Change to
+                      /// ```dart
+                      /// on NoUsernameException catch(e) {
+                      ///   //...
+                      /// }
+                      /// //...
+                      /// ```
+                      /// Not implemented yet since it originally seemed like there were performance issues.
+                      /// Benchmark both syntaxes to find out if one way is slower than the other.
                       print(e);
                       setState(() {
                         _loginButtonEnabled = true;

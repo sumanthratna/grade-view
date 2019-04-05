@@ -9,7 +9,8 @@ import 'dart:io' show Platform;
 import 'dart:convert' show jsonDecode;
 
 void main() async {
-  assert(Platform.environment['USER']!=null && Platform.environment['PASS']!=null);
+  assert(Platform.environment['USER'] != null &&
+      Platform.environment['PASS'] != null);
   User test = User.fromJson(jsonDecode((await API.getUser(
           Platform.environment['USER'], Platform.environment['PASS']))
       .body));
@@ -17,7 +18,8 @@ void main() async {
       (await API.getGrades(test.username, Platform.environment['PASS']))
           .body)['courses'];
   test.courses = [];
-  courses.forEach((final f) => test.courses.add(Course.fromJson(f as Map<String, dynamic>)));
+  courses.forEach((final f) =>
+      test.courses.add(Course.fromJson(f as Map<String, dynamic>)));
 
   testWidgets('snackbar tests', (final WidgetTester tester) async {
     await tester.pumpWidget(MyApp());

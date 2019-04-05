@@ -14,15 +14,17 @@ class AssignmentPage extends StatelessWidget {
       @required final this.assignment})
       : super(key: key);
 
+  @protected
   @override
   Widget build(final BuildContext context) {
-    final Widget backButton = const Padding(
-        child: const Align(
-            child: const BackButton(color: Colors.white),
+    const Widget backButton = Padding(
+        child: Align(
+            child: BackButton(color: Colors.white),
             alignment: Alignment.centerLeft),
-        padding: const EdgeInsets.only(top: 10.0, bottom: 0.0));
+        padding: EdgeInsets.only(top: 10.0, bottom: 0.0));
 
-    final Widget assignmentInfo = ListView(children: <Widget>[
+    final Widget assignmentInfo = ListView(
+        children: <Widget>[
       Info(
           left: "Score",
           right: assignment.achievedScore.toString() +
@@ -42,8 +44,12 @@ class AssignmentPage extends StatelessWidget {
       Info(
           left: "Due Date",
           right: _formatDate(assignment.dueDate),
-          onTap: () {})
-    ]);
+          onTap: () {}),
+      assignment.notes == null || assignment.notes.isEmpty
+          ? null
+          : Info(left: "Notes", right: assignment.notes, onTap: () {})
+    ]..removeWhere((final Widget f) => f == null));
+
     final Widget body = Container(
         width: MediaQuery.of(context).size.width,
         padding: const EdgeInsets.all(28.0),
@@ -65,7 +71,8 @@ class AssignmentPage extends StatelessWidget {
       builder: (final BuildContext context) => AlertDialog(
               title: const Text('Delete Assignment'),
               content: const Text(
-                  'Are you sure you want to delete this assignment? This action cannot be undone.'),
+                  'Are you sure you want to delete this assignment? This '
+                  'action cannot be undone.'),
               actions: <FlatButton>[
                 FlatButton(
                     child: const Text('No'),

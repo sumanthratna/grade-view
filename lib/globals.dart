@@ -3,11 +3,11 @@ import 'package:firebase_messaging/firebase_messaging.dart'
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'
     show FlutterSecureStorage;
 import 'api.dart' show User;
-import 'package:flutter/material.dart' show BoxDecoration, LinearGradient, Colors;
+import 'package:flutter/material.dart'
+    show BoxDecoration, LinearGradient, Colors;
 
 const decoration = BoxDecoration(
-    gradient:
-        LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent]));
+    gradient: LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent]));
 final FirebaseMessaging firebaseMessaging = FirebaseMessaging()
   ..requestNotificationPermissions()
   ..configure(onLaunch: (final Map<String, dynamic> message) {
