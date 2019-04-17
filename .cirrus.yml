@@ -1,7 +1,17 @@
 container:
   image: cirrusci/flutter:latest
 
+lint_task:
+  script: flutter analyze
+
 test_task:
+  environment:
+    GVUSER: ENCRYPTED[d82ff4cc8386326033ea6f6cc96edabc2f291e1736ec133f4fdab4a2633da9a3bae46ed4809a0d2138921cfc5a8c4a10]
+    GVPASS: ENCRYPTED[902552670964721f65adf559c2585f1b39af2ed5a841d3b10baff4d7f691badf929d18e60a7f2f92447eff0dd1e1b490]
   pub_cache:
     folder: ~/.pub-cache
   test_script: flutter test
+
+task:
+  name: build
+  script: flutter build ios

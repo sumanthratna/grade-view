@@ -1,5 +1,6 @@
 # FCPS SIS GradeView
-[![Codemagic build status](https://api.codemagic.io/apps/5c699bc024cab100120d2931/5c699bc024cab100120d2930/status_badge.svg)](https://codemagic.io/apps/5c699bc024cab100120d2931/5c699bc024cab100120d2930/latest_build) [![Travis Build Status](https://travis-ci.org/sumanthratna/grade-view.svg?branch=master)](https://travis-ci.org/sumanthratna/grade-view)
+[![Travis Build Status](https://travis-ci.org/sumanthratna/grade-view.svg?branch=master)](https://travis-ci.org/sumanthratna/grade-view) [![Codemagic Build Status](https://api.codemagic.io/apps/5c699bc024cab100120d2931/5c699bc024cab100120d2930/status_badge.svg)](https://codemagic.io/apps/5c699bc024cab100120d2931/5c699bc024cab100120d2930/latest_build) [![Bitrise Build Status](https://app.bitrise.io/app/1eb88e8e2f886294/status.svg?token=dbUXfDkBiOLZlYKQiZTgZA&branch=master)](https://app.bitrise.io/app/1eb88e8e2f886294) [![Cirrus-CI Build Status](https://api.cirrus-ci.com/github/sumanthratna/grade-view.svg)](https://cirrus-ci.com/github/sumanthratna/grade-view)
+
 
 An app for FCPS SIS.
 
@@ -34,14 +35,14 @@ Once again, you shouldn't have access to the correct value of `MyFireba5eK3y`.
 Run the app and enter either your FCPS credentials or the test user credentials. The test user's username is `1234567`. The password field can be left empty (the password does not matter for the test user).
 
 ## To-Do List:
- - [x] quarters during grade-fetching is hard-coded to `third_quarter`, fix this (get first element in `dynamic`)
+ - [x] quarters during grade-fetching is hard-coded to `third_quarter`
  - [x] noInternet snackbar is being triggered even if login is successful
  - [x] some assignment names are too long for cards in Course view
  - [ ] show teacher email next to course id/name, open mail app on click
  - [x] fix padding
  - [x] add widget testing
  - [ ] add integration tests
- - [ ] add bitrise integration
+ - [x] add Bitrise integration
  - [ ] implement push notifications
  - [ ] create graphs of grades over time
  - [x] don't store password longer than it needs to be stored
@@ -55,7 +56,7 @@ Run the app and enter either your FCPS credentials or the test user credentials.
  - [x] `IntrinsicHeight` is expensive (`O(n^2)`)
  - [ ] use BLoC pattern
  - [ ] snackbar tests show `status code 400`
- - [ ] add CirrusCI
+ - [x] add CirrusCI
  - [ ] `DataTable` is expensive
  - [x] remove `backButton` from `CoursePage` and `AssignmentPage` and instead use an `AppBar` (similar to the `AppBar` in `HomePage`)
  - [x] split contents of `_tabs` in `HomePage` into multiple `StatelessWidget`s
