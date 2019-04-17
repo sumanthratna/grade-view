@@ -1,6 +1,6 @@
 os:
 - linux
-sudo: false
+sudo:             false
 addons:
   apt:
     sources:
@@ -9,24 +9,25 @@ addons:
     - libstdc++6
     - fonts-droid
 git:
-  depth: 1
+  depth:          1
 cache:
   directories:
   - "$HOME/.pub-cache"
 env:
+  global:
+    - secure:     mJ08lR5n98p/ep27LxZ/AQwDeGonp/JAZSnROHEuYiQH8Oh9yhbfEBrRcvRLuK9283yIE7gLzEaQ5s9N8EbtDvLQcIq9M48z/lBdqxCdFwQxrt5H3qfjHBfH/dy+ffYDDA7NvNCRry3EUhV9+vyuKaN7uLGWT74Db4cUVjgoo52blPPR37aXfoBNK7eHCoCcQCTA7iEdGmC0yVOnGSLfgmd2aaoY5bVeq9LtfvnKxy67tvOguipFgaELyh4CjTqv2syKCDykQfUo80PCgMQd5hiAFgGWI1fSAx5hkSmW4rhwAHm0gGvZjpYy05PXKeIgqTnMJEoRtvfiyOLD2LffDh4DbD6+fQVuKkSsN0txnUl7QWbPYdTBUEJFSzyywdF70EK0eykGD4JjCyAWwBoKdG9PqKRHDFhUFdv6SqOzZuAwn8Bee+BJa5btv8mS0sErPvAcEj9NctB8xwNbNcQwNbt2R/MClCK0tpNLaXBLQWB6WEpyxsDqsICHz2Ii7XlMZUjI/CcqjHg8e3RXw9ihDk2SK8c26u/QaILHmkoOnnsjfXcpyfyjIO8+ocJ7G+usMFNCys3U7akPCC6eSM/QpeW8PzpUQP6LAhRaDU4b0/ehvI6EXQu2fnEwUNKzgPCx+9Vx+xnmFXFFILQB2qqr972Fx3e3Gd1rc3eN5lsqcbw=
+    - secure:     0HVIfGYiKg7grYmstcSJWxvJop9WATy3s6LT1FJwsqKZMXo2ZJr8ZLBWwsADxwzEBjDqbCHSqYmV6D5bNbFwFyxKxktDlFguV598At7xVBa44ma4DlIsJKDuqrMe0aYP3cxG2Krm9nivJtp8DJtjNQL5PgMCSdDh+YupAw6zNKg2R3ReqViS6rxCJBqykURDJhxBBM0tL1DbjbYdiZgrjWxAhEvHM/w4+eQNAy6esJuRng2vN8RkfYycfO9MLlJolWP/PjGvapxD4I59LtJ7vXMEaR0dkOZdTp0jum2rwXV9vu5+ivRGNJd4MFqmU/yq6pmUqL5mCT4yYRciO8qbQWm826zOFAdVyGv5y7Bpaus0DoK6tQT1b4b4gqGdjMmUbe0cC9dKbrNgSTI48aL+RW4HMdTlS9ZRR5dNOyN2wZ43KxZ1bGrbyQCcsbgxZg2MWOeS5ubSU2cjrJpwVDax5tC7c699wXa2ses4DL+XQ7aMUaE1Lk0xM9+1ZU+X9F+I7ZKSOIE0jdRxgtMuFb/M1ZfnZ46Q+f38hnc2iNGcRfyRwGDaqWNbg93Mp3ephztW3pbUyUlL51mrGQm9vet5ddvjSOOF3fErtq24Pf8MMDqaFFbGwuYGGMxaZvv8fw1hJWHrj0gNVHGxxKX1PN6DEDU+jIDtLo0rEL+B2l3mROM=
   matrix:
   - FLUTTER_VERSION=stable
   - FLUTTER_VERSION=dev
-  - secure: mJ08lR5n98p/ep27LxZ/AQwDeGonp/JAZSnROHEuYiQH8Oh9yhbfEBrRcvRLuK9283yIE7gLzEaQ5s9N8EbtDvLQcIq9M48z/lBdqxCdFwQxrt5H3qfjHBfH/dy+ffYDDA7NvNCRry3EUhV9+vyuKaN7uLGWT74Db4cUVjgoo52blPPR37aXfoBNK7eHCoCcQCTA7iEdGmC0yVOnGSLfgmd2aaoY5bVeq9LtfvnKxy67tvOguipFgaELyh4CjTqv2syKCDykQfUo80PCgMQd5hiAFgGWI1fSAx5hkSmW4rhwAHm0gGvZjpYy05PXKeIgqTnMJEoRtvfiyOLD2LffDh4DbD6+fQVuKkSsN0txnUl7QWbPYdTBUEJFSzyywdF70EK0eykGD4JjCyAWwBoKdG9PqKRHDFhUFdv6SqOzZuAwn8Bee+BJa5btv8mS0sErPvAcEj9NctB8xwNbNcQwNbt2R/MClCK0tpNLaXBLQWB6WEpyxsDqsICHz2Ii7XlMZUjI/CcqjHg8e3RXw9ihDk2SK8c26u/QaILHmkoOnnsjfXcpyfyjIO8+ocJ7G+usMFNCys3U7akPCC6eSM/QpeW8PzpUQP6LAhRaDU4b0/ehvI6EXQu2fnEwUNKzgPCx+9Vx+xnmFXFFILQB2qqr972Fx3e3Gd1rc3eN5lsqcbw=
-  - secure: 0HVIfGYiKg7grYmstcSJWxvJop9WATy3s6LT1FJwsqKZMXo2ZJr8ZLBWwsADxwzEBjDqbCHSqYmV6D5bNbFwFyxKxktDlFguV598At7xVBa44ma4DlIsJKDuqrMe0aYP3cxG2Krm9nivJtp8DJtjNQL5PgMCSdDh+YupAw6zNKg2R3ReqViS6rxCJBqykURDJhxBBM0tL1DbjbYdiZgrjWxAhEvHM/w4+eQNAy6esJuRng2vN8RkfYycfO9MLlJolWP/PjGvapxD4I59LtJ7vXMEaR0dkOZdTp0jum2rwXV9vu5+ivRGNJd4MFqmU/yq6pmUqL5mCT4yYRciO8qbQWm826zOFAdVyGv5y7Bpaus0DoK6tQT1b4b4gqGdjMmUbe0cC9dKbrNgSTI48aL+RW4HMdTlS9ZRR5dNOyN2wZ43KxZ1bGrbyQCcsbgxZg2MWOeS5ubSU2cjrJpwVDax5tC7c699wXa2ses4DL+XQ7aMUaE1Lk0xM9+1ZU+X9F+I7ZKSOIE0jdRxgtMuFb/M1ZfnZ46Q+f38hnc2iNGcRfyRwGDaqWNbg93Mp3ephztW3pbUyUlL51mrGQm9vet5ddvjSOOF3fErtq24Pf8MMDqaFFbGwuYGGMxaZvv8fw1hJWHrj0gNVHGxxKX1PN6DEDU+jIDtLo0rEL+B2l3mROM=
 matrix:
   allow_failures:
-  - env: FLUTTER_VERSION=dev
+  - env:          FLUTTER_VERSION=dev
 before_script:
 - git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
 - "./flutter/bin/flutter doctor"
 script:
-- ls -lh
+- ls -alh
 - "./flutter/bin/flutter test"
 - "./flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run lib/"
 - "./flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run test/"
