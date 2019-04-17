@@ -1,3 +1,6 @@
+osx_instance:
+  image: mojave-xcode-10.2-flutter
+
 container:
   image: cirrusci/flutter:latest
 
