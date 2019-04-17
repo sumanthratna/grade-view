@@ -1,7 +1,35 @@
-import 'package:flutter/material.dart';
+import 'package:decimal/decimal.dart' show Decimal;
+import 'package:flutter/material.dart'
+    show
+        StatelessWidget,
+        Key,
+        required,
+        Widget,
+        BuildContext,
+        Colors,
+        EdgeInsets,
+        ListView,
+        Container,
+        MediaQuery,
+        Column,
+        Center,
+        Text,
+        TextAlign,
+        TextStyle,
+        Expanded,
+        Scaffold,
+        showDialog,
+        AlertDialog,
+        FlatButton,
+        Navigator,
+        FloatingActionButton,
+        Icon,
+        Icons,
+        AppBar,
+        IconThemeData;
 
-import 'api.dart' show Course, Assignment;
-import 'custom_widgets.dart' show Info;
+import 'api.dart' show Assignment, Course, Weighting, percentageToLetterGrade;
+import 'custom_widgets.dart' show BackBar, Info;
 import 'globals.dart' show decoration;
 
 class AssignmentPage extends StatelessWidget {
@@ -14,17 +42,16 @@ class AssignmentPage extends StatelessWidget {
       @required final this.assignment})
       : super(key: key);
 
-  @protected
   @override
   Widget build(final BuildContext context) {
-    const Widget backButton = Padding(
-        child: Align(
-            child: BackButton(color: Colors.white),
-            alignment: Alignment.centerLeft),
-        padding: EdgeInsets.only(top: 10.0, bottom: 0.0));
-
     final Widget assignmentInfo = ListView(
         children: <Widget>[
+      Info(
+        left: "Letter Grade",
+        right: percentageToLetterGrade(
+            100.0 * assignment.achievedPoints / assignment.maxPoints),
+        onTap: () {},
+      ),
       Info(
           left: "Score",
           right: assignment.achievedScore.toString() +
@@ -40,10 +67,15 @@ class AssignmentPage extends StatelessWidget {
       Info(left: "Type", right: assignment.assignmentType, onTap: () {}),
       Info(left: "Teacher", right: course.teacher, onTap: () {}),
       Info(left: "Period", right: course.period.toString(), onTap: () {}),
-      Info(left: "Date", right: _formatDate(assignment.date), onTap: () {}),
+      Info(
+          left: "Date",
+
+          // The `substring` is to remove the time.
+          right: assignment.date.toIso8601String().substring(0, 10),
+          onTap: () {}),
       Info(
           left: "Due Date",
-          right: _formatDate(assignment.dueDate),
+          right: assignment.dueDate.toIso8601String().substring(0, 10),
           onTap: () {}),
       assignment.notes == null || assignment.notes.isEmpty
           ? null
@@ -55,7 +87,6 @@ class AssignmentPage extends StatelessWidget {
         padding: const EdgeInsets.all(28.0),
         decoration: decoration,
         child: Column(children: <Widget>[
-          backButton,
           Center(
               child: Text(assignment.name,
                   textAlign: TextAlign.center,
@@ -63,7 +94,16 @@ class AssignmentPage extends StatelessWidget {
           Expanded(child: assignmentInfo)
         ]));
 
-    return Scaffold(body: body, floatingActionButton: _getDeleteFab(context));
+    return Scaffold(
+        appBar: BackBar(
+            appBar: AppBar(
+                title:
+                    const Text('Back', style: TextStyle(color: Colors.white)),
+                iconTheme: const IconThemeData(color: Colors.white),
+                centerTitle: false),
+            onTap: () => Navigator.pop(context)),
+        body: body,
+        floatingActionButton: _getDeleteFab(context));
   }
 
   void _delete(final BuildContext context) => showDialog(
@@ -80,20 +120,55 @@ class AssignmentPage extends StatelessWidget {
                 FlatButton(
                     child: const Text('Yes'),
                     onPressed: () {
+                      course.breakdown[assignment.assignmentType]
+                          .achievedPoints = (Decimal.parse(course
+                                  .breakdown[assignment.assignmentType]
+                                  .achievedPoints
+                                  .toString()) -
+                              Decimal.parse(
+                                  assignment.achievedPoints.toString()))
+                          .toDouble();
+                      course.breakdown[assignment.assignmentType]
+                          .maxPoints = (Decimal.parse(course
+                                  .breakdown[assignment.assignmentType]
+                                  .maxPoints
+                                  .toString()) -
+                              Decimal.parse(assignment.maxPoints.toString()))
+                          .toDouble();
+                      course.breakdown[assignment.assignmentType].percentage =
+                          double.parse((course
+                                      .breakdown[assignment.assignmentType]
+                                      .weight *
+                                  course.breakdown[assignment.assignmentType]
+                                      .achievedPoints /
+                                  course.breakdown[assignment.assignmentType]
+                                      .maxPoints)
+                              .toStringAsFixed(course.courseMantissaLength));
+                      course.breakdown["TOTAL"].percentage = double.parse(
+                          (course.breakdown.weightings
+                                  .map((final Weighting f) =>
+                                      f.name == "TOTAL" ? 0.0 : f.percentage)
+                                  .reduce((final double a, final double b) =>
+                                      a + b))
+                              .toStringAsFixed(course.courseMantissaLength));
+                      course.breakdown[assignment.assignmentType].letterGrade =
+                          percentageToLetterGrade(100.0 *
+                              course.breakdown[assignment.assignmentType]
+                                  .percentage /
+                              course
+                                  .breakdown[assignment.assignmentType].weight);
+                      course.breakdown["TOTAL"].letterGrade =
+                          percentageToLetterGrade(
+                              course.breakdown["TOTAL"].percentage);
                       course.assignments = List.from(course.assignments)
                         ..remove(assignment);
-                      //TODO recalculate breakdown
+                      course.percentage = course.breakdown["TOTAL"].percentage;
+                      course.letterGrade =
+                          course.breakdown["TOTAL"].letterGrade;
                       Navigator.pop(context);
                       Navigator.pop(context);
                     })
               ]));
-
-  String _formatDate(final DateTime arg) =>
-      arg.month.toString() +
-      "/" +
-      arg.day.toString() +
-      "/" +
-      arg.year.toString();
 
   Widget _getDeleteFab(final BuildContext context) => assignment.real
       ? Container()

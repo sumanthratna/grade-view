@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart'
     show
+        Brightness,
         StatefulWidget,
         DropdownMenuItem,
         FormFieldSetter,
@@ -44,6 +45,22 @@ import 'package:flutter/material.dart'
         kToolbarHeight,
         DropdownButtonFormField;
 
+class BackBar extends StatelessWidget implements PreferredSizeWidget {
+  final GestureTapCallback onTap;
+  final AppBar appBar;
+
+  BackBar(
+      {final Key key, @required final this.onTap, @required final this.appBar})
+      : super(key: key);
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(final BuildContext context) =>
+      InkWell(onTap: onTap, child: appBar);
+}
+
 class DropdownFormField extends StatefulWidget {
   final List<DropdownMenuItem> items;
   final FormFieldSetter<String> onSaved;
@@ -83,7 +100,7 @@ class Info extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Flexible(
-                        child: Text(left,
+                        child: Text(left ?? '',
                             softWrap: false,
                             style: const TextStyle(
                                 fontSize: 16.0,
@@ -92,7 +109,7 @@ class Info extends StatelessWidget {
                             overflow: TextOverflow.fade,
                             maxLines: 1)),
                     Align(
-                        child: Text(right,
+                        child: Text(right ?? '',
                             style: const TextStyle(
                                 fontSize: 16.0, color: Colors.black)),
                         alignment: Alignment.centerRight)
@@ -119,6 +136,7 @@ class InputText extends StatelessWidget {
         key: key,
         controller: controller,
         keyboardType: keyboardType,
+        keyboardAppearance: Brightness.dark,
         autofocus: autofocus,
         obscureText: obscureText,
         decoration: InputDecoration(
@@ -142,22 +160,6 @@ class LoadingIndicator extends StatelessWidget {
             child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
       ]);
-}
-
-class LogoutBar extends StatelessWidget implements PreferredSizeWidget {
-  final GestureTapCallback onTap;
-  final AppBar appBar;
-
-  LogoutBar(
-      {final Key key, @required final this.onTap, @required final this.appBar})
-      : super(key: key);
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-
-  @override
-  Widget build(final BuildContext context) =>
-      InkWell(onTap: onTap, child: appBar);
 }
 
 class _DropdownFormFieldState extends State<DropdownFormField> {

@@ -40,7 +40,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart'
 
 import 'custom_exceptions.dart';
 import 'custom_widgets.dart' show InputText;
-import 'globals.dart' show user, storage;
+import 'globals.dart' show user, storage, testUsername;
 
 class LoginPage extends StatefulWidget {
   static const String tag = '/';
@@ -145,7 +145,8 @@ class _LoginPageState extends State<LoginPage> {
                       if (usernameInput.isEmpty && passwordInput.isNotEmpty) {
                         throw NoUsernameException();
                       } else if (usernameInput.isNotEmpty &&
-                          passwordInput.isEmpty) {
+                          passwordInput.isEmpty &&
+                          usernameInput != testUsername) {
                         throw NoPasswordException();
                       } else if (usernameInput.isEmpty &&
                           passwordInput.isEmpty) {
@@ -173,21 +174,21 @@ class _LoginPageState extends State<LoginPage> {
                         if ((response.statusCode / 100).floor() == 4) {
                           throw IncorrectCredentialsException();
                         } else {
-                          /// Triggers the `else` in the `catch`.
+                          // Triggers the `else` in the `catch`.
                           throw Exception(
                               'Status Code ' + response.statusCode.toString());
                         }
                       }
                     } catch (e) {
-                      /// TODO: Change to
-                      /// ```dart
-                      /// on NoUsernameException catch(e) {
-                      ///   //...
-                      /// }
-                      /// //...
-                      /// ```
-                      /// Not implemented yet since it originally seemed like there were performance issues.
-                      /// Benchmark both syntaxes to find out if one way is slower than the other.
+                      // TODO: Change to
+                      // ```dart
+                      // on NoUsernameException catch(e) {
+                      //   //...
+                      // }
+                      // //...
+                      // ```
+                      // Not implemented yet since it originally seemed like there were performance issues.
+                      // Benchmark both syntaxes to find out if one way is slower than the other.
                       print(e);
                       setState(() {
                         _loginButtonEnabled = true;

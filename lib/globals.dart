@@ -6,8 +6,9 @@ import 'api.dart' show User;
 import 'package:flutter/material.dart'
     show BoxDecoration, LinearGradient, Colors;
 
-const decoration = BoxDecoration(
+const BoxDecoration decoration = BoxDecoration(
     gradient: LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent]));
+const String testUsername = '1234567';
 final FirebaseMessaging firebaseMessaging = FirebaseMessaging()
   ..requestNotificationPermissions()
   ..configure(onLaunch: (final Map<String, dynamic> message) {

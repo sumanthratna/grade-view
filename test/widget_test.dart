@@ -1,26 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import 'package:grade_view/main.dart' show MyApp;
-import 'package:grade_view/api.dart' show API, User, Course;
-
 import 'dart:io' show Platform;
 
-import 'dart:convert' show jsonDecode;
+import 'package:flutter/material.dart' show Key;
+import 'package:flutter_test/flutter_test.dart'
+    show
+        testWidgets,
+        WidgetTester,
+        Finder,
+        find,
+        expect,
+        findsOneWidget,
+        findsNothing;
+import 'package:grade_view/main.dart' show MyApp;
 
 void main() async {
-  assert(Platform.environment['USER'] != null &&
-      Platform.environment['PASS'] != null);
-  User test = User.fromJson(jsonDecode((await API.getUser(
-          Platform.environment['USER'], Platform.environment['PASS']))
-      .body));
-  final courses = jsonDecode(
-      (await API.getGrades(test.username, Platform.environment['PASS']))
-          .body)['courses'];
-  test.courses = [];
-  courses.forEach((final f) =>
-      test.courses.add(Course.fromJson(f as Map<String, dynamic>)));
-
+  assert(Platform.environment['GVUSER'] != null &&
+      Platform.environment['GVPASS'] != null);
   testWidgets('snackbar tests', (final WidgetTester tester) async {
     await tester.pumpWidget(MyApp());
     final Finder button = find.byKey(const Key('log-in')),
@@ -31,14 +25,18 @@ void main() async {
     await tester.pump();
     expect(find.text('Please Enter a Username and Password'), findsOneWidget);
 
-    await tester.enterText(username, test.username);
+    await tester.enterText(username, Platform.environment['GVUSER']);
     await tester.tap(button);
     await tester.pump();
     expect(find.text('Please Enter a Password'), findsOneWidget);
 
-    await tester.enterText(password, Platform.environment['PASS']);
+    await tester.enterText(password, Platform.environment['GVPASS']);
     await tester.tap(button);
     await tester.pump();
-    expect(find.text(test.username), findsOneWidget); //logged in
+    expect(find.text(Platform.environment['GVUSER']), findsOneWidget);
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Grades'), findsOneWidget);
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Log In'), findsNothing);
   });
 }

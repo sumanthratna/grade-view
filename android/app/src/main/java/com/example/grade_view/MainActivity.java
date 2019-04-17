@@ -1,4 +1,4 @@
-package com.example.gradeview;
+package com.example.grade_view;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

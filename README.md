@@ -30,8 +30,11 @@ FIREBASE_SECRET="MyFireba5eK3y"
 ```
 Once again, you shouldn't have access to the correct value of `MyFireba5eK3y`.
 
+## Usage
+Run the app and enter either your FCPS credentials or the test user credentials. The test user's username is `1234567`. The password field can be left empty (the password does not matter for the test user).
+
 ## To-Do List:
- - [x] quarters during grade-fetching is hard-coded to `third_quarter`, fix this to be generic (get first element in dynamic)
+ - [x] quarters during grade-fetching is hard-coded to `third_quarter`, fix this (get first element in `dynamic`)
  - [x] noInternet snackbar is being triggered even if login is successful
  - [x] some assignment names are too long for cards in Course view
  - [ ] show teacher email next to course id/name, open mail app on click
@@ -40,20 +43,21 @@ Once again, you shouldn't have access to the correct value of `MyFireba5eK3y`.
  - [ ] add integration tests
  - [ ] add bitrise integration
  - [ ] implement push notifications
- - [ ] cache grades (or just use the API?) and create graphs of grades over time
+ - [ ] create graphs of grades over time
  - [x] don't store password longer than it needs to be stored
  - [ ] add screenshots to README
  - [ ] implement methods for all API classes
- - [x] make `Breakdown` class extend `List<Weighting>` instead of 'having' one
+ - [x] make `Breakdown` class extend `List<Weighting>`
  - [ ] don't send username and password to API call methods as arguments
  - [x] double clicking login button causes courses to show up twice
  - [x] allow swiping in `HomePage` (use `TabBar`?)
  - [x] fix `DataTable` on small devices
  - [x] `IntrinsicHeight` is expensive (`O(n^2)`)
- - [ ] before gradebook closes for quarter ending, fetch grades
  - [ ] use BLoC pattern
- - [ ] snackbar tests show `status code 400` but all tests pass (bug?)
+ - [ ] snackbar tests show `status code 400`
  - [ ] add CirrusCI
  - [ ] `DataTable` is expensive
- - [ ] remove `backButton` from `CoursePage` and `AssignmentPage` and instead use an `AppBar` (similar to the `AppBar` in `HomePage`)
- - [ ] split contents of `_tabs` in `HomePage` into multiple `StatelessWidget`s
+ - [x] remove `backButton` from `CoursePage` and `AssignmentPage` and instead use an `AppBar` (similar to the `AppBar` in `HomePage`)
+ - [x] split contents of `_tabs` in `HomePage` into multiple `StatelessWidget`s
+ - [ ] adding `Assignment`s to the front of a `List` is costly for large `List`s, maybe use a `Queue`?
+ - [ ] add an animation when `pop`ping routes when calculating for the desired grade
