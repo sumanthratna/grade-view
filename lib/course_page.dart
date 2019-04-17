@@ -162,16 +162,31 @@ class CoursePage extends StatelessWidget {
                   tooltip: 'Calculate the Grade Needed',
                   heroTag: 'calc',
                   child: const Icon(Icons.arrow_upward, color: Colors.white),
-                  onPressed: () => calculateForGrade(context)))
+                  onPressed: () async => calculateForGrade(context)))
         ]));
   }
 
-  void calculateForGrade(final BuildContext context) => showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (final BuildContext context) => AlertDialog(
-          title: const Text('Calculate Required Score'),
-          content: CalculateRequiredScoreForm(course: course)));
+  void calculateForGrade(final BuildContext context) async {
+    Map<String, dynamic> data = await showDialog<Map<String, dynamic>>(
+        context: context,
+        barrierDismissible: true,
+        builder: (final BuildContext context) => AlertDialog(
+            title: const Text('Calculate Required Score'),
+            content: CalculateRequiredScoreForm(course: course)));
+    if (data == null || data.isEmpty) {
+      return;
+    }
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (final BuildContext context) => AlertDialog(
+            title: const Text('Necessary Score'),
+            content: Text('For an assignment of type '
+                '\'${data['assignmentType']}\' a score of at least '
+                '${data['necessaryPoints']}/${data['assignmentMaxPoints']} '
+                'is needed to achieve a course grade of '
+                '${data['desiredCoursePercentage']}%.')));
+  }
 }
 
 class _AddGradeFormState extends State<AddGradeForm> {
@@ -394,6 +409,9 @@ class _CalculateRequiredScoreFormState
           child: ListBody(children: <Widget>[
             TextFormField(
                 autofocus: true,
+                keyboardType: TextInputType.numberWithOptions(
+                    signed: true, decimal: true),
+                keyboardAppearance: Brightness.dark,
                 validator: (final String value) {
                   if (value.isEmpty) {
                     return 'Please Enter a Value';
@@ -433,6 +451,9 @@ class _CalculateRequiredScoreFormState
                     return 'Please Enter a Valid Number';
                   }
                 },
+                keyboardType: TextInputType.numberWithOptions(
+                    signed: true, decimal: true),
+                keyboardAppearance: Brightness.dark,
                 onSaved: (final String value) =>
                     _assignmentMaxPoints = double.tryParse(value),
                 decoration: const InputDecoration(
@@ -453,24 +474,19 @@ class _CalculateRequiredScoreFormState
                             (widget.course.breakdown[_assignmentType]
                                     .maxPoints +
                                 _assignmentMaxPoints);
-                    final String necessaryScore =
+                    final String necessaryPoints =
                         (necessaryAssignmentTypeAchievedPoints -
                                 widget.course.breakdown[_assignmentType]
                                     .achievedPoints)
                             .toStringAsFixed(
                                 widget.course.courseMantissaLength);
-                    showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (final BuildContext context) => AlertDialog(
-                            title: const Text('Necessary Score'),
-                            content: Text('For an assignment of type '
-                                '\'$_assignmentType\' a score of at least '
-                                '$necessaryScore/$_assignmentMaxPoints '
-                                'is needed.'))).then((final dynamic onValue) {
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    });
+                    Map<String, dynamic> data = {
+                      'assignmentType': _assignmentType,
+                      'necessaryPoints': necessaryPoints,
+                      'assignmentMaxPoints': _assignmentMaxPoints,
+                      'desiredCoursePercentage': _desiredCoursePercentage
+                    };
+                    Navigator.pop(context, data);
                   }
                 }),
           ])));

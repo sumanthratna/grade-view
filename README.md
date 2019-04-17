@@ -59,5 +59,4 @@ Run the app and enter either your FCPS credentials or the test user credentials.
  - [ ] `DataTable` is expensive
  - [x] remove `backButton` from `CoursePage` and `AssignmentPage` and instead use an `AppBar` (similar to the `AppBar` in `HomePage`)
  - [x] split contents of `_tabs` in `HomePage` into multiple `StatelessWidget`s
- - [ ] adding `Assignment`s to the front of a `List` is costly for large `List`s, maybe use a `Queue`?
- - [ ] add an animation when `pop`ping routes when calculating for the desired grade
+ - [ ] adding `Assignment`s to the front of a `List` is costly for large `List`s
