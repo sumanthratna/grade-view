@@ -212,7 +212,7 @@ class _HomePageState extends State<HomePage>
           controller: _tabController,
           indicatorWeight: 3.0,
           tabs: const <Tab>[
-            Tab(icon: Icon(Icons.person), text: 'Home'),
+            Tab(icon: Icon(Icons.person), text: 'User'),
             Tab(icon: Icon(Icons.school), text: 'Grades'),
             /*Tab(icon: Icon(Icons.show_chart), text: 'Charts')*/
             Tab(icon: Icon(Icons.settings), text: 'Settings')
@@ -236,11 +236,12 @@ class _HomePageState extends State<HomePage>
     final List<dynamic> fetchedGrades = jsonDecode((await API.getGrades(
             user.username, await storage.read(key: 'gradeviewpassword')))
         .body)['courses'];
-    // await storage.delete(key: 'gradeviewpassword');
     fetchedGrades.forEach((final dynamic f) =>
         user.courses.add(Course.fromJson(f as Map<String, dynamic>)));
     refreshUserCoursesList();
   }
+
+  void clearPassword() async => await storage.delete(key: 'gradeviewpassword');
 
   @protected
   @mustCallSuper
@@ -250,6 +251,7 @@ class _HomePageState extends State<HomePage>
     fetchUser();
     fetchActive();
     setupTabController();
+    clearPassword();
   }
 
   void refreshUserCoursesList() =>

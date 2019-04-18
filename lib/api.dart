@@ -11,10 +11,10 @@ import 'package:http/http.dart' show Response;
 
 import 'globals.dart' show firebaseMessaging, storage;
 
-int mantissaLength(final String arg) =>
+int getMantissaLength(final String arg) =>
     arg != null ? (arg.length - arg.lastIndexOf(RegExp(r"\.")) - 1) : -1;
 
-String percentageToLetterGrade(final double percentage) {
+String convertPercentageToLetterGrade(final double percentage) {
   final int rounded = percentage.round();
   if (rounded >= 93) {
     return "A";
@@ -230,7 +230,7 @@ class Breakdown extends ListBase<Weighting> {
     final weighting = weightings[index];
     return DataRow.byIndex(index: index, cells: <DataCell>[
       DataCell(Text('${weighting.name}'), onTap: () {}),
-      DataCell(Text('${weighting.percentage}%'), onTap: () {}),
+      DataCell(Text('${weighting.percentage.toInt()}%'), onTap: () {}),
       DataCell(Text('${weighting.weight}%'), onTap: () {}),
       DataCell(Text('${weighting.achievedPoints}/${weighting.maxPoints}')),
       DataCell(Text('${weighting.letterGrade}'), onTap: () {})
@@ -278,7 +278,7 @@ class Course {
       @required final this.teacher})
       : period = int.parse(period),
         percentage = double.parse(percentage),
-        courseMantissaLength = mantissaLength(percentage.toString());
+        courseMantissaLength = getMantissaLength(percentage.toString());
 
   Course.fromJson(final Map<String, dynamic> json)
       : period = json['period'],
@@ -302,7 +302,7 @@ class Course {
             : null,
         teacher = json['teacher'],
         courseMantissaLength = json['grades'] != null
-            ? mantissaLength(
+            ? getMantissaLength(
                 json['grades'][json['grades']?.keys?.first]['percentage'])
             : null,
         assignments = <Assignment>[],
@@ -376,6 +376,7 @@ class Weighting {
   String letterGrade;
   double percentage;
   double achievedPoints, maxPoints;
+  final int weightingMantissaLength;
 
   Weighting(
       {@required final this.name,
@@ -387,7 +388,8 @@ class Weighting {
       : weight = double.parse(weight),
         percentage = double.parse(percentage),
         achievedPoints = double.parse(achievedPoints),
-        maxPoints = double.parse(maxPoints);
+        maxPoints = double.parse(maxPoints),
+        weightingMantissaLength = getMantissaLength(percentage);
 
   Weighting.fromJson(final String name, final Map<String, dynamic> json)
       : name = name,
@@ -395,7 +397,8 @@ class Weighting {
         letterGrade = json['letter_grade'],
         percentage = double.parse(json['percentage']),
         achievedPoints = double.parse(json['points'].replaceAll(',', '')),
-        maxPoints = double.parse(json['points_possible'].replaceAll(',', ''));
+        maxPoints = double.parse(json['points_possible'].replaceAll(',', '')),
+        weightingMantissaLength = getMantissaLength(json['percentage']);
 
   Map<String, String> toJson() => {
         'name': name,

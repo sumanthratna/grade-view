@@ -35,29 +35,21 @@ Once again, you shouldn't have access to the correct value of `MyFireba5eK3y`.
 Run the app and enter either your FCPS credentials or the test user credentials. The test user's username is `1234567`. The password field can be left empty (the password does not matter for the test user).
 
 ## To-Do List:
- - [x] quarters during grade-fetching is hard-coded to `third_quarter`
- - [x] noInternet snackbar is being triggered even if login is successful
- - [x] some assignment names are too long for cards in Course view
+Not necessarily in order of priority.
  - [ ] show teacher email next to course id/name, open mail app on click
- - [x] fix padding
- - [x] add widget testing
  - [ ] add integration tests
- - [x] add Bitrise integration
  - [ ] implement push notifications
  - [ ] create graphs of grades over time
- - [x] don't store password longer than it needs to be stored
- - [ ] add screenshots to README
  - [ ] implement methods for all API classes
- - [x] make `Breakdown` class extend `List<Weighting>`
  - [ ] don't send username and password to API call methods as arguments
- - [x] double clicking login button causes courses to show up twice
- - [x] allow swiping in `HomePage` (use `TabBar`?)
- - [x] fix `DataTable` on small devices
- - [x] `IntrinsicHeight` is expensive (`O(n^2)`)
  - [ ] use BLoC pattern
  - [ ] snackbar tests show `status code 400`
- - [x] add CirrusCI
  - [ ] `DataTable` is expensive
- - [x] remove `backButton` from `CoursePage` and `AssignmentPage` and instead use an `AppBar` (similar to the `AppBar` in `HomePage`)
- - [x] split contents of `_tabs` in `HomePage` into multiple `StatelessWidget`s
  - [ ] adding `Assignment`s to the front of a `List` is costly for large `List`s
+ - [ ] allow adding grades even if there's no breakdown information (all assignments are weighted equally)
+ - [x] allow editing of artificial assignments
+ - [ ] only show assignments that are of a certain type when that type is clicked in the breakdown `DataTable`
+ - [ ] `RenderFlex` exception when selecting date in add grade form
+ - [ ] convert all `double` operations to use the `Decimal` package
+ - [ ] selecting item from dropdown requires two clicks (focusing issue)
+ - [ ] some properties don't immediately change when editing assignments (dropdown)

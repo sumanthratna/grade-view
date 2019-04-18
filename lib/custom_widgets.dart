@@ -66,13 +66,15 @@ class DropdownFormField extends StatefulWidget {
   final FormFieldSetter<String> onSaved;
   final FormFieldValidator<String> validator;
   final InputDecoration decoration;
+  final String initialValue;
 
   DropdownFormField(
       {final Key key,
       @required final this.items,
       @required final this.onSaved,
       @required final this.validator,
-      @required final this.decoration})
+      @required final this.decoration,
+      final this.initialValue})
       : super(key: key);
 
   @override
@@ -164,6 +166,11 @@ class LoadingIndicator extends StatelessWidget {
 
 class _DropdownFormFieldState extends State<DropdownFormField> {
   String _value;
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialValue;
+  }
 
   @override
   Widget build(final BuildContext context) => DropdownButtonFormField<String>(
