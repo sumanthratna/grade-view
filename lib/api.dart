@@ -15,6 +15,9 @@ int getMantissaLength(final String arg) =>
     arg != null ? (arg.length - arg.lastIndexOf(RegExp(r"\.")) - 1) : -1;
 
 String convertPercentageToLetterGrade(final double percentage) {
+  if (percentage.isNaN || percentage.isInfinite) {
+    return "A";
+  }
   final int rounded = percentage.round();
   if (rounded >= 93) {
     return "A";

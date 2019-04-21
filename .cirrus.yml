@@ -1,20 +1,33 @@
 osx_instance:
-  image: mojave-xcode-10.2-flutter
+  image:             mojave-xcode-10.2-flutter
 
 container:
-  image: cirrusci/flutter:latest
+  image:             cirrusci/flutter:latest
 
-lint_task:
-  script: flutter analyze
+task:
+  environment:
+    FIREBASE_SECRET: ENCRYPTED[bd9ceb2e4e6e93f49b9a7ad06ba91ced412ef70f6ba87ffe58c6bebfd341a5e304881f64dd7adc33420272f7407e148c]
+  name:              setup
+  script:
+    - cp ios/Runner/GoogleService-Info-sample.plist ios/Runner/GoogleService-Info.plist
+    - plutil -replace API_KEY -string "$FIREBASE_SECRET" ios/Runner/GoogleService-Info.plist
 
 test_task:
   environment:
-    GVUSER: ENCRYPTED[d82ff4cc8386326033ea6f6cc96edabc2f291e1736ec133f4fdab4a2633da9a3bae46ed4809a0d2138921cfc5a8c4a10]
-    GVPASS: ENCRYPTED[902552670964721f65adf559c2585f1b39af2ed5a841d3b10baff4d7f691badf929d18e60a7f2f92447eff0dd1e1b490]
+    GVUSER:          ENCRYPTED[d82ff4cc8386326033ea6f6cc96edabc2f291e1736ec133f4fdab4a2633da9a3bae46ed4809a0d2138921cfc5a8c4a10]
+    GVPASS:          ENCRYPTED[902552670964721f65adf559c2585f1b39af2ed5a841d3b10baff4d7f691badf929d18e60a7f2f92447eff0dd1e1b490]
   pub_cache:
-    folder: ~/.pub-cache
-  test_script: flutter test
+    folder:          ~/.pub-cache
+  test_script:       flutter test
+
+lint_task:
+  script:            flutter analyze
 
 task:
-  name: build
-  script: flutter build ios
+  name:              build
+  script:
+    - flutter build bundle
+    - flutter build appbundle
+    - flutter build aot
+    - flutter build apk
+    - flutter build ios

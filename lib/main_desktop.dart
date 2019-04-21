@@ -7,10 +7,15 @@ import 'package:flutter/material.dart'
         StatelessWidget,
         ThemeData,
         Colors;
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride, TargetPlatform;
 
 import 'login_page.dart' show LoginPage;
 
-void main() => runApp(MyApp());
+void main() {
+  debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

@@ -63,43 +63,50 @@ class AssignmentPage extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    final Widget assignmentInfo =
-        ListView(padding: EdgeInsets.only(bottom: 112.0), children: <Widget>[
-      Info(
-        left: "Letter Grade",
-        right: convertPercentageToLetterGrade(
-            100.0 * assignment.achievedPoints / assignment.maxPoints),
-        onTap: () {},
-      ),
-      Info(
-          left: "Score",
-          right: assignment.achievedScore.toString() +
-              "/" +
-              assignment.maxScore.toString(),
-          onTap: () {}),
-      Info(
-          left: "Points",
-          right: assignment.achievedPoints.toString() +
-              "/" +
-              assignment.maxPoints.toString(),
-          onTap: () {}),
-      Info(left: "Type", right: assignment.assignmentType, onTap: () {}),
-      Info(left: "Teacher", right: course.teacher, onTap: () {}),
-      Info(left: "Period", right: course.period.toString(), onTap: () {}),
-      Info(
-          left: "Date",
+    final Widget assignmentInfo = ListView(
+        padding:
+            assignment.real ? EdgeInsets.zero : EdgeInsets.only(bottom: 112.0),
+        children: <Widget>[
+          Info(
+            left: "Letter Grade",
+            right: assignment.achievedPoints == null
+                ? "N/A"
+                : convertPercentageToLetterGrade(
+                    100.0 * assignment.achievedPoints / assignment.maxPoints),
+            onTap: () {},
+          ),
+          Info(
+              left: "Score",
+              right: (assignment.achievedScore == null &&
+                      assignment.maxScore == null)
+                  ? "N/A"
+                  : assignment.achievedScore.toString() +
+                      "/" +
+                      assignment.maxScore.toString(),
+              onTap: () {}),
+          Info(
+              left: "Points",
+              right: assignment.achievedPoints.toString() +
+                  "/" +
+                  assignment.maxPoints.toString(),
+              onTap: () {}),
+          Info(left: "Type", right: assignment.assignmentType, onTap: () {}),
+          Info(left: "Teacher", right: course.teacher, onTap: () {}),
+          Info(left: "Period", right: course.period.toString(), onTap: () {}),
+          Info(
+              left: "Date",
 
-          // The `substring` is to remove the time.
-          right: assignment.date.toIso8601String().substring(0, 10),
-          onTap: () {}),
-      Info(
-          left: "Due Date",
-          right: assignment.dueDate.toIso8601String().substring(0, 10),
-          onTap: () {}),
-      assignment.notes == null || assignment.notes.isEmpty
-          ? Container()
-          : Info(left: "Notes", right: assignment.notes, onTap: () {})
-    ]);
+              // The `substring` is to remove the time.
+              right: assignment.date.toIso8601String().substring(0, 10),
+              onTap: () {}),
+          Info(
+              left: "Due Date",
+              right: assignment.dueDate.toIso8601String().substring(0, 10),
+              onTap: () {}),
+          assignment.notes == null || assignment.notes.isEmpty
+              ? Container()
+              : Info(left: "Notes", right: assignment.notes, onTap: () {})
+        ]);
 
     final Widget body = Container(
         width: MediaQuery.of(context).size.width,

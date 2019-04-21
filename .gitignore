@@ -9,7 +9,7 @@
 .buildlog/
 .history
 .svn/
-FIREBASE_SECRET.bat
+SECRETS.bat
 ios/Runner/GoogleService-Info.plist
 
 # IntelliJ related
@@ -38,6 +38,7 @@ build/
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
