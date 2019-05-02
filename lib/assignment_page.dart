@@ -63,49 +63,66 @@ class AssignmentPage extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
+    final Decimal percentage = assignment.achievedPoints == null
+        ? null
+        : Decimal.fromInt(100) *
+            assignment.achievedPoints /
+            assignment.maxPoints;
     final Widget assignmentInfo = ListView(
         padding:
             assignment.real ? EdgeInsets.zero : EdgeInsets.only(bottom: 112.0),
         children: <Widget>[
           Info(
-            left: "Letter Grade",
-            right: assignment.achievedPoints == null
-                ? "N/A"
-                : convertPercentageToLetterGrade(
-                    100.0 * assignment.achievedPoints / assignment.maxPoints),
+            left: 'Letter Grade',
+            right: percentage == null
+                ? 'N/A'
+                : convertPercentageToLetterGrade(percentage),
             onTap: () {},
           ),
           Info(
-              left: "Score",
+            left: 'Percentage',
+            right: percentage == null
+                ? 'N/A'
+                : percentage.toStringAsFixed(
+                        course.breakdown == null || course.breakdown.isEmpty
+                            ? course.courseMantissaLength
+                            : course.breakdown[assignment.assignmentType]
+                                .weightingMantissaLength) +
+                    '%',
+            onTap: () {},
+          ),
+          Info(
+              left: 'Score',
               right: (assignment.achievedScore == null &&
                       assignment.maxScore == null)
-                  ? "N/A"
+                  ? 'N/A'
                   : assignment.achievedScore.toString() +
-                      "/" +
+                      '/' +
                       assignment.maxScore.toString(),
               onTap: () {}),
           Info(
-              left: "Points",
+              left: 'Points',
               right: assignment.achievedPoints.toString() +
-                  "/" +
+                  '/' +
                   assignment.maxPoints.toString(),
               onTap: () {}),
-          Info(left: "Type", right: assignment.assignmentType, onTap: () {}),
-          Info(left: "Teacher", right: course.teacher, onTap: () {}),
-          Info(left: "Period", right: course.period.toString(), onTap: () {}),
           Info(
-              left: "Date",
-
-              // The `substring` is to remove the time.
+              left: 'Type',
+              right: assignment.assignmentType ?? 'N/A',
+              onTap: () {}),
+          Info(left: 'Teacher', right: course.teacher, onTap: () {}),
+          Info(left: 'Period', right: course.period.toString(), onTap: () {}),
+          Info(
+              left: 'Date',
               right: assignment.date.toIso8601String().substring(0, 10),
               onTap: () {}),
           Info(
-              left: "Due Date",
+              left: 'Due Date',
               right: assignment.dueDate.toIso8601String().substring(0, 10),
               onTap: () {}),
           assignment.notes == null || assignment.notes.isEmpty
               ? Container()
-              : Info(left: "Notes", right: assignment.notes, onTap: () {})
+              : Info(left: 'Notes', right: assignment.notes, onTap: () {})
         ]);
 
     final Widget body = Container(
@@ -150,52 +167,85 @@ class AssignmentPage extends StatelessWidget {
                 FlatButton(
                     child: const Text('Yes'),
                     onPressed: () {
-                      course.breakdown[assignment.assignmentType]
-                          .achievedPoints = (Decimal.parse(course
-                                  .breakdown[assignment.assignmentType]
-                                  .achievedPoints
-                                  .toString()) -
-                              Decimal.parse(
-                                  assignment.achievedPoints.toString()))
-                          .toDouble();
-                      course.breakdown[assignment.assignmentType]
-                          .maxPoints = (Decimal.parse(course
-                                  .breakdown[assignment.assignmentType]
-                                  .maxPoints
-                                  .toString()) -
-                              Decimal.parse(assignment.maxPoints.toString()))
-                          .toDouble();
-                      course.breakdown[assignment.assignmentType].percentage =
-                          double.parse((course
-                                      .breakdown[assignment.assignmentType]
-                                      .weight *
-                                  course.breakdown[assignment.assignmentType]
-                                      .achievedPoints /
-                                  course.breakdown[assignment.assignmentType]
-                                      .maxPoints)
-                              .toStringAsFixed(course.courseMantissaLength));
-                      course.breakdown["TOTAL"].percentage = double.parse(
-                          (course.breakdown.weightings
-                                  .map((final Weighting f) =>
-                                      f.name == "TOTAL" ? 0.0 : f.percentage)
-                                  .reduce((final double value,
-                                          final double element) =>
-                                      value + element))
-                              .toStringAsFixed(course.courseMantissaLength));
-                      course.breakdown[assignment.assignmentType].letterGrade =
-                          convertPercentageToLetterGrade(100.0 *
-                              course.breakdown[assignment.assignmentType]
-                                  .percentage /
-                              course
-                                  .breakdown[assignment.assignmentType].weight);
-                      course.breakdown["TOTAL"].letterGrade =
-                          convertPercentageToLetterGrade(
-                              course.breakdown["TOTAL"].percentage);
+                      if (course.breakdown.isEmpty) {
+                        if (course.assignments.length == 1) {
+                          final Decimal newCoursePercentage = Decimal.parse(
+                              0.toStringAsFixed(course.courseMantissaLength));
+                          course.percentage = newCoursePercentage;
+                          course.letterGrade = 'N/A';
+                        } else {
+                          final Decimal originalCourseMaxPoints = course
+                              .assignments
+                              .map((final Assignment e) => e.maxPoints)
+                              .reduce((final Decimal element,
+                                      final Decimal value) =>
+                                  element + value);
+                          final Decimal originalCourseAchievedPoints = course
+                              .assignments
+                              .map((final Assignment e) => e.achievedPoints)
+                              .reduce((final Decimal element,
+                                      final Decimal value) =>
+                                  element + value);
+                          final Decimal newCourseMaxPoints =
+                              originalCourseMaxPoints - assignment.maxPoints;
+                          final Decimal newCourseAchievedPoints =
+                              originalCourseAchievedPoints -
+                                  assignment.achievedPoints;
+                          final Decimal newCoursePercentage =
+                              Decimal.fromInt(100) *
+                                  newCourseAchievedPoints /
+                                  newCourseMaxPoints;
+                          course.percentage = newCoursePercentage;
+                          course.letterGrade = convertPercentageToLetterGrade(
+                              newCoursePercentage);
+                        }
+                      } else {
+                        course.breakdown[assignment.assignmentType]
+                            .achievedPoints = course
+                                .breakdown[assignment.assignmentType]
+                                .achievedPoints -
+                            assignment.achievedPoints;
+                        course.breakdown[assignment.assignmentType].maxPoints =
+                            course.breakdown[assignment.assignmentType]
+                                    .maxPoints -
+                                assignment.maxPoints;
+                        course.breakdown[assignment.assignmentType].percentage =
+                            Decimal.parse((course
+                                        .breakdown[assignment.assignmentType]
+                                        .weight *
+                                    course.breakdown[assignment.assignmentType]
+                                        .achievedPoints /
+                                    course.breakdown[assignment.assignmentType]
+                                        .maxPoints)
+                                .toStringAsFixed(course.courseMantissaLength));
+                        course.breakdown['TOTAL']
+                            .percentage = Decimal.parse((course
+                                .breakdown.weightings
+                                .map((final Weighting f) => f.name == 'TOTAL'
+                                    ? Decimal.fromInt(0)
+                                    : f.percentage)
+                                .reduce((final Decimal value,
+                                        final Decimal element) =>
+                                    value + element))
+                            .toStringAsFixed(course.courseMantissaLength));
+                        course.breakdown[assignment.assignmentType]
+                                .letterGrade =
+                            convertPercentageToLetterGrade(
+                                Decimal.fromInt(100) *
+                                    course.breakdown[assignment.assignmentType]
+                                        .percentage /
+                                    course.breakdown[assignment.assignmentType]
+                                        .weight);
+                        course.breakdown['TOTAL'].letterGrade =
+                            convertPercentageToLetterGrade(
+                                course.breakdown['TOTAL'].percentage);
+                        course.percentage =
+                            course.breakdown['TOTAL'].percentage;
+                        course.letterGrade =
+                            course.breakdown['TOTAL'].letterGrade;
+                      }
                       course.assignments = List.from(course.assignments)
                         ..remove(assignment);
-                      course.percentage = course.breakdown["TOTAL"].percentage;
-                      course.letterGrade =
-                          course.breakdown["TOTAL"].letterGrade;
                       Navigator.pop(context);
                       Navigator.pop(context);
                     })
@@ -247,8 +297,8 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
   String _assignmentType;
   DateTime _assignmentDate;
   DateTime _assignmentDueDate;
-  double _assignmentAchievedScore, _assignmentMaxScore;
-  double _assignmentAchievedPoints, _assignmentMaxPoints;
+  Decimal _assignmentAchievedScore, _assignmentMaxScore;
+  Decimal _assignmentAchievedPoints, _assignmentMaxPoints;
   String _assignmentNotes;
 
   @override
@@ -282,7 +332,7 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                 items: (List<Weighting>.from(widget.course.breakdown)
                         .map((final Weighting f) => f.name)
                         .toList()
-                          ..remove("TOTAL"))
+                          ..remove('TOTAL'))
                     .map((final String f) =>
                         DropdownMenuItem<String>(value: f, child: Text(f)))
                     .toList()),
@@ -307,12 +357,12 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                   TextInputType.numberWithOptions(signed: true, decimal: true),
               keyboardAppearance: Brightness.dark,
               validator: (final String value) {
-                if (value.isNotEmpty && double.tryParse(value) == null) {
+                if (value.isNotEmpty && Decimal.tryParse(value) == null) {
                   return 'Please Enter a Valid Number';
                 }
               },
               onSaved: (final String value) =>
-                  _assignmentAchievedScore = double.tryParse(value),
+                  _assignmentAchievedScore = Decimal.tryParse(value),
             ),
             TextFormField(
                 initialValue: widget.assignment.maxScore.toString(),
@@ -321,12 +371,12 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                     signed: true, decimal: true),
                 keyboardAppearance: Brightness.dark,
                 validator: (final String value) {
-                  if (value.isNotEmpty && double.tryParse(value) == null) {
+                  if (value.isNotEmpty && Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
                 },
                 onSaved: (final String value) =>
-                    _assignmentMaxScore = double.tryParse(value)),
+                    _assignmentMaxScore = Decimal.tryParse(value)),
             TextFormField(
                 initialValue: widget.assignment.achievedPoints.toString(),
                 decoration:
@@ -338,12 +388,12 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please Enter a Value';
                   }
-                  if (double.tryParse(value) == null) {
+                  if (Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
                 },
                 onSaved: (final String value) =>
-                    _assignmentAchievedPoints = double.tryParse(value)),
+                    _assignmentAchievedPoints = Decimal.tryParse(value)),
             TextFormField(
                 initialValue: widget.assignment.maxPoints.toString(),
                 decoration: const InputDecoration(labelText: 'Maximum Points*'),
@@ -354,12 +404,12 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please Enter a Value';
                   }
-                  if (double.tryParse(value) == null) {
+                  if (Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
                 },
                 onSaved: (final String value) =>
-                    _assignmentMaxPoints = double.tryParse(value)),
+                    _assignmentMaxPoints = Decimal.tryParse(value)),
             TextFormField(
                 initialValue: widget.assignment.notes,
                 decoration: const InputDecoration(labelText: 'Notes'),
@@ -368,129 +418,143 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                 child: const Text('Submit'),
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
+                    updateAssignment() {
+                      widget.assignment.name = _assignmentName;
+                      widget.assignment.assignmentType = _assignmentType;
+                      widget.assignment.date = _assignmentDate;
+                      widget.assignment.dueDate = _assignmentDueDate;
+                      widget.assignment.achievedScore =
+                          _assignmentAchievedScore ?? _assignmentAchievedPoints;
+                      widget.assignment.maxScore =
+                          _assignmentMaxScore ?? _assignmentMaxPoints;
+                      widget.assignment.achievedPoints =
+                          _assignmentAchievedPoints;
+                      widget.assignment.maxPoints = _assignmentMaxPoints;
+                      widget.assignment.notes = _assignmentNotes ?? '';
+                      setState(() => widget.course.assignments =
+                          List<Assignment>.from(widget.course.assignments));
+                    }
+
                     _formKey.currentState.save();
-                    widget.course.breakdown[widget.assignment.assignmentType]
-                        .achievedPoints = (Decimal.parse(widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .achievedPoints
-                                .toString()) -
-                            Decimal.parse(
-                                widget.assignment.achievedPoints.toString()))
-                        .toDouble();
-                    widget.course.breakdown[widget.assignment.assignmentType]
-                        .maxPoints = (Decimal.parse(widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .maxPoints
-                                .toString()) -
-                            Decimal.parse(
-                                widget.assignment.maxPoints.toString()))
-                        .toDouble();
-                    widget.course.breakdown[widget.assignment.assignmentType]
-                        .percentage = double.parse((widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .weight *
-                            widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .achievedPoints /
-                            widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .maxPoints)
-                        .toStringAsFixed(widget.course.courseMantissaLength));
-                    widget.course.breakdown[widget.assignment.assignmentType]
-                            .letterGrade =
-                        convertPercentageToLetterGrade(100.0 *
-                            widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .percentage /
-                            widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .weight);
+                    if (widget.course.breakdown.isEmpty) {
+                      updateAssignment();
+                      final Decimal newCourseAchievedPoints = widget
+                          .course.assignments
+                          .map((final Assignment e) => e.achievedPoints)
+                          .reduce(
+                              (final Decimal element, final Decimal value) =>
+                                  element + value);
+                      final Decimal newCourseMaxPoints = widget
+                          .course.assignments
+                          .map((final Assignment e) => e.maxPoints)
+                          .reduce(
+                              (final Decimal element, final Decimal value) =>
+                                  element + value);
+                      final Decimal newCoursePercentage = Decimal.fromInt(100) *
+                          newCourseAchievedPoints /
+                          newCourseMaxPoints;
+                      widget.course.percentage = newCoursePercentage;
+                      widget.course.letterGrade =
+                          convertPercentageToLetterGrade(newCoursePercentage);
+                    } else {
+                      widget.course.breakdown[widget.assignment.assignmentType]
+                          .achievedPoints = widget
+                              .course
+                              .breakdown[widget.assignment.assignmentType]
+                              .achievedPoints -
+                          widget.assignment.achievedPoints;
+                      widget.course.breakdown[widget.assignment.assignmentType]
+                          .maxPoints = widget
+                              .course
+                              .breakdown[widget.assignment.assignmentType]
+                              .maxPoints -
+                          widget.assignment.maxPoints;
+                      widget.course.breakdown[widget.assignment.assignmentType]
+                          .percentage = Decimal.parse((widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .weight *
+                              widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .achievedPoints /
+                              widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .maxPoints)
+                          .toStringAsFixed(widget.course.courseMantissaLength));
+                      widget.course.breakdown[widget.assignment.assignmentType]
+                              .letterGrade =
+                          convertPercentageToLetterGrade(Decimal.fromInt(100) *
+                              widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .percentage /
+                              widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .weight);
+                      updateAssignment();
 
-                    widget.assignment.name = _assignmentName;
-                    widget.assignment.assignmentType = _assignmentType;
-                    widget.assignment.date = _assignmentDate;
-                    widget.assignment.dueDate = _assignmentDueDate;
-                    widget.assignment.achievedScore =
-                        _assignmentAchievedScore ?? _assignmentAchievedPoints;
-                    widget.assignment.maxScore =
-                        _assignmentMaxScore ?? _assignmentMaxPoints;
-                    widget.assignment.achievedPoints =
-                        _assignmentAchievedPoints;
-                    widget.assignment.maxPoints = _assignmentMaxPoints;
-                    widget.assignment.notes = _assignmentNotes ?? '';
-                    setState(() => widget.course.assignments =
-                        List<Assignment>.from(widget.course.assignments));
+                      widget.course.breakdown[widget.assignment.assignmentType]
+                          .achievedPoints = widget
+                              .course
+                              .breakdown[widget.assignment.assignmentType]
+                              .achievedPoints +
+                          widget.assignment.achievedPoints;
+                      widget.course.breakdown[widget.assignment.assignmentType]
+                          .maxPoints = widget
+                              .course
+                              .breakdown[widget.assignment.assignmentType]
+                              .maxPoints +
+                          widget.assignment.maxPoints;
+                      widget.course.breakdown[widget.assignment.assignmentType]
+                          .percentage = Decimal.parse((widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .weight *
+                              widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .achievedPoints /
+                              widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .maxPoints)
+                          .toStringAsFixed(widget
+                              .course
+                              .breakdown[widget.assignment.assignmentType]
+                              .weightingMantissaLength));
 
-                    widget.course.breakdown[widget.assignment.assignmentType]
-                        .achievedPoints = (Decimal.parse(widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .achievedPoints
-                                .toString()) +
-                            Decimal.parse(
-                                widget.assignment.achievedPoints.toString()))
-                        .toDouble();
-                    widget.course.breakdown[widget.assignment.assignmentType]
-                        .maxPoints = (Decimal.parse(widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .maxPoints
-                                .toString()) +
-                            Decimal.parse(
-                                widget.assignment.maxPoints.toString()))
-                        .toDouble();
-                    widget.course.breakdown[widget.assignment.assignmentType]
-                        .percentage = double.parse((widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .weight *
-                            widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .achievedPoints /
-                            widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .maxPoints)
-                        .toStringAsFixed(widget
-                            .course
-                            .breakdown[widget.assignment.assignmentType]
-                            .weightingMantissaLength));
-
-                    widget.course.breakdown["TOTAL"].percentage = double.parse(
-                        (widget.course.breakdown.weightings
-                                .map((final Weighting f) =>
-                                    f.name == "TOTAL" ? 0.0 : f.percentage)
-                                .reduce((final double value,
-                                        final double element) =>
-                                    value + element))
-                            .toStringAsFixed(widget.course.breakdown["TOTAL"]
-                                .weightingMantissaLength));
-                    widget.course.breakdown[widget.assignment.assignmentType]
-                            .letterGrade =
-                        convertPercentageToLetterGrade(100.0 *
-                            widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .percentage /
-                            widget
-                                .course
-                                .breakdown[widget.assignment.assignmentType]
-                                .weight);
-                    widget.course.letterGrade =
-                        widget.course.breakdown["TOTAL"].letterGrade =
-                            convertPercentageToLetterGrade(
-                                widget.course.breakdown["TOTAL"].percentage);
-                    widget.course.percentage = double.parse(widget
-                        .course.breakdown["TOTAL"].percentage
-                        .toStringAsFixed(widget.course.courseMantissaLength));
+                      widget.course.breakdown['TOTAL'].percentage =
+                          Decimal.parse((widget.course.breakdown.weightings
+                                  .map((final Weighting f) => f.name == 'TOTAL'
+                                      ? Decimal.fromInt(0)
+                                      : f.percentage)
+                                  .reduce((final Decimal value,
+                                          final Decimal element) =>
+                                      value + element))
+                              .toStringAsFixed(widget.course.breakdown['TOTAL']
+                                  .weightingMantissaLength));
+                      widget.course.breakdown[widget.assignment.assignmentType]
+                              .letterGrade =
+                          convertPercentageToLetterGrade(Decimal.fromInt(100) *
+                              widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .percentage /
+                              widget
+                                  .course
+                                  .breakdown[widget.assignment.assignmentType]
+                                  .weight);
+                      widget.course.letterGrade =
+                          widget.course.breakdown['TOTAL'].letterGrade =
+                              convertPercentageToLetterGrade(
+                                  widget.course.breakdown['TOTAL'].percentage);
+                      widget.course.percentage = Decimal.parse(widget
+                          .course.breakdown['TOTAL'].percentage
+                          .toStringAsFixed(widget.course.courseMantissaLength));
+                    }
                     Navigator.pop(context);
                   }
                 })

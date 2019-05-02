@@ -1,5 +1,8 @@
 import 'dart:convert' show jsonDecode;
+import 'dart:io' show Platform;
 
+import 'package:firebase_messaging/firebase_messaging.dart'
+    show FirebaseMessaging, IosNotificationSettings;
 import 'package:flutter/material.dart'
     show
         StatefulWidget,
@@ -58,10 +61,8 @@ class GradesTab extends StatelessWidget {
         itemBuilder: (final BuildContext context, final int index) => Info(
             key: Key(user.courses[index].id),
             left: user.courses[index].name,
-            right: user.courses[index].letterGrade +
-                " (" +
-                user.courses[index].percentage.toString() +
-                "%)",
+            right: '${user.courses[index].letterGrade} '
+                '\(${user.courses[index].percentage.toStringAsFixed(user.courses[index].courseMantissaLength)}\%\)',
             onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -76,7 +77,7 @@ class GradesTab extends StatelessWidget {
       child: Column(children: <Widget>[
         const Padding(
             padding: EdgeInsets.only(bottom: 16.0),
-            child: Text("Grades",
+            child: Text('Grades',
                 style: TextStyle(fontSize: 32.0, color: Colors.white))),
         Expanded(child: grades)
       ]),
@@ -90,18 +91,23 @@ class HomePage extends StatefulWidget {
 }
 
 class SettingsTab extends StatelessWidget {
+  final FirebaseMessaging _firebaseMessaging;
   final bool _firebaseDeviceStatus;
-  SettingsTab(final this._firebaseDeviceStatus);
+  SettingsTab(final this._firebaseMessaging, final this._firebaseDeviceStatus);
+
   @override
   Widget build(final BuildContext context) {
     final Widget settings = Column(children: <Widget>[
       SwitchListTile(
-          title: const Text("Enable push notifications",
+          title: const Text('Enable push notifications',
               style: TextStyle(color: Colors.white)),
           value: _firebaseDeviceStatus,
           onChanged: (final bool newValue) async =>
-              await API.setActivationForDevice(user.username,
-                  await storage.read(key: 'gradeviewpassword'), newValue))
+              await API.setActivationForDevice(
+                  _firebaseMessaging,
+                  user.username,
+                  await storage.read(key: 'gradeviewpassword'),
+                  newValue))
     ]);
 
     return Container(
@@ -111,7 +117,7 @@ class SettingsTab extends StatelessWidget {
         child: Column(children: <Widget>[
           const Padding(
               padding: EdgeInsets.only(bottom: 16.0),
-              child: Text("Settings",
+              child: Text('Settings',
                   style: TextStyle(fontSize: 32.0, color: Colors.white))),
           settings
         ]));
@@ -160,7 +166,7 @@ class UserTab extends StatelessWidget {
                   TextSpan(
                       text: user.courses[index].name,
                       style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const TextSpan(text: " "),
+                  const TextSpan(text: ' '),
                   TextSpan(
                       text: user.courses[index].id,
                       style: const TextStyle(fontWeight: FontWeight.normal)),
@@ -187,6 +193,8 @@ class _HomePageState extends State<HomePage>
   final List<Widget> _tabs = List<Widget>(3);
   TabController _tabController;
 
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
   @override
   Widget build(final BuildContext context) {
     if (user.courses == null || user.courses.isEmpty) {
@@ -195,7 +203,7 @@ class _HomePageState extends State<HomePage>
 
     _tabs[0] = UserTab();
     _tabs[1] = GradesTab();
-    _tabs[2] = SettingsTab(_firebaseDeviceActive);
+    _tabs[2] = SettingsTab(_firebaseMessaging, _firebaseDeviceActive);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -220,6 +228,8 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  void clearPassword() async => await storage.delete(key: 'gradeviewpassword');
+
   @protected
   @mustCallSuper
   @override
@@ -230,7 +240,9 @@ class _HomePageState extends State<HomePage>
 
   void fetchActive() async =>
       _firebaseDeviceActive = await API.getActivationForDevice(
-          user.username, await storage.read(key: 'gradeviewpassword'));
+          _firebaseMessaging,
+          user.username,
+          await storage.read(key: 'gradeviewpassword'));
 
   void fetchUser() async {
     final List<dynamic> fetchedGrades = jsonDecode((await API.getGrades(
@@ -241,7 +253,24 @@ class _HomePageState extends State<HomePage>
     refreshUserCoursesList();
   }
 
-  void clearPassword() async => await storage.delete(key: 'gradeviewpassword');
+  void firebaseCloudMessagingListeners() {
+    if (Platform.isIOS) {
+      iosPermission();
+    }
+
+    _firebaseMessaging
+        .getToken()
+        .then((final String token) => print('Firebase token: $token'));
+
+    _firebaseMessaging.configure(
+      onMessage: (final Map<String, dynamic> message) async =>
+          print('Firebase on message $message'),
+      onResume: (final Map<String, dynamic> message) async =>
+          print('Firebase on resume $message'),
+      onLaunch: (final Map<String, dynamic> message) async =>
+          print('Firebase on launch $message'),
+    );
+  }
 
   @protected
   @mustCallSuper
@@ -251,7 +280,17 @@ class _HomePageState extends State<HomePage>
     fetchUser();
     fetchActive();
     setupTabController();
+    firebaseCloudMessagingListeners();
     clearPassword();
+  }
+
+  void iosPermission() {
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.onIosSettingsRegistered.listen(
+        (final IosNotificationSettings settings) =>
+            print("Firebase settings registered: $settings"));
+    _firebaseMessaging.setAutoInitEnabled(true);
   }
 
   void refreshUserCoursesList() =>

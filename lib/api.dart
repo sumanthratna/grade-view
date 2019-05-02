@@ -1,67 +1,74 @@
 import 'dart:async' show Future;
 import 'dart:collection' show ListBase;
 import 'dart:convert' show base64, base64Encode, utf8, jsonDecode;
-import 'dart:io' show Platform;
-import 'dart:math' show Random;
+import 'dart:io' show Platform, HttpStatus;
+import 'dart:math' show Random, pow;
 
+import 'package:decimal/decimal.dart' show Decimal;
+import 'package:firebase_messaging/firebase_messaging.dart'
+    show FirebaseMessaging;
 import 'package:flutter/material.dart'
     show Text, Image, DataRow, DataColumn, DataCell, required;
-import 'package:http/http.dart' as http show get, post;
+import 'package:http/http.dart' as http show get, post, patch;
 import 'package:http/http.dart' show Response;
 
-import 'globals.dart' show firebaseMessaging, storage;
+import 'globals.dart' show storage;
 
-int getMantissaLength(final String arg) =>
-    arg != null ? (arg.length - arg.lastIndexOf(RegExp(r"\.")) - 1) : -1;
-
-String convertPercentageToLetterGrade(final double percentage) {
+String convertPercentageToLetterGrade(final Decimal percentage) {
   if (percentage.isNaN || percentage.isInfinite) {
-    return "A";
+    return 'A';
   }
-  final int rounded = percentage.round();
+  final int rounded = percentage.round().toInt();
   if (rounded >= 93) {
-    return "A";
+    return 'A';
   } else if (90 <= rounded && rounded <= 92) {
-    return "A-";
+    return 'A-';
   } else if (87 <= rounded && rounded <= 89) {
-    return "B+";
+    return 'B+';
   } else if (83 <= rounded && rounded <= 86) {
-    return "B";
+    return 'B';
   } else if (80 <= rounded && rounded <= 82) {
-    return "B-";
+    return 'B-';
   } else if (77 <= rounded && rounded <= 79) {
-    return "C+";
+    return 'C+';
   } else if (73 <= rounded && rounded <= 76) {
-    return "C";
+    return 'C';
   } else if (70 <= rounded && rounded <= 72) {
-    return "C-";
+    return 'C-';
   } else if (67 <= rounded && rounded <= 69) {
-    return "D+";
+    return 'D+';
   } else if (64 <= rounded && rounded <= 66) {
-    return "D";
+    return 'D';
   } else {
-    return "F";
+    return 'F';
   }
 }
 
+int getMantissaLength(final String arg) =>
+    arg != null ? (arg.length - arg.lastIndexOf(RegExp(r'\.')) - 1) : -1;
+
 class API {
-  static const String _base = "https://sisapi.sites.tjhsst.edu";
+  static const String _base = 'https://sisapi.sites.tjhsst.edu';
   static Future<bool> getActivationForDevice(
-      final String username, final String password) async {
+      final FirebaseMessaging firebaseMessaging,
+      final String username,
+      final String password) async {
     final String registrationID =
         await storage.read(key: 'gradeviewfirebaseregistrationid') ??
             await firebaseMessaging.getToken();
-    final String url = _base + "/devices/" + registrationID;
+    final String url = '$_base/devices/$registrationID/';
+    // final String url = '$_base/devices/';
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     final Response response =
-        await http.get(url, headers: {'Authorization': auth});
-    return jsonDecode(response.body)['active'] ?? false;
+        await http.get(Uri.encodeFull(url), headers: {'Authorization': auth});
+    print('Firebase device: ${jsonDecode(response.body)['active']}');
+    return jsonDecode(response.body)['active'];
   }
 
   static Future<Response> getGrades(
       final String username, final String password) {
-    final String url = _base + "/grades/?save_password";
+    final String url = '$_base/grades/?save_password';
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     return http.get(url, headers: {'Authorization': auth});
@@ -69,15 +76,15 @@ class API {
 
   static Future<Response> getUser(
       final String username, final String password) {
-    final String url = _base + "/user/";
+    final String url = '$_base/user/';
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     return http.get(url, headers: {'Authorization': auth});
   }
 
-  static Future<bool> registerDevice(
+  static Future<bool> registerDevice(final FirebaseMessaging firebaseMessaging,
       final String username, final String password) async {
-    final String url = _base + "/devices/";
+    final String url = '$_base/devices/';
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
     final String registrationID =
@@ -86,50 +93,54 @@ class API {
     final Response check =
         await http.get(url, headers: {'Authorization': auth});
     if (check.body.contains(registrationID)) {
-      setActivationForDevice(username, password, true);
+      return setActivationForDevice(
+          firebaseMessaging, username, password, true);
+    } else {
+      await storage.write(
+          key: 'gradeviewfirebaseregistrationid',
+          value: await firebaseMessaging.getToken());
+      final Map<String, String> device = {
+        'id': Random().nextInt(pow(2, 32)).toString(),
+        'name': 'FCPS GradeView notifications',
+        'registration_id':
+            await storage.read(key: 'gradeviewfirebaseregistrationid'),
+        'device_id': '', //await FlutterUdid.udid,
+        'active': true.toString(),
+        'type':
+            (Platform.isIOS ? 'ios' : (Platform.isAndroid ? 'android' : 'web'))
+      };
+      final Response response =
+          await http.post(url, headers: {'Authorization': auth}, body: device);
+      return Future.value(response.statusCode == HttpStatus.ok);
     }
-    await storage.write(
-        key: 'gradeviewfirebaseregistrationid',
-        value: await firebaseMessaging.getToken());
-    final Map<String, dynamic> device = {
-      'id': Random()..nextInt(1000),
-      'name': username,
-      'registration_id':
-          await storage.read(key: 'gradeviewfirebaseregistrationid'),
-      // 'device_id': await FlutterUdid.udid,
-      'active': true,
-      'type': (Platform.isIOS ? 'ios' : (Platform.isAndroid ? 'android' : null))
-    };
-    final Response response =
-        await http.post(url, headers: {'Authorization': auth}, body: device);
-    return Future.value((response.statusCode / 100).floor() == 2);
   }
 
   static Future<bool> setActivationForDevice(
-      final String username, final String password, final bool activate) async {
-    final String registrationId =
-        await storage.read(key: 'gradeviewfirebaseregistrationid') ??
-            await firebaseMessaging.getToken();
-    final String url = _base + "/devices/" + registrationId;
+      final FirebaseMessaging firebaseMessaging,
+      final String username,
+      final String password,
+      final bool activate) async {
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
-    final String id = await storage.read(key: 'gradeviewfirebaseid') ??
-        Random().nextInt(2 ^ 32).toString();
-    await storage.write(key: 'gradeviewfirebaseid', value: id);
-    final Map<String, String> params = {
-      'id': id,
-      'name': 'FCPS GradeView notifications',
-      'registration_id': registrationId,
-      'device_id': '',
-      // 'device_id': await FlutterUdid.udid,
-      'active': activate.toString(),
-      'type': (Platform.isIOS ? 'ios' : (Platform.isAndroid ? 'android' : null))
-    };
+
+    Future<Map<String, String>> getParams() async {
+      final String registrationId =
+          await storage.read(key: 'gradeviewfirebaseregistrationid') ??
+              await firebaseMessaging.getToken();
+      return <String, String>{
+        'registration_id': registrationId,
+        'active': activate.toString(),
+        'type':
+            (Platform.isIOS ? 'ios' : (Platform.isAndroid ? 'android' : 'web'))
+      };
+    }
+
+    final Map<String, String> params = await getParams();
+    final String url = '$_base/devices/${params['registration_id']}';
     final Response response =
-        await http.post(url, headers: {'Authorizaton': auth}, body: params);
-    print(params);
-    print(response.statusCode);
-    return Future.value((response.statusCode / 100).floor() == 2);
+        await http.patch(url, headers: {'Authorizaton': auth}, body: params);
+    print('Firebase device parameters: $params');
+    return Future.value(response.statusCode == HttpStatus.ok);
   }
 }
 
@@ -138,8 +149,8 @@ class Assignment {
   String assignmentType;
   DateTime date;
   DateTime dueDate;
-  double achievedScore, maxScore;
-  double achievedPoints, maxPoints;
+  Decimal achievedScore, maxScore;
+  Decimal achievedPoints, maxPoints;
   String notes;
   bool real = true;
 
@@ -162,11 +173,11 @@ class Assignment {
         date = DateTime.parse(json['date']),
         dueDate = DateTime.parse(json['due_date']) {
     final score = json['score'].split(' out of ');
-    achievedScore = double.tryParse(score[0]);
-    maxScore = double.tryParse(score[score.length == 2 ? 1 : 0]);
+    achievedScore = Decimal.tryParse(score[0]);
+    maxScore = Decimal.tryParse(score[score.length == 2 ? 1 : 0]);
     final points = json['points'].split(' / ');
-    achievedPoints = double.tryParse(points[0]);
-    maxPoints = double.tryParse(
+    achievedPoints = Decimal.tryParse(points[0]);
+    maxPoints = Decimal.tryParse(
         points.length == 2 ? points[1] : points[0].split(' ')[0]);
   }
 
@@ -206,25 +217,36 @@ class Breakdown extends ListBase<Weighting> {
     }
   }
 
-  void operator []=(final int index, final Weighting value) =>
-      weightings[index] = value;
+  void operator []=(final dynamic arg, final Weighting value) {
+    if (arg is int) {
+      weightings[arg] = value;
+    } else if (arg is String) {
+      final List<String> weightingNames =
+          weightings.map((final Weighting f) => f.name);
+      if (weightings.map((final Weighting f) => f.name).contains(arg)) {
+        weightings[weightingNames.toList().indexOf(arg)] = value;
+      } else {
+        weightings.add(value);
+      }
+    }
+  }
 
   void add(final Weighting value) => weightings.add(value);
   void addAll(final Iterable<Weighting> all) => weightings.addAll(all);
 
   List<DataColumn> getDataColumns() => <DataColumn>[
         DataColumn(
-            label: const Text("Assignment\nType"),
+            label: const Text('Assignment\nType'),
             onSort: (final int index, final bool sort) {}),
         DataColumn(
-            label: const Text("Average"),
+            label: const Text('Average'),
             onSort: (final int index, final bool sort) {}),
         DataColumn(
-            label: const Text("Weight"),
+            label: const Text('Weight'),
             onSort: (final int index, final bool sort) {}),
-        DataColumn(label: const Text("Points")),
+        DataColumn(label: const Text('Points')),
         DataColumn(
-            label: const Text("Letter\nGrade"),
+            label: const Text('Letter\nGrade'),
             onSort: (final int index, final bool sort) {})
       ];
 
@@ -248,8 +270,8 @@ class Breakdown extends ListBase<Weighting> {
     return out;
   }
 
-  Map<String, double> toJson() {
-    Map<String, double> out = Map<String, double>();
+  Map<String, Decimal> toJson() {
+    Map<String, Decimal> out = Map<String, Decimal>();
     for (final Weighting weighting in weightings) {
       out[weighting.name] = weighting.percentage;
     }
@@ -265,7 +287,7 @@ class Course {
   final String id;
   final String location;
   String letterGrade;
-  double percentage;
+  Decimal percentage;
   List<Assignment> assignments;
   final String teacher;
   Breakdown breakdown;
@@ -280,19 +302,19 @@ class Course {
       @required final String percentage,
       @required final this.teacher})
       : period = int.parse(period),
-        percentage = double.parse(percentage),
+        percentage = Decimal.parse(percentage),
         courseMantissaLength = getMantissaLength(percentage.toString());
 
   Course.fromJson(final Map<String, dynamic> json)
       : period = json['period'],
-        name = json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")) >= 0
+        name = json['name'].indexOf(RegExp(r'\([0-9A-Z]+\)')) >= 0
             ? json['name']
-                .substring(0, json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")))
+                .substring(0, json['name'].indexOf(RegExp(r'\([0-9A-Z]+\)')))
                 .trim()
             : json['name'],
-        id = json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")) >= 0
+        id = json['name'].indexOf(RegExp(r'\([0-9A-Z]+\)')) >= 0
             ? json['name']
-                .substring(json['name'].indexOf(RegExp(r"\([0-9A-Z]+\)")))
+                .substring(json['name'].indexOf(RegExp(r'\([0-9A-Z]+\)')))
                 .trim()
             : null,
         location = json['location'],
@@ -300,7 +322,7 @@ class Course {
             ? json['grades'][json['grades']?.keys?.first]['letter']
             : null,
         percentage = json['grades'] != null
-            ? double.tryParse(
+            ? Decimal.tryParse(
                 json['grades'][json['grades']?.keys?.first]['percentage'])
             : null,
         teacher = json['teacher'],
@@ -316,7 +338,7 @@ class Course {
       json['grades'][json['grades']?.keys?.first]['breakdown']?.forEach(
           (final String k, final dynamic v) =>
               breakdown.add(Weighting.fromJson(k, v as Map<String, dynamic>)));
-      breakdown.sort((final Weighting a, final Weighting b) => a.name == "TOTAL"
+      breakdown.sort((final Weighting a, final Weighting b) => a.name == 'TOTAL'
           ? double.maxFinite.toInt()
           : a.name.compareTo(b.name));
     }
@@ -375,10 +397,10 @@ class User {
 
 class Weighting {
   final String name;
-  final double weight;
+  final Decimal weight;
   String letterGrade;
-  double percentage;
-  double achievedPoints, maxPoints;
+  Decimal percentage;
+  Decimal achievedPoints, maxPoints;
   final int weightingMantissaLength;
 
   Weighting(
@@ -388,19 +410,19 @@ class Weighting {
       @required final String percentage,
       @required final String achievedPoints,
       @required final String maxPoints})
-      : weight = double.parse(weight),
-        percentage = double.parse(percentage),
-        achievedPoints = double.parse(achievedPoints),
-        maxPoints = double.parse(maxPoints),
+      : weight = Decimal.parse(weight),
+        percentage = Decimal.parse(percentage),
+        achievedPoints = Decimal.parse(achievedPoints),
+        maxPoints = Decimal.parse(maxPoints),
         weightingMantissaLength = getMantissaLength(percentage);
 
   Weighting.fromJson(final String name, final Map<String, dynamic> json)
       : name = name,
-        weight = double.parse(json['weight']),
+        weight = Decimal.parse(json['weight']),
         letterGrade = json['letter_grade'],
-        percentage = double.parse(json['percentage']),
-        achievedPoints = double.parse(json['points'].replaceAll(',', '')),
-        maxPoints = double.parse(json['points_possible'].replaceAll(',', '')),
+        percentage = Decimal.parse(json['percentage']),
+        achievedPoints = Decimal.parse(json['points'].replaceAll(',', '')),
+        maxPoints = Decimal.parse(json['points_possible'].replaceAll(',', '')),
         weightingMantissaLength = getMantissaLength(json['percentage']);
 
   Map<String, String> toJson() => {

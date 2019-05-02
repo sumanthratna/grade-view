@@ -4,6 +4,7 @@ import 'package:decimal/decimal.dart' show Decimal;
 import 'package:flutter/material.dart'
     show
         Brightness,
+        FontWeight,
         StatefulWidget,
         Key,
         State,
@@ -48,7 +49,9 @@ import 'package:flutter/material.dart'
         DropdownMenuItem,
         RaisedButton,
         IconThemeData,
-        TextInputType;
+        TextInputType,
+        mustCallSuper,
+        protected;
 import 'package:intl/intl.dart' show DateFormat;
 
 import 'api.dart'
@@ -98,33 +101,51 @@ class CoursePage extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 32.0, color: Colors.white)));
 
-    final Widget courseBreakdown = Scrollbar(
-        child: SingleChildScrollView(
-            child: Card(
-                child: DataTable(
-                    rows: course.breakdown.getDataRows(),
-                    columns: course.breakdown.getDataColumns()),
-                margin:
-                    const EdgeInsets.only(left: 4.0, right: 4.0, bottom: 16.0)),
-            scrollDirection: Axis.horizontal));
+    final Widget courseBreakdown = course.breakdown.isEmpty
+        ? const Padding(
+            child: Text(
+              'No Breakdown Information Available',
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            padding: EdgeInsets.symmetric(vertical: 8.0))
+        : Scrollbar(
+            child: SingleChildScrollView(
+                child: Card(
+                    child: DataTable(
+                        rows: course.breakdown.getDataRows(),
+                        columns: course.breakdown.getDataColumns()),
+                    margin: const EdgeInsets.only(
+                        left: 4.0, right: 4.0, bottom: 16.0)),
+                scrollDirection: Axis.horizontal));
 
-    final Widget courseGrades = ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: course.assignments.length,
-        shrinkWrap: true,
-        itemBuilder: (final BuildContext context, final int index) => Info(
-            left: course.assignments[index].name,
-            right: " " +
-                course.assignments[index].achievedPoints.toString() +
-                "/" +
-                course.assignments[index].maxPoints.toString(),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    settings: const RouteSettings(name: 'assignment-page'),
-                    builder: (final BuildContext context) => AssignmentPage(
-                        course: course,
-                        assignment: course.assignments[index])))));
+    final Widget courseAssignments = course.assignments.isEmpty
+        ? const Padding(
+            child: Text(
+              'No Assignments Available',
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            padding: EdgeInsets.symmetric(vertical: 8.0))
+        : ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: course.assignments.length,
+            shrinkWrap: true,
+            itemBuilder: (final BuildContext context, final int index) => Info(
+                left: course.assignments[index].name,
+                right: ' ' +
+                    course.assignments[index].achievedPoints.toString() +
+                    '/' +
+                    course.assignments[index].maxPoints.toString(),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        settings: const RouteSettings(name: 'assignment-page'),
+                        builder: (final BuildContext context) => AssignmentPage(
+                            course: course,
+                            assignment: course.assignments[index])))));
 
     final Widget body = Container(
         width: MediaQuery.of(context).size.width,
@@ -134,7 +155,7 @@ class CoursePage extends StatelessWidget {
           pageTitle,
           Expanded(
               child: ListView(
-            children: <Widget>[courseBreakdown, courseGrades],
+            children: <Widget>[courseBreakdown, courseAssignments],
             padding: const EdgeInsets.only(bottom: 112.0),
           ))
         ]));
@@ -197,9 +218,14 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
   String _assignmentType;
   DateTime _assignmentDate;
   DateTime _assignmentDueDate;
-  double _assignmentAchievedScore, _assignmentMaxScore;
-  double _assignmentAchievedPoints, _assignmentMaxPoints;
+  Decimal _assignmentAchievedScore, _assignmentMaxScore;
+  Decimal _assignmentAchievedPoints, _assignmentMaxPoints;
   String _assignmentNotes;
+
+  // -1 for a text field.
+  // 0 for dropdown with no weightings.
+  // 1 for dropdown with weigtings.
+  int _assignmentTypeSelector;
 
   @override
   Widget build(final BuildContext context) => SingleChildScrollView(
@@ -217,23 +243,48 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                   }
                 },
                 onSaved: (final String value) => _assignmentName = value),
-            DropdownFormField(
-                validator: (final String value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please Select a Value';
-                  }
-                },
-                onSaved: (final String value) => _assignmentType = value,
-                decoration: const InputDecoration(
-                  labelText: 'Assignment Type*',
-                ),
-                items: (List<Weighting>.from(widget.course.breakdown)
-                        .map((final Weighting f) => f.name)
-                        .toList()
-                          ..remove("TOTAL"))
-                    .map((final String f) =>
-                        DropdownMenuItem<String>(value: f, child: Text(f)))
-                    .toList()),
+            _assignmentTypeSelector == 1
+                ? DropdownFormField(
+                    validator: (final String value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please Select a Value';
+                      }
+                    },
+                    onSaved: (final String value) => _assignmentType = value,
+                    decoration: const InputDecoration(
+                      labelText: 'Assignment Type*',
+                    ),
+                    items: (List<Weighting>.from(widget.course.breakdown)
+                            .map((final Weighting f) => f.name)
+                            .toList()
+                              ..remove('TOTAL'))
+                        .map((final String f) =>
+                            DropdownMenuItem<String>(value: f, child: Text(f)))
+                        .toList())
+                : (_assignmentTypeSelector == -1
+                    ? TextFormField(
+                        keyboardAppearance: Brightness.dark,
+                        decoration:
+                            const InputDecoration(labelText: 'Assignment Name'),
+                        onSaved: (final String value) =>
+                            _assignmentType = value)
+                    : DropdownFormField(
+                        validator: (final String value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please Select a Value';
+                          }
+                        },
+                        onSaved: (final String value) =>
+                            _assignmentType = value,
+                        decoration: const InputDecoration(
+                          labelText: 'Assignment Type*',
+                        ),
+                        items: widget.course.assignments
+                            .map((final Assignment f) => f.assignmentType)
+                            .toSet()
+                            .map((final String f) => DropdownMenuItem<String>(
+                                value: f, child: Text(f)))
+                            .toList())),
             DateTimePickerFormField(
                 format: DateFormat('yyyy-MM-dd'),
                 inputType: InputType.date,
@@ -252,12 +303,12 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                   TextInputType.numberWithOptions(signed: true, decimal: true),
               keyboardAppearance: Brightness.dark,
               validator: (final String value) {
-                if (value.isNotEmpty && double.tryParse(value) == null) {
+                if (value.isNotEmpty && Decimal.tryParse(value) == null) {
                   return 'Please Enter a Valid Number';
                 }
               },
               onSaved: (final String value) =>
-                  _assignmentAchievedScore = double.tryParse(value),
+                  _assignmentAchievedScore = Decimal.tryParse(value),
             ),
             TextFormField(
                 decoration: const InputDecoration(labelText: 'Maximum Score'),
@@ -265,12 +316,12 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                     signed: true, decimal: true),
                 keyboardAppearance: Brightness.dark,
                 validator: (final String value) {
-                  if (value.isNotEmpty && double.tryParse(value) == null) {
+                  if (value.isNotEmpty && Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
                 },
                 onSaved: (final String value) =>
-                    _assignmentMaxScore = double.tryParse(value)),
+                    _assignmentMaxScore = Decimal.tryParse(value)),
             TextFormField(
                 decoration:
                     const InputDecoration(labelText: 'Achieved Points*'),
@@ -281,12 +332,12 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please Enter a Value';
                   }
-                  if (double.tryParse(value) == null) {
+                  if (Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
                 },
                 onSaved: (final String value) =>
-                    _assignmentAchievedPoints = double.tryParse(value)),
+                    _assignmentAchievedPoints = Decimal.tryParse(value)),
             TextFormField(
                 decoration: const InputDecoration(labelText: 'Maximum Points*'),
                 keyboardType: TextInputType.numberWithOptions(
@@ -296,12 +347,12 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please Enter a Value';
                   }
-                  if (double.tryParse(value) == null) {
+                  if (Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
                 },
                 onSaved: (final String value) =>
-                    _assignmentMaxPoints = double.tryParse(value)),
+                    _assignmentMaxPoints = Decimal.tryParse(value)),
             TextFormField(
                 decoration: const InputDecoration(labelText: 'Notes'),
                 keyboardAppearance: Brightness.dark,
@@ -313,7 +364,7 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                     _formKey.currentState.save();
                     final Assignment newAssignment = Assignment(
                         name: _assignmentName,
-                        assignmentType: _assignmentType,
+                        assignmentType: _assignmentType ?? 'N/A',
                         date: _assignmentDate ?? DateTime.now(),
                         dueDate: _assignmentDueDate ?? DateTime.now(),
                         achievedScore: _assignmentAchievedScore ??
@@ -326,50 +377,73 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                     widget.course.assignments =
                         List<Assignment>.from(widget.course.assignments)
                           ..insert(0, newAssignment);
-                    widget.course.breakdown[_assignmentType]
-                        .achievedPoints = (Decimal.parse(widget.course
-                                .breakdown[_assignmentType].achievedPoints
-                                .toString()) +
-                            Decimal.parse(_assignmentAchievedPoints.toString()))
-                        .toDouble();
-                    widget.course.breakdown[_assignmentType].maxPoints =
-                        (Decimal.parse(widget
-                                    .course.breakdown[_assignmentType].maxPoints
-                                    .toString()) +
-                                Decimal.parse(_assignmentMaxPoints.toString()))
-                            .toDouble();
-                    widget.course.breakdown[_assignmentType].percentage =
-                        double.parse(
-                            (widget.course.breakdown[_assignmentType].weight *
-                                    widget.course.breakdown[_assignmentType]
-                                        .achievedPoints /
-                                    widget.course.breakdown[_assignmentType]
-                                        .maxPoints)
-                                .toStringAsFixed(widget
-                                    .course
-                                    .breakdown[_assignmentType]
-                                    .weightingMantissaLength));
-                    widget.course.breakdown["TOTAL"].percentage = double.parse(
-                        (widget.course.breakdown.weightings
-                                .map((final Weighting f) =>
-                                    f.name == "TOTAL" ? 0.0 : f.percentage)
-                                .reduce((final double value,
-                                        final double element) =>
-                                    value + element))
-                            .toStringAsFixed(widget.course.breakdown["TOTAL"]
-                                .weightingMantissaLength));
-                    widget.course.breakdown[_assignmentType].letterGrade =
-                        convertPercentageToLetterGrade(100.0 *
-                            widget
-                                .course.breakdown[_assignmentType].percentage /
-                            widget.course.breakdown[_assignmentType].weight);
-                    widget.course.letterGrade =
-                        widget.course.breakdown["TOTAL"].letterGrade =
-                            convertPercentageToLetterGrade(
-                                widget.course.breakdown["TOTAL"].percentage);
-                    widget.course.percentage = double.parse(widget
-                        .course.breakdown["TOTAL"].percentage
-                        .toStringAsFixed(widget.course.courseMantissaLength));
+                    if (_assignmentTypeSelector == -1) {
+                      final Decimal newPercentage = Decimal.fromInt(100) *
+                          _assignmentAchievedPoints /
+                          _assignmentMaxPoints;
+                      widget.course.percentage = newPercentage;
+                      widget.course.letterGrade =
+                          convertPercentageToLetterGrade(newPercentage);
+                    } else if (_assignmentTypeSelector == 0) {
+                      final Decimal newCourseAchievedPoints = widget
+                          .course.assignments
+                          .map((final Assignment e) => e.achievedPoints)
+                          .reduce(
+                              (final Decimal element, final Decimal value) =>
+                                  element + value);
+                      final Decimal newCourseMaxPoints = widget
+                          .course.assignments
+                          .map((final Assignment e) => e.maxPoints)
+                          .reduce(
+                              (final Decimal element, final Decimal value) =>
+                                  element + value);
+                      final Decimal newCoursePercentage = Decimal.fromInt(100) *
+                          newCourseAchievedPoints /
+                          newCourseMaxPoints;
+                      widget.course.percentage = newCoursePercentage;
+                      widget.course.letterGrade =
+                          convertPercentageToLetterGrade(newCoursePercentage);
+                    } else {
+                      widget.course.breakdown[_assignmentType].achievedPoints =
+                          widget.course.breakdown[_assignmentType]
+                                  .achievedPoints +
+                              _assignmentAchievedPoints;
+                      widget.course.breakdown[_assignmentType].maxPoints =
+                          widget.course.breakdown[_assignmentType].maxPoints +
+                              _assignmentMaxPoints;
+                      widget.course.breakdown[_assignmentType].percentage =
+                          Decimal.parse(
+                              (widget.course.breakdown[_assignmentType].weight *
+                                      widget.course.breakdown[_assignmentType]
+                                          .achievedPoints /
+                                      widget.course.breakdown[_assignmentType]
+                                          .maxPoints)
+                                  .toStringAsFixed(widget
+                                      .course
+                                      .breakdown[_assignmentType]
+                                      .weightingMantissaLength));
+                      widget.course.breakdown['TOTAL'].percentage =
+                          Decimal.parse((widget.course.breakdown.weightings
+                                  .map((final Weighting f) => f.name == 'TOTAL'
+                                      ? Decimal.fromInt(0)
+                                      : f.percentage)
+                                  .reduce((final Decimal value,
+                                          final Decimal element) =>
+                                      value + element))
+                              .toStringAsFixed(widget.course.breakdown['TOTAL']
+                                  .weightingMantissaLength));
+                      widget.course.breakdown[_assignmentType].letterGrade =
+                          convertPercentageToLetterGrade(Decimal.fromInt(100) *
+                              widget.course.breakdown[_assignmentType]
+                                  .percentage /
+                              widget.course.breakdown[_assignmentType].weight);
+                      widget.course.breakdown['TOTAL'].letterGrade =
+                          widget.course.letterGrade =
+                              convertPercentageToLetterGrade(
+                                  widget.course.breakdown['TOTAL'].percentage);
+                      widget.course.percentage =
+                          widget.course.breakdown['TOTAL'].percentage;
+                    }
                     Navigator.pop(context);
                     Navigator.push(
                         context,
@@ -382,15 +456,32 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                   }
                 })
           ])));
+
+  @protected
+  @override
+  @mustCallSuper
+  void initState() {
+    super.initState();
+    if (widget.course.assignments.isEmpty) {
+      // There are no assignments yet.
+      _assignmentTypeSelector = -1;
+    } else if (widget.course.breakdown.isEmpty) {
+      // There is no breakdown information, so all assignments are weighted equally.
+      _assignmentTypeSelector = 0;
+    } else {
+      // There are weighted assignments.
+      _assignmentTypeSelector = 1;
+    }
+  }
 }
 
 class _CalculateRequiredScoreFormState
     extends State<CalculateRequiredScoreForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  double _desiredCoursePercentage;
+  Decimal _desiredCoursePercentage;
   String _assignmentType;
-  double _assignmentMaxPoints;
+  Decimal _assignmentMaxPoints;
 
   @override
   Widget build(final BuildContext context) => SingleChildScrollView(
@@ -407,12 +498,12 @@ class _CalculateRequiredScoreFormState
                     return 'Please Enter a Value';
                   }
                   if (value.isNotEmpty &&
-                      double.tryParse(value.replaceAll("%", "")) == null) {
+                      Decimal.tryParse(value.replaceAll('%', '')) == null) {
                     return 'Please Enter a Valid Number';
                   }
                 },
                 onSaved: (final String value) => _desiredCoursePercentage =
-                    double.tryParse(value.replaceAll("%", "")),
+                    Decimal.tryParse(value.replaceAll('%', '')),
                 decoration: const InputDecoration(
                     labelText: 'Desired Course Percentage*')),
             DropdownFormField(
@@ -428,7 +519,7 @@ class _CalculateRequiredScoreFormState
                 items: (widget.course.breakdown
                         .map((final Weighting f) => f.name)
                         .toList()
-                          ..remove("TOTAL"))
+                          ..remove('TOTAL'))
                     .map((final String f) =>
                         DropdownMenuItem<String>(value: f, child: Text(f)))
                     .toList()),
@@ -437,7 +528,7 @@ class _CalculateRequiredScoreFormState
                   if (value.isEmpty) {
                     return 'Please Enter a Value';
                   }
-                  if (value.isNotEmpty && double.tryParse(value) == null) {
+                  if (value.isNotEmpty && Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
                 },
@@ -445,7 +536,7 @@ class _CalculateRequiredScoreFormState
                     signed: true, decimal: true),
                 keyboardAppearance: Brightness.dark,
                 onSaved: (final String value) =>
-                    _assignmentMaxPoints = double.tryParse(value),
+                    _assignmentMaxPoints = Decimal.tryParse(value),
                 decoration: const InputDecoration(
                     labelText: 'Point Value of Assignment*')),
             RaisedButton(
@@ -453,13 +544,13 @@ class _CalculateRequiredScoreFormState
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
-                    final double amountToImprove =
+                    final Decimal amountToImprove =
                         _desiredCoursePercentage - widget.course.percentage;
-                    final double necessaryAssignmentTypePercentage =
+                    final Decimal necessaryAssignmentTypePercentage =
                         (widget.course.breakdown[_assignmentType].percentage +
                                 amountToImprove) /
                             widget.course.breakdown[_assignmentType].weight;
-                    final double necessaryAssignmentTypeAchievedPoints =
+                    final Decimal necessaryAssignmentTypeAchievedPoints =
                         necessaryAssignmentTypePercentage *
                             (widget.course.breakdown[_assignmentType]
                                     .maxPoints +
@@ -468,7 +559,7 @@ class _CalculateRequiredScoreFormState
                         (necessaryAssignmentTypeAchievedPoints -
                                 widget.course.breakdown[_assignmentType]
                                     .achievedPoints)
-                            .toStringAsFixed(widget.course.breakdown["TOTAL"]
+                            .toStringAsFixed(widget.course.breakdown['TOTAL']
                                 .weightingMantissaLength);
                     Map<String, dynamic> data = {
                       'assignmentType': _assignmentType,

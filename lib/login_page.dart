@@ -1,5 +1,5 @@
 import 'dart:convert' show jsonDecode;
-import 'dart:io' show SocketException;
+import 'dart:io' show HttpStatus, SocketException;
 
 import 'package:flutter/material.dart'
     show
@@ -88,7 +88,8 @@ class _LoginPageState extends State<LoginPage> {
         keyboardType: TextInputType.number,
         autofocus: true,
         obscureText: false,
-        helpText: 'Username');
+        helpText: 'Username',
+        enabled: !_loading);
 
     final Widget password = InputText(
         key: const Key('password'),
@@ -96,7 +97,8 @@ class _LoginPageState extends State<LoginPage> {
         keyboardType: TextInputType.text,
         autofocus: false,
         obscureText: true,
-        helpText: 'Password');
+        helpText: 'Password',
+        enabled: !_loading);
 
     final Widget loginButton = Padding(
         key: const Key('log-in'),
@@ -113,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
         final response =
             await API.getUser(usernameInput, passwordInput);
         print('status code ' + response.statusCode.toString());
-        if ((response.statusCode / 100).floor() == 2) {
+        if (response.statusCode == HttpStatus.ok) {
           //2xx status code
           user = User.fromJson(jsonDecode(response.body));
           storage.write(key: "password", value: passwordInput);
@@ -155,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                       final Response response =
                           await API.getUser(usernameInput, passwordInput);
                       print('status code ' + response.statusCode.toString());
-                      if ((response.statusCode / 100).floor() == 2) {
+                      if (response.statusCode == HttpStatus.ok) {
                         user = User.fromJson(jsonDecode(response.body));
                         storage.write(
                             key: "gradeviewpassword", value: passwordInput);
@@ -171,7 +173,8 @@ class _LoginPageState extends State<LoginPage> {
                           });
                         });
                       } else {
-                        if ((response.statusCode / 100).floor() == 4) {
+                        if (response.statusCode == HttpStatus.forbidden ||
+                            response.statusCode == HttpStatus.unauthorized) {
                           throw IncorrectCredentialsException();
                         } else {
                           // Triggers the `else` in the `catch`.

@@ -31,10 +31,10 @@ before_script:
 - "plutil -replace API_KEY -string "$FIREBASE_SECRET" ios/Runner/GoogleService-Info.plist"
 script:
 - ls -alh
-- "./flutter/bin/flutter test"
 - "./flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run lib/"
 - "./flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run test/"
 - "./flutter/bin/flutter analyze"
+- "./flutter/bin/flutter test"
 - "./flutter/bin/flutter build bundle"
 - "./flutter/bin/flutter build appbundle"
 - "./flutter/bin/flutter build aot"

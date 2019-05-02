@@ -124,13 +124,15 @@ class InputText extends StatelessWidget {
   final bool autofocus;
   final bool obscureText;
   final String helpText;
+  final bool enabled;
   const InputText(
       {final Key key,
       @required final this.controller,
       @required final this.keyboardType,
       @required final this.obscureText,
       @required final this.helpText,
-      @required final this.autofocus})
+      @required final this.autofocus,
+      @required final this.enabled})
       : super(key: key);
 
   @override
@@ -146,6 +148,7 @@ class InputText extends StatelessWidget {
           contentPadding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
         ),
+        enabled: enabled,
       );
 }
 
