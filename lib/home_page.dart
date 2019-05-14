@@ -5,60 +5,61 @@ import 'package:firebase_messaging/firebase_messaging.dart'
     show FirebaseMessaging, IosNotificationSettings;
 import 'package:flutter/material.dart'
     show
-        StatefulWidget,
-        State,
-        SingleTickerProviderStateMixin,
-        GlobalKey,
-        ScaffoldState,
-        Widget,
-        TabController,
-        protected,
-        BuildContext,
-        Hero,
-        Padding,
-        EdgeInsets,
-        Container,
-        BoxDecoration,
-        Border,
-        Colors,
-        Text,
-        TextStyle,
-        ListView,
-        Center,
-        RichText,
-        TextSpan,
-        FontWeight,
-        Key,
-        MediaQuery,
-        Column,
-        Expanded,
-        Navigator,
-        MaterialPageRoute,
-        RouteSettings,
-        SwitchListTile,
-        Scaffold,
         AppBar,
-        IconThemeData,
-        ModalRoute,
-        TabBarView,
-        TabBar,
-        Tab,
+        Border,
+        BoxDecoration,
+        BuildContext,
+        Center,
+        Colors,
+        Column,
+        Container,
+        EdgeInsets,
+        Expanded,
+        FontWeight,
+        GlobalKey,
+        Hero,
         Icon,
         Icons,
+        IconThemeData,
+        Key,
+        ListView,
+        MaterialPageRoute,
+        MediaQuery,
+        ModalRoute,
         mustCallSuper,
-        StatelessWidget;
+        Navigator,
+        Padding,
+        protected,
+        RichText,
+        RouteSettings,
+        Scaffold,
+        ScaffoldState,
+        SingleTickerProviderStateMixin,
+        State,
+        StatelessWidget,
+        StatefulWidget,
+        SwitchListTile,
+        Tab,
+        TabBar,
+        TabBarView,
+        TabController,
+        Text,
+        TextSpan,
+        TextStyle,
+        Widget;
+import 'package:grade_view/widgets.dart'
+    show BackBar, InfoCard, LoadingIndicator;
 
-import 'api.dart' show API, Course;
+import 'package:grade_view/api.dart' show API, Course;
 import 'course_page.dart' show CoursePage;
-import 'custom_widgets.dart' show BackBar, LoadingIndicator, Info;
-import 'globals.dart' show user, storage, decoration;
+import 'globals.dart' show decoration, storage, user;
 
 class GradesTab extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     final Widget grades = ListView.builder(
         itemCount: user.courses.length,
-        itemBuilder: (final BuildContext context, final int index) => Info(
+        itemBuilder: (final BuildContext context, final int index) => InfoCard(
             key: Key(user.courses[index].id),
             left: user.courses[index].name,
             right: '${user.courses[index].letterGrade} '
@@ -98,7 +99,8 @@ class SettingsTab extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     final Widget settings = Column(children: <Widget>[
-      SwitchListTile(
+      // test adaptive constructor
+      SwitchListTile.adaptive(
           title: const Text('Enable push notifications',
               style: TextStyle(color: Colors.white)),
           value: _firebaseDeviceStatus,

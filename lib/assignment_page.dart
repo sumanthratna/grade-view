@@ -3,52 +3,53 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart'
 import 'package:decimal/decimal.dart' show Decimal;
 import 'package:flutter/material.dart'
     show
-        Padding,
-        StatelessWidget,
-        StatefulWidget,
-        SingleChildScrollView,
-        Brightness,
-        TextInputType,
-        Form,
-        ListBody,
-        TextFormField,
-        InputDecoration,
-        State,
-        GlobalKey,
-        FormState,
-        Key,
-        required,
-        Widget,
-        BuildContext,
-        Colors,
-        EdgeInsets,
-        ListView,
-        Container,
-        MediaQuery,
-        Column,
-        Center,
-        Text,
-        TextAlign,
-        TextStyle,
-        Expanded,
-        Scaffold,
-        showDialog,
         AlertDialog,
+        AppBar,
+        Brightness,
+        BuildContext,
+        Center,
+        Colors,
+        Column,
+        Container,
+        DropdownMenuItem,
+        EdgeInsets,
+        Expanded,
         FlatButton,
-        Navigator,
         FloatingActionButton,
+        Form,
+        FormState,
+        GlobalKey,
         Icon,
         Icons,
-        AppBar,
         IconThemeData,
+        InputDecoration,
+        Key,
+        ListBody,
+        ListView,
         MainAxisAlignment,
-        DropdownMenuItem,
-        RaisedButton;
+        MediaQuery,
+        Navigator,
+        Padding,
+        RaisedButton,
+        required,
+        Scaffold,
+        showDialog,
+        SingleChildScrollView,
+        State,
+        StatefulWidget,
+        StatelessWidget,
+        Text,
+        TextAlign,
+        TextFormField,
+        TextInputType,
+        TextStyle,
+        Widget;
+import 'package:grade_view/widgets.dart'
+    show BackBar, DropdownFormField, InfoCard;
 import 'package:intl/intl.dart' show DateFormat;
 
-import 'api.dart'
+import 'package:grade_view/api.dart'
     show Assignment, Course, Weighting, convertPercentageToLetterGrade;
-import 'custom_widgets.dart' show BackBar, Info, DropdownFormField;
 import 'globals.dart' show decoration;
 
 class AssignmentPage extends StatelessWidget {
@@ -72,14 +73,14 @@ class AssignmentPage extends StatelessWidget {
         padding:
             assignment.real ? EdgeInsets.zero : EdgeInsets.only(bottom: 112.0),
         children: <Widget>[
-          Info(
+          InfoCard(
             left: 'Letter Grade',
             right: percentage == null
                 ? 'N/A'
                 : convertPercentageToLetterGrade(percentage),
             onTap: () {},
           ),
-          Info(
+          InfoCard(
             left: 'Percentage',
             right: percentage == null
                 ? 'N/A'
@@ -91,7 +92,7 @@ class AssignmentPage extends StatelessWidget {
                     '%',
             onTap: () {},
           ),
-          Info(
+          InfoCard(
               left: 'Score',
               right: (assignment.achievedScore == null &&
                       assignment.maxScore == null)
@@ -100,29 +101,30 @@ class AssignmentPage extends StatelessWidget {
                       '/' +
                       assignment.maxScore.toString(),
               onTap: () {}),
-          Info(
+          InfoCard(
               left: 'Points',
               right: assignment.achievedPoints.toString() +
                   '/' +
                   assignment.maxPoints.toString(),
               onTap: () {}),
-          Info(
+          InfoCard(
               left: 'Type',
               right: assignment.assignmentType ?? 'N/A',
               onTap: () {}),
-          Info(left: 'Teacher', right: course.teacher, onTap: () {}),
-          Info(left: 'Period', right: course.period.toString(), onTap: () {}),
-          Info(
+          InfoCard(left: 'Teacher', right: course.teacher, onTap: () {}),
+          InfoCard(
+              left: 'Period', right: course.period.toString(), onTap: () {}),
+          InfoCard(
               left: 'Date',
               right: assignment.date.toIso8601String().substring(0, 10),
               onTap: () {}),
-          Info(
+          InfoCard(
               left: 'Due Date',
               right: assignment.dueDate.toIso8601String().substring(0, 10),
               onTap: () {}),
           assignment.notes == null || assignment.notes.isEmpty
               ? Container()
-              : Info(left: 'Notes', right: assignment.notes, onTap: () {})
+              : InfoCard(left: 'Notes', right: assignment.notes, onTap: () {})
         ]);
 
     final Widget body = Container(
@@ -418,7 +420,7 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                 child: const Text('Submit'),
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
-                    updateAssignment() {
+                    void updateAssignment() {
                       widget.assignment.name = _assignmentName;
                       widget.assignment.assignmentType = _assignmentType;
                       widget.assignment.date = _assignmentDate;

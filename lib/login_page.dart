@@ -3,43 +3,43 @@ import 'dart:io' show HttpStatus, SocketException;
 
 import 'package:flutter/material.dart'
     show
-        StatefulWidget,
-        State,
-        SnackBar,
-        Text,
-        GlobalKey,
-        ScaffoldState,
-        TextEditingController,
-        Widget,
+        BorderRadius,
         BuildContext,
-        Hero,
+        Center,
         CircleAvatar,
         Colors,
+        EdgeInsets,
+        GlobalKey,
+        Hero,
         Image,
         Key,
-        TextInputType,
+        ListView,
+        MaterialPageRoute,
+        mustCallSuper,
+        Navigator,
         Padding,
-        EdgeInsets,
+        protected,
         RaisedButton,
         RoundedRectangleBorder,
-        BorderRadius,
-        Navigator,
-        MaterialPageRoute,
-        TextStyle,
         Scaffold,
-        Center,
-        ListView,
+        ScaffoldState,
         SizedBox,
-        protected,
-        mustCallSuper;
+        SnackBar,
+        State,
+        StatefulWidget,
+        Text,
+        TextEditingController,
+        TextInputType,
+        TextStyle,
+        Widget;
 import 'package:grade_view/api.dart' show API, User;
 import 'package:grade_view/home_page.dart' show HomePage;
+import 'package:grade_view/widgets.dart' show InputText;
 import 'package:http/http.dart' show Response;
 import 'package:modal_progress_hud/modal_progress_hud.dart'
     show ModalProgressHUD;
 
-import 'custom_exceptions.dart';
-import 'custom_widgets.dart' show InputText;
+import 'package:grade_view/exceptions.dart';
 import 'globals.dart' show user, storage, testUsername;
 
 class LoginPage extends StatefulWidget {
@@ -112,17 +112,7 @@ class _LoginPageState extends State<LoginPage> {
       final String usernameInput = _usernameController.text.trim(),
           passwordInput = _passwordController.text.trim();
       try {
-        final response =
-            await API.getUser(usernameInput, passwordInput);
-        print('status code ' + response.statusCode.toString());
-        if (response.statusCode == HttpStatus.ok) {
-          //2xx status code
-          user = User.fromJson(jsonDecode(response.body));
-          storage.write(key: "password", value: passwordInput);
-          Navigator.of(context).pushNamed(HomePage.tag);
-        } else {
-          throw (IncorrectPasswordException());
-        }
+        ...
       } on IncorrectPasswordException {
         showSnackBar(incorrectPassword);
       } on SocketException {

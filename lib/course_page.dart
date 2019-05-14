@@ -3,61 +3,66 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart'
 import 'package:decimal/decimal.dart' show Decimal;
 import 'package:flutter/material.dart'
     show
-        Brightness,
-        FontWeight,
-        StatefulWidget,
-        Key,
-        State,
-        required,
-        StatelessWidget,
-        BuildContext,
-        showDialog,
         AlertDialog,
-        Text,
-        Widget,
-        Padding,
-        Colors,
         AppBar,
-        EdgeInsets,
-        TextAlign,
-        TextStyle,
-        ListView,
-        NeverScrollableScrollPhysics,
-        Container,
-        MediaQuery,
-        Column,
-        Expanded,
-        Scaffold,
-        SingleChildScrollView,
-        Card,
-        Scrollbar,
-        DataTable,
         Axis,
-        Navigator,
-        MaterialPageRoute,
-        RouteSettings,
-        MainAxisAlignment,
+        Brightness,
+        BuildContext,
+        Card,
+        Colors,
+        Column,
+        Container,
+        DropdownMenuItem,
+        EdgeInsets,
+        Expanded,
         FloatingActionButton,
+        FontWeight,
+        Form,
+        FormFieldSetter,
+        FormState,
+        GlobalKey,
         Icon,
         Icons,
-        GlobalKey,
-        FormState,
-        Form,
-        ListBody,
-        TextFormField,
-        InputDecoration,
-        DropdownMenuItem,
-        RaisedButton,
         IconThemeData,
-        TextInputType,
+        InputDecoration,
+        Key,
+        ListBody,
+        ListView,
+        MainAxisAlignment,
+        MaterialPageRoute,
+        MediaQuery,
         mustCallSuper,
-        protected;
+        Navigator,
+        NeverScrollableScrollPhysics,
+        Padding,
+        protected,
+        RaisedButton,
+        required,
+        RouteSettings,
+        Scaffold,
+        Scrollbar,
+        showDialog,
+        SingleChildScrollView,
+        State,
+        StatefulWidget,
+        Text,
+        TextAlign,
+        TextFormField,
+        TextInputType,
+        TextStyle,
+        Widget;
+import 'package:grade_view/api.dart'
+    show
+        Assignment,
+        convertPercentageToLetterGrade,
+        Course,
+        setupAssignmentTypeSelector,
+        Weighting;
+import 'package:grade_view/widgets.dart'
+    show BackBar, BreakdownTable, getAssignmentTypeSelector, InfoCard;
 import 'package:intl/intl.dart' show DateFormat;
 
-import 'api.dart'
-    show Assignment, Course, Weighting, convertPercentageToLetterGrade;
 import 'assignment_page.dart' show AssignmentPage;
-import 'custom_widgets.dart' show BackBar, Info, DropdownFormField;
 import 'globals.dart' show decoration;
 
 class AddAssignmentForm extends StatefulWidget {
@@ -81,134 +86,12 @@ class CalculateRequiredScoreForm extends StatefulWidget {
       _CalculateRequiredScoreFormState();
 }
 
-class CoursePage extends StatelessWidget {
+class CoursePage extends StatefulWidget {
   final Course course;
-
   CoursePage({final Key key, @required final this.course}) : super(key: key);
 
-  void addAssignment(final BuildContext context) => showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (final BuildContext context) => AlertDialog(
-          title: const Text('Add Grade'),
-          content: AddAssignmentForm(course: course)));
-
   @override
-  Widget build(final BuildContext context) {
-    final Widget pageTitle = Padding(
-        padding: const EdgeInsets.only(bottom: 16.0),
-        child: Text(course.name,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 32.0, color: Colors.white)));
-
-    final Widget courseBreakdown = course.breakdown.isEmpty
-        ? const Padding(
-            child: Text(
-              'No Breakdown Information Available',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-              textAlign: TextAlign.center,
-            ),
-            padding: EdgeInsets.symmetric(vertical: 8.0))
-        : Scrollbar(
-            child: SingleChildScrollView(
-                child: Card(
-                    child: DataTable(
-                        rows: course.breakdown.getDataRows(),
-                        columns: course.breakdown.getDataColumns()),
-                    margin: const EdgeInsets.only(
-                        left: 4.0, right: 4.0, bottom: 16.0)),
-                scrollDirection: Axis.horizontal));
-
-    final Widget courseAssignments = course.assignments.isEmpty
-        ? const Padding(
-            child: Text(
-              'No Assignments Available',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-              textAlign: TextAlign.center,
-            ),
-            padding: EdgeInsets.symmetric(vertical: 8.0))
-        : ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: course.assignments.length,
-            shrinkWrap: true,
-            itemBuilder: (final BuildContext context, final int index) => Info(
-                left: course.assignments[index].name,
-                right: ' ' +
-                    course.assignments[index].achievedPoints.toString() +
-                    '/' +
-                    course.assignments[index].maxPoints.toString(),
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        settings: const RouteSettings(name: 'assignment-page'),
-                        builder: (final BuildContext context) => AssignmentPage(
-                            course: course,
-                            assignment: course.assignments[index])))));
-
-    final Widget body = Container(
-        width: MediaQuery.of(context).size.width,
-        padding: const EdgeInsets.all(28.0),
-        decoration: decoration,
-        child: Column(children: <Widget>[
-          pageTitle,
-          Expanded(
-              child: ListView(
-            children: <Widget>[courseBreakdown, courseAssignments],
-            padding: const EdgeInsets.only(bottom: 112.0),
-          ))
-        ]));
-
-    return Scaffold(
-        appBar: BackBar(
-            appBar: AppBar(
-                title:
-                    const Text('Back', style: TextStyle(color: Colors.white)),
-                iconTheme: const IconThemeData(color: Colors.white),
-                centerTitle: false),
-            onTap: () => Navigator.pop(context)),
-        body: body,
-        floatingActionButton:
-            Column(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-          Padding(
-              padding: const EdgeInsets.all(2.5),
-              child: FloatingActionButton(
-                  tooltip: 'Add Grade',
-                  heroTag: 'add',
-                  child: const Icon(Icons.add, color: Colors.white),
-                  onPressed: () => addAssignment(context))),
-          Padding(
-              padding: const EdgeInsets.all(2.5),
-              child: FloatingActionButton(
-                  tooltip: 'Calculate the Grade Needed',
-                  heroTag: 'calc',
-                  child: const Icon(Icons.arrow_upward, color: Colors.white),
-                  onPressed: () async => calculateForGrade(context)))
-        ]));
-  }
-
-  void calculateForGrade(final BuildContext context) async {
-    Map<String, dynamic> data = await showDialog<Map<String, dynamic>>(
-        context: context,
-        barrierDismissible: true,
-        builder: (final BuildContext context) => AlertDialog(
-            title: const Text('Calculate Required Score'),
-            content: CalculateRequiredScoreForm(course: course)));
-    if (data == null || data.isEmpty) {
-      return;
-    }
-    showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (final BuildContext context) => AlertDialog(
-            title: const Text('Necessary Score'),
-            content: Text('For an assignment of type '
-                '\'${data['assignmentType']}\' a score of at least '
-                '${data['necessaryPoints']}/${data['assignmentMaxPoints']} '
-                'is needed to achieve a course grade of '
-                '${data['desiredCoursePercentage']}%.')));
-  }
+  State<CoursePage> createState() => _CoursePageState();
 }
 
 class _AddAssignmentFormState extends State<AddAssignmentForm> {
@@ -243,48 +126,8 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                   }
                 },
                 onSaved: (final String value) => _assignmentName = value),
-            _assignmentTypeSelector == 1
-                ? DropdownFormField(
-                    validator: (final String value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please Select a Value';
-                      }
-                    },
-                    onSaved: (final String value) => _assignmentType = value,
-                    decoration: const InputDecoration(
-                      labelText: 'Assignment Type*',
-                    ),
-                    items: (List<Weighting>.from(widget.course.breakdown)
-                            .map((final Weighting f) => f.name)
-                            .toList()
-                              ..remove('TOTAL'))
-                        .map((final String f) =>
-                            DropdownMenuItem<String>(value: f, child: Text(f)))
-                        .toList())
-                : (_assignmentTypeSelector == -1
-                    ? TextFormField(
-                        keyboardAppearance: Brightness.dark,
-                        decoration:
-                            const InputDecoration(labelText: 'Assignment Name'),
-                        onSaved: (final String value) =>
-                            _assignmentType = value)
-                    : DropdownFormField(
-                        validator: (final String value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please Select a Value';
-                          }
-                        },
-                        onSaved: (final String value) =>
-                            _assignmentType = value,
-                        decoration: const InputDecoration(
-                          labelText: 'Assignment Type*',
-                        ),
-                        items: widget.course.assignments
-                            .map((final Assignment f) => f.assignmentType)
-                            .toSet()
-                            .map((final String f) => DropdownMenuItem<String>(
-                                value: f, child: Text(f)))
-                            .toList())),
+            getAssignmentTypeSelector(_assignmentTypeSelector, widget.course,
+                (final String value) => _assignmentType = value),
             DateTimePickerFormField(
                 format: DateFormat('yyyy-MM-dd'),
                 inputType: InputType.date,
@@ -385,8 +228,10 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                       widget.course.letterGrade =
                           convertPercentageToLetterGrade(newPercentage);
                     } else if (_assignmentTypeSelector == 0) {
-                      final Decimal newCourseAchievedPoints = widget
-                          .course.assignments
+                      final Decimal newCourseAchievedPoints = (widget
+                              .course.assignments
+                            ..removeWhere((final Assignment e) =>
+                                e.achievedPoints == null))
                           .map((final Assignment e) => e.achievedPoints)
                           .reduce(
                               (final Decimal element, final Decimal value) =>
@@ -462,16 +307,7 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
   @mustCallSuper
   void initState() {
     super.initState();
-    if (widget.course.assignments.isEmpty) {
-      // There are no assignments yet.
-      _assignmentTypeSelector = -1;
-    } else if (widget.course.breakdown.isEmpty) {
-      // There is no breakdown information, so all assignments are weighted equally.
-      _assignmentTypeSelector = 0;
-    } else {
-      // There are weighted assignments.
-      _assignmentTypeSelector = 1;
-    }
+    _assignmentTypeSelector = setupAssignmentTypeSelector(widget.course);
   }
 }
 
@@ -482,6 +318,11 @@ class _CalculateRequiredScoreFormState
   Decimal _desiredCoursePercentage;
   String _assignmentType;
   Decimal _assignmentMaxPoints;
+
+  // -1 for a text field.
+  // 0 for dropdown with no weightings.
+  // 1 for dropdown with weigtings.
+  int _assignmentTypeSelector;
 
   @override
   Widget build(final BuildContext context) => SingleChildScrollView(
@@ -506,23 +347,8 @@ class _CalculateRequiredScoreFormState
                     Decimal.tryParse(value.replaceAll('%', '')),
                 decoration: const InputDecoration(
                     labelText: 'Desired Course Percentage*')),
-            DropdownFormField(
-                validator: (final String value) {
-                  if (value.isEmpty) {
-                    return 'Please Select a Value';
-                  }
-                },
-                onSaved: (final String value) => _assignmentType = value,
-                decoration: const InputDecoration(
-                  labelText: 'Assignment Type*',
-                ),
-                items: (widget.course.breakdown
-                        .map((final Weighting f) => f.name)
-                        .toList()
-                          ..remove('TOTAL'))
-                    .map((final String f) =>
-                        DropdownMenuItem<String>(value: f, child: Text(f)))
-                    .toList()),
+            getAssignmentTypeSelector(_assignmentTypeSelector, widget.course,
+                (final String value) => _assignmentType = value),
             TextFormField(
                 validator: (final String value) {
                   if (value.isEmpty) {
@@ -544,31 +370,209 @@ class _CalculateRequiredScoreFormState
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
-                    final Decimal amountToImprove =
-                        _desiredCoursePercentage - widget.course.percentage;
-                    final Decimal necessaryAssignmentTypePercentage =
-                        (widget.course.breakdown[_assignmentType].percentage +
-                                amountToImprove) /
-                            widget.course.breakdown[_assignmentType].weight;
-                    final Decimal necessaryAssignmentTypeAchievedPoints =
-                        necessaryAssignmentTypePercentage *
-                            (widget.course.breakdown[_assignmentType]
-                                    .maxPoints +
-                                _assignmentMaxPoints);
-                    final String necessaryPoints =
-                        (necessaryAssignmentTypeAchievedPoints -
-                                widget.course.breakdown[_assignmentType]
-                                    .achievedPoints)
-                            .toStringAsFixed(widget.course.breakdown['TOTAL']
-                                .weightingMantissaLength);
-                    Map<String, dynamic> data = {
-                      'assignmentType': _assignmentType,
-                      'necessaryPoints': necessaryPoints,
-                      'assignmentMaxPoints': _assignmentMaxPoints,
-                      'desiredCoursePercentage': _desiredCoursePercentage
-                    };
+                    Map<String, dynamic> data;
+                    if (_assignmentTypeSelector == -1 ||
+                        _assignmentTypeSelector == 0) {
+                      // test calculation
+                      final Decimal oldCoursePoints = (widget.course.assignments
+                            ..removeWhere((final Assignment e) =>
+                                e.achievedPoints == null))
+                          .map((final Assignment element) => element.maxPoints)
+                          .reduce(
+                              (final Decimal value, final Decimal element) =>
+                                  value + element);
+                      final Decimal newCoursePoints =
+                          oldCoursePoints + _assignmentMaxPoints;
+                      final Decimal necessaryAchievedCoursePoints =
+                          newCoursePoints /
+                              Decimal.fromInt(100) *
+                              _desiredCoursePercentage;
+                      final String necessaryAchievedAssignmentPoints =
+                          (necessaryAchievedCoursePoints - oldCoursePoints)
+                              .toStringAsFixed(
+                                  widget.course.courseMantissaLength);
+                      data = <String, dynamic>{
+                        'assignmentType': _assignmentType,
+                        'necessaryPoints': necessaryAchievedAssignmentPoints,
+                        'assignmentMaxPoints': _assignmentMaxPoints,
+                        'desiredCoursePercentage': _desiredCoursePercentage
+                      };
+                    } else {
+                      final Decimal amountToImprove =
+                          _desiredCoursePercentage - widget.course.percentage;
+                      final Decimal necessaryAssignmentTypePercentage =
+                          (widget.course.breakdown[_assignmentType].percentage +
+                                  amountToImprove) /
+                              widget.course.breakdown[_assignmentType].weight;
+                      final Decimal necessaryAssignmentTypeAchievedPoints =
+                          necessaryAssignmentTypePercentage *
+                              (widget.course.breakdown[_assignmentType]
+                                      .maxPoints +
+                                  _assignmentMaxPoints);
+                      final String necessaryPoints =
+                          (necessaryAssignmentTypeAchievedPoints -
+                                  widget.course.breakdown[_assignmentType]
+                                      .achievedPoints)
+                              .toStringAsFixed(widget.course.breakdown['TOTAL']
+                                  .weightingMantissaLength);
+                      data = <String, dynamic>{
+                        'assignmentType': _assignmentType,
+                        'necessaryPoints': necessaryPoints,
+                        'assignmentMaxPoints': _assignmentMaxPoints,
+                        'desiredCoursePercentage': _desiredCoursePercentage
+                      };
+                    }
                     Navigator.pop(context, data);
                   }
                 }),
           ])));
+
+  @protected
+  @override
+  @mustCallSuper
+  void initState() {
+    super.initState();
+    _assignmentTypeSelector = setupAssignmentTypeSelector(widget.course);
+  }
+}
+
+class _CoursePageState extends State<CoursePage> {
+  void addAssignment(final BuildContext context) => showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (final BuildContext context) => AlertDialog(
+          title: const Text('Add Grade'),
+          content: AddAssignmentForm(course: widget.course)));
+
+  @override
+  Widget build(final BuildContext context) {
+    final Widget pageTitle = Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: Text(widget.course.name,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 32.0, color: Colors.white)));
+
+    final BreakdownTable breakdownTable =
+        BreakdownTable(widget.course.breakdown);
+    breakdownTable.state.breakdownTableSource
+        .addListener(() => setState(() {}));
+
+    final Widget courseBreakdown = widget.course.breakdown.isEmpty
+        ? const Padding(
+            child: Text(
+              'No Breakdown Information Available',
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            padding: EdgeInsets.symmetric(vertical: 8.0))
+        : Scrollbar(
+            child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Card(child: breakdownTable),
+          ));
+
+    final List<Assignment> assignmentsToShow =
+        breakdownTable.state.breakdownTableSource.currentlySelected.isEmpty
+            ? widget.course.assignments
+            : widget.course.assignments
+                .where((final Assignment element) => breakdownTable
+                    .state.breakdownTableSource.currentlySelected
+                    .contains(element.assignmentType))
+                .toList();
+    print('cp ' +
+        breakdownTable.state.breakdownTableSource.currentlySelected.toString());
+
+    final Widget courseAssignments = widget.course.assignments.isEmpty
+        ? const Padding(
+            child: Text(
+              'No Assignments Available',
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            padding: EdgeInsets.symmetric(vertical: 8.0))
+        : ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: assignmentsToShow.length,
+            shrinkWrap: true,
+            itemBuilder: (final BuildContext context, final int index) =>
+                InfoCard(
+                    left: widget.course.assignments[index].name,
+                    right: ' ' +
+                        assignmentsToShow[index].achievedPoints.toString() +
+                        '/' +
+                        assignmentsToShow[index].maxPoints.toString(),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            settings:
+                                const RouteSettings(name: 'assignment-page'),
+                            builder: (final BuildContext context) =>
+                                AssignmentPage(
+                                    course: widget.course,
+                                    assignment: assignmentsToShow[index])))));
+
+    final Widget body = Container(
+        width: MediaQuery.of(context).size.width,
+        padding: const EdgeInsets.all(28.0),
+        decoration: decoration,
+        child: Column(children: <Widget>[
+          pageTitle,
+          Expanded(
+              child: ListView(
+            children: <Widget>[courseBreakdown, courseAssignments],
+            padding: const EdgeInsets.only(bottom: 112.0),
+          ))
+        ]));
+
+    return Scaffold(
+        appBar: BackBar(
+            appBar: AppBar(
+                title:
+                    const Text('Back', style: TextStyle(color: Colors.white)),
+                iconTheme: const IconThemeData(color: Colors.white),
+                centerTitle: false),
+            onTap: () => Navigator.pop(context)),
+        body: body,
+        floatingActionButton:
+            Column(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+          Padding(
+              padding: const EdgeInsets.all(2.5),
+              child: FloatingActionButton(
+                  tooltip: 'Add Grade',
+                  heroTag: 'add',
+                  child: const Icon(Icons.add, color: Colors.white),
+                  onPressed: () => addAssignment(context))),
+          Padding(
+              padding: const EdgeInsets.all(2.5),
+              child: FloatingActionButton(
+                  tooltip: 'Calculate the Grade Needed',
+                  heroTag: 'calc',
+                  child: const Icon(Icons.arrow_upward, color: Colors.white),
+                  onPressed: () async => calculateForGrade(context)))
+        ]));
+  }
+
+  void calculateForGrade(final BuildContext context) async {
+    Map<String, dynamic> data = await showDialog<Map<String, dynamic>>(
+        context: context,
+        barrierDismissible: true,
+        builder: (final BuildContext context) => AlertDialog(
+            title: const Text('Calculate Required Score'),
+            content: CalculateRequiredScoreForm(course: widget.course)));
+    if (data == null || data.isEmpty) {
+      return;
+    }
+    showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (final BuildContext context) => AlertDialog(
+            title: const Text('Necessary Score'),
+            content: Text('For an assignment of type '
+                '\'${data['assignmentType']}\' a score of at least '
+                '${data['necessaryPoints']}/${data['assignmentMaxPoints']} '
+                'is needed to achieve a course grade of '
+                '${data['desiredCoursePercentage']}%.')));
+  }
 }

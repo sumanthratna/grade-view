@@ -1,14 +1,14 @@
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride, TargetPlatform;
 import 'package:flutter/material.dart'
     show
-        runApp,
-        Widget,
         BuildContext,
+        Colors,
         MaterialApp,
         StatelessWidget,
         ThemeData,
-        Colors;
-import 'package:flutter/foundation.dart'
-    show debugDefaultTargetPlatformOverride, TargetPlatform;
+        runApp,
+        Widget;
 
 import 'login_page.dart' show LoginPage;
 

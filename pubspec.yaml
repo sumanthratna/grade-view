@@ -3,7 +3,7 @@ description:                   'an app for FCPS SIS with lots of additional func
 author:                        'S Ratna <sratna@sumanthratna.gq>'
 repository:                    'https://github.com/sumanthratna/grade-view'
 issue_tracker:                 'https://github.com/sumanthratna/grade-view/issues'
-version:                       1.0.5
+version:                       1.0.7
 environment:
     sdk:                       '>=2.0.0 <3.0.0'
 dependencies:
@@ -16,6 +16,7 @@ dependencies:
     datetime_picker_formfield: ^0.1.8
     decimal:                   ^0.3.3
     cupertino_icons:           ^0.1.2
+    flutter_typeahead:         ^1.5.0
 dev_dependencies:
     flutter_test:
         sdk:                   flutter

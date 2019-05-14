@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart'
-    show BoxDecoration, LinearGradient, Colors;
+    show BoxDecoration, Colors, LinearGradient;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'
     show FlutterSecureStorage;
 
-import 'api.dart' show User;
+import 'package:grade_view/api.dart' show User;
 
 const BoxDecoration decoration = BoxDecoration(
     gradient: LinearGradient(colors: [Colors.blue, Colors.lightBlueAccent]));
