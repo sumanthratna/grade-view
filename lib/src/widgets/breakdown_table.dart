@@ -31,7 +31,10 @@ class BreakdownTableSource extends DataTableSource {
         _currentlySelected = List<String>(),
         rows = List<DataRow>();
   BreakdownTableSource.fromWeightings(final this.weightings)
-      : _currentlySelected = List<String>(),
+      : _currentlySelected = weightings
+            .map((final Weighting e) => e.name)
+            .toList()
+              ..remove((final String value) => value == 'TOTAL'),
         rows = <DataRow>[] {
     setupRows();
   }
@@ -71,30 +74,29 @@ class BreakdownTableSource extends DataTableSource {
 
   void setupRows() {
     rows.clear();
-    weightings.asMap().forEach((final int index, final Weighting element) {
-      rows.add(DataRow.byIndex(
-        index: index,
-        cells: <DataCell>[
-          DataCell(Text('${element.name}')),
-          DataCell(Text('${element.percentage.toInt()}%')),
-          DataCell(Text('${element.weight}%')),
-          DataCell(Text('${element.achievedPoints}/${element.maxPoints}')),
-          DataCell(Text('${element.letterGrade}')),
-        ],
-        selected: _currentlySelected.contains(element.name),
-        onSelectChanged: element.name == "TOTAL"
-            ? null
-            : (final bool value) {
-                if (value && !_currentlySelected.contains(element.name)) {
-                  _currentlySelected.add(element.name);
-                } else {
-                  _currentlySelected.remove(element.name);
-                }
-                print(_currentlySelected);
-                notifyListeners();
-              },
-      ));
-    });
+    weightings.asMap().forEach((final int index, final Weighting element) =>
+        rows.add(DataRow.byIndex(
+          index: index,
+          cells: <DataCell>[
+            DataCell(Text('${element.name}')),
+            DataCell(Text('${element.percentage.toInt()}%')),
+            DataCell(Text('${element.weight}%')),
+            DataCell(Text('${element.achievedPoints}/${element.maxPoints}')),
+            DataCell(Text('${element.letterGrade}')),
+          ],
+          selected: _currentlySelected.contains(element.name),
+          onSelectChanged: element.name == "TOTAL"
+              ? null
+              : (final bool value) {
+                  if (value && !_currentlySelected.contains(element.name)) {
+                    _currentlySelected.add(element.name);
+                  } else {
+                    _currentlySelected.remove(element.name);
+                  }
+                  setupRows();
+                  notifyListeners();
+                },
+        )));
   }
 
   void setWeightings(
@@ -110,19 +112,6 @@ class _BreakdownTableState extends State<BreakdownTable> {
   @override
   Widget build(final BuildContext context) {
     return DataTable(
-      rows: widget.rows,
-      columns: widget.columns,
-      onSelectAll: (final bool value) {
-        _currentlySelected.clear();
-        if (value) {
-          setState(() => _currentlySelected.addAll(widget.columns
-              .map((final DataColumn e) => (e.label as Text).data)
-              .toList()
-                ..remove((final String value) => value == "TOTAL")));
-        } else {
-          setState(() {});
-        }
-      },
-    );
+        rows: widget.rows, columns: widget.columns, onSelectAll: null);
   }
 }

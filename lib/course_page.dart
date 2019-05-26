@@ -544,7 +544,7 @@ class _CoursePageState extends State<CoursePage> {
             content: Text('For an assignment of type '
                 '\'${data['assignmentType']}\' a score of at least '
                 '${data['necessaryPoints']}/${data['assignmentMaxPoints']} '
-                'is needed to achieve a course grade of '
+                'is needed to achieve a course grade of at least '
                 '${data['desiredCoursePercentage']}%.')));
   }
 
@@ -555,8 +555,6 @@ class _CoursePageState extends State<CoursePage> {
     super.initState();
     breakdownTableSource =
         BreakdownTableSource.fromWeightings(widget.course.breakdown.weightings)
-          ..addListener(() => setState(() {
-                print("listen");
-              }));
+          ..addListener(() => setState(() {}));
   }
 }
