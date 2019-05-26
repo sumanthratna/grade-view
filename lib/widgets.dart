@@ -13,8 +13,10 @@ import 'package:grade_view/api.dart' show Assignment, Course, Weighting;
 
 import 'src/widgets/dropdown_form_field.dart' show DropdownFormField;
 
+export 'src/widgets/assignments_list.dart' show AssignmentList;
 export 'src/widgets/back_bar.dart' show BackBar;
-export 'src/widgets/breakdown_table.dart' show BreakdownTable;
+export 'src/widgets/breakdown_table.dart'
+    show BreakdownTableSource, BreakdownTable;
 export 'src/widgets/dropdown_form_field.dart' show DropdownFormField;
 export 'src/widgets/info_card.dart' show InfoCard;
 export 'src/widgets/input_text.dart' show InputText;

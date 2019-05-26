@@ -10,7 +10,7 @@ import 'package:flutter/material.dart'
         runApp,
         Widget;
 
-import 'login_page.dart' show LoginPage;
+import 'package:grade_view/login_page.dart' show LoginPage;
 
 void main() {
   debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;

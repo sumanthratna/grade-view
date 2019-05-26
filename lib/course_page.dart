@@ -12,13 +12,11 @@ import 'package:flutter/material.dart'
         Colors,
         Column,
         Container,
-        DropdownMenuItem,
         EdgeInsets,
         Expanded,
         FloatingActionButton,
         FontWeight,
         Form,
-        FormFieldSetter,
         FormState,
         GlobalKey,
         Icon,
@@ -33,7 +31,6 @@ import 'package:flutter/material.dart'
         MediaQuery,
         mustCallSuper,
         Navigator,
-        NeverScrollableScrollPhysics,
         Padding,
         protected,
         RaisedButton,
@@ -58,11 +55,17 @@ import 'package:grade_view/api.dart'
         Course,
         setupAssignmentTypeSelector,
         Weighting;
+import 'package:grade_view/assignment_page.dart' show AssignmentPage;
 import 'package:grade_view/widgets.dart'
-    show BackBar, BreakdownTable, getAssignmentTypeSelector, InfoCard;
+    show
+        AssignmentList,
+        BackBar,
+        BreakdownTableSource,
+        BreakdownTable,
+        getAssignmentTypeSelector;
 import 'package:intl/intl.dart' show DateFormat;
+import 'package:provider/provider.dart' show ChangeNotifierProvider;
 
-import 'assignment_page.dart' show AssignmentPage;
 import 'globals.dart' show decoration;
 
 class AddAssignmentForm extends StatefulWidget {
@@ -437,6 +440,7 @@ class _CalculateRequiredScoreFormState
 }
 
 class _CoursePageState extends State<CoursePage> {
+  BreakdownTableSource breakdownTableSource;
   void addAssignment(final BuildContext context) => showDialog(
       context: context,
       barrierDismissible: true,
@@ -452,11 +456,6 @@ class _CoursePageState extends State<CoursePage> {
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 32.0, color: Colors.white)));
 
-    final BreakdownTable breakdownTable =
-        BreakdownTable(widget.course.breakdown);
-    breakdownTable.state.breakdownTableSource
-        .addListener(() => setState(() {}));
-
     final Widget courseBreakdown = widget.course.breakdown.isEmpty
         ? const Padding(
             child: Text(
@@ -468,20 +467,11 @@ class _CoursePageState extends State<CoursePage> {
             padding: EdgeInsets.symmetric(vertical: 8.0))
         : Scrollbar(
             child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Card(child: breakdownTable),
-          ));
-
-    final List<Assignment> assignmentsToShow =
-        breakdownTable.state.breakdownTableSource.currentlySelected.isEmpty
-            ? widget.course.assignments
-            : widget.course.assignments
-                .where((final Assignment element) => breakdownTable
-                    .state.breakdownTableSource.currentlySelected
-                    .contains(element.assignmentType))
-                .toList();
-    print('cp ' +
-        breakdownTable.state.breakdownTableSource.currentlySelected.toString());
+                scrollDirection: Axis.horizontal,
+                child: Card(
+                  child: BreakdownTable(breakdownTableSource.getRows(),
+                      breakdownTableSource.getColumns()),
+                )));
 
     final Widget courseAssignments = widget.course.assignments.isEmpty
         ? const Padding(
@@ -492,26 +482,7 @@ class _CoursePageState extends State<CoursePage> {
               textAlign: TextAlign.center,
             ),
             padding: EdgeInsets.symmetric(vertical: 8.0))
-        : ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: assignmentsToShow.length,
-            shrinkWrap: true,
-            itemBuilder: (final BuildContext context, final int index) =>
-                InfoCard(
-                    left: widget.course.assignments[index].name,
-                    right: ' ' +
-                        assignmentsToShow[index].achievedPoints.toString() +
-                        '/' +
-                        assignmentsToShow[index].maxPoints.toString(),
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            settings:
-                                const RouteSettings(name: 'assignment-page'),
-                            builder: (final BuildContext context) =>
-                                AssignmentPage(
-                                    course: widget.course,
-                                    assignment: assignmentsToShow[index])))));
+        : AssignmentList(widget.course);
 
     final Widget body = Container(
         width: MediaQuery.of(context).size.width,
@@ -520,10 +491,11 @@ class _CoursePageState extends State<CoursePage> {
         child: Column(children: <Widget>[
           pageTitle,
           Expanded(
-              child: ListView(
-            children: <Widget>[courseBreakdown, courseAssignments],
-            padding: const EdgeInsets.only(bottom: 112.0),
-          ))
+              child: ChangeNotifierProvider<BreakdownTableSource>(
+                  builder: (final BuildContext context) => breakdownTableSource,
+                  child: ListView(
+                      children: <Widget>[courseBreakdown, courseAssignments],
+                      padding: const EdgeInsets.only(bottom: 112.0))))
         ]));
 
     return Scaffold(
@@ -574,5 +546,17 @@ class _CoursePageState extends State<CoursePage> {
                 '${data['necessaryPoints']}/${data['assignmentMaxPoints']} '
                 'is needed to achieve a course grade of '
                 '${data['desiredCoursePercentage']}%.')));
+  }
+
+  @protected
+  @mustCallSuper
+  @override
+  initState() {
+    super.initState();
+    breakdownTableSource =
+        BreakdownTableSource.fromWeightings(widget.course.breakdown.weightings)
+          ..addListener(() => setState(() {
+                print("listen");
+              }));
   }
 }

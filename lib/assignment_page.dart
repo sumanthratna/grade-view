@@ -50,7 +50,7 @@ import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:grade_view/api.dart'
     show Assignment, Course, Weighting, convertPercentageToLetterGrade;
-import 'globals.dart' show decoration;
+import 'package:grade_view/globals.dart' show decoration;
 
 class AssignmentPage extends StatelessWidget {
   final Course course;

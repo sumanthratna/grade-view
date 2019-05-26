@@ -10,31 +10,29 @@ import 'package:flutter/material.dart'
         StatefulWidget,
         Text,
         Widget;
-
-import 'package:grade_view/api.dart' show Breakdown, Weighting;
+import 'package:grade_view/api.dart' show Weighting;
 
 class BreakdownTable extends StatefulWidget {
-  /// To access `currentlySelected` from [CoursePage].
-  final _BreakdownTableState state = _BreakdownTableState();
-  final Breakdown breakdown;
-
-  BreakdownTable(final this.breakdown);
+  final List<DataRow> rows;
+  final List<DataColumn> columns;
+  BreakdownTable(final this.rows, final this.columns);
 
   @override
-  State<BreakdownTable> createState() => state;
+  State<BreakdownTable> createState() => _BreakdownTableState();
 }
 
 class BreakdownTableSource extends DataTableSource {
   List<Weighting> weightings;
-  List<String> currentlySelected;
+  List<String> _currentlySelected;
   List<DataRow> rows;
 
   BreakdownTableSource()
       : weightings = List<Weighting>(),
-        currentlySelected = List<String>(),
+        _currentlySelected = List<String>(),
         rows = List<DataRow>();
   BreakdownTableSource.fromWeightings(final this.weightings)
-      : currentlySelected = List<String>() {
+      : _currentlySelected = List<String>(),
+        rows = <DataRow>[] {
     setupRows();
   }
 
@@ -45,7 +43,14 @@ class BreakdownTableSource extends DataTableSource {
   int get rowCount => weightings.length;
 
   @override
-  int get selectedRowCount => currentlySelected.length;
+  int get selectedRowCount => _currentlySelected.length;
+
+  List<String> get stateCurrentlySelected => _currentlySelected;
+
+  set stateCurrentlySelected(final List<String> newCurrentlySelected) {
+    _currentlySelected = newCurrentlySelected;
+    notifyListeners();
+  }
 
   List<DataColumn> getColumns() => const <DataColumn>[
         DataColumn(label: Text('Assignment\nType')),
@@ -64,9 +69,6 @@ class BreakdownTableSource extends DataTableSource {
     return out;
   }
 
-  @override
-  void notifyListeners() => super.notifyListeners();
-
   void setupRows() {
     rows.clear();
     weightings.asMap().forEach((final int index, final Weighting element) {
@@ -79,57 +81,47 @@ class BreakdownTableSource extends DataTableSource {
           DataCell(Text('${element.achievedPoints}/${element.maxPoints}')),
           DataCell(Text('${element.letterGrade}')),
         ],
-        selected: currentlySelected.contains(element.name),
+        selected: _currentlySelected.contains(element.name),
         onSelectChanged: element.name == "TOTAL"
             ? null
             : (final bool value) {
-                if (value) {
-                  currentlySelected.add(element.name);
+                if (value && !_currentlySelected.contains(element.name)) {
+                  _currentlySelected.add(element.name);
                 } else {
-                  currentlySelected.remove(element.name);
+                  _currentlySelected.remove(element.name);
                 }
+                print(_currentlySelected);
                 notifyListeners();
               },
       ));
     });
-    print('cw ' + currentlySelected.toString());
   }
 
-  void setWeightings(final List<Weighting> weightings) {
+  void setWeightings(
+      final BuildContext context, final List<Weighting> weightings) {
     this.weightings = weightings;
     setupRows();
   }
 }
 
 class _BreakdownTableState extends State<BreakdownTable> {
-  BreakdownTableSource breakdownTableSource = BreakdownTableSource();
-
-  _BreakdownTableState() {
-    breakdownTableSource.addListener(() {
-      setState(() {
-        breakdownTableSource.setupRows();
-      });
-    });
-  }
+  List<String> _currentlySelected = <String>[];
 
   @override
   Widget build(final BuildContext context) {
-    breakdownTableSource.setWeightings(widget.breakdown.weightings);
     return DataTable(
-      rows: breakdownTableSource.getRows(),
-      columns: breakdownTableSource.getColumns(),
+      rows: widget.rows,
+      columns: widget.columns,
       onSelectAll: (final bool value) {
-        breakdownTableSource.currentlySelected.clear();
+        _currentlySelected.clear();
         if (value) {
-          setState(() => breakdownTableSource.currentlySelected.addAll(widget
-              .breakdown.weightings
-              .map((final Weighting element) => element.name)
+          setState(() => _currentlySelected.addAll(widget.columns
+              .map((final DataColumn e) => (e.label as Text).data)
               .toList()
-                ..remove("TOTAL")));
+                ..remove((final String value) => value == "TOTAL")));
         } else {
           setState(() {});
         }
-        breakdownTableSource.notifyListeners();
       },
     );
   }

@@ -40,7 +40,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart'
     show ModalProgressHUD;
 
 import 'package:grade_view/exceptions.dart';
-import 'globals.dart' show user, storage, testUsername;
+import 'package:grade_view/globals.dart' show user, storage, testUsername;
 
 class LoginPage extends StatefulWidget {
   static const String tag = '/';

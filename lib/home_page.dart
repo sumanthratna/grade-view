@@ -51,8 +51,8 @@ import 'package:grade_view/widgets.dart'
     show BackBar, InfoCard, LoadingIndicator;
 
 import 'package:grade_view/api.dart' show API, Course;
-import 'course_page.dart' show CoursePage;
-import 'globals.dart' show decoration, storage, user;
+import 'package:grade_view/course_page.dart' show CoursePage;
+import 'package:grade_view/globals.dart' show decoration, storage, user;
 
 class GradesTab extends StatelessWidget {
   @override
