@@ -56,11 +56,11 @@ class BreakdownTableSource extends DataTableSource {
   }
 
   List<DataColumn> getColumns() => const <DataColumn>[
-        DataColumn(label: Text('Assignment\nType')),
+        DataColumn(label: Text('Assignment Type')),
         DataColumn(label: Text('Average')),
         DataColumn(label: Text('Weight')),
         DataColumn(label: Text('Points')),
-        DataColumn(label: Text('Letter\nGrade'))
+        DataColumn(label: Text('Letter Grade'))
       ];
 
   DataRow getRow(final int index) => rows[index];
@@ -110,8 +110,6 @@ class _BreakdownTableState extends State<BreakdownTable> {
   List<String> _currentlySelected = <String>[];
 
   @override
-  Widget build(final BuildContext context) {
-    return DataTable(
-        rows: widget.rows, columns: widget.columns, onSelectAll: null);
-  }
+  Widget build(final BuildContext context) =>
+      DataTable(rows: widget.rows, columns: widget.columns, onSelectAll: null);
 }

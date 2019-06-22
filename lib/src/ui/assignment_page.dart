@@ -34,6 +34,7 @@ import 'package:flutter/material.dart'
         required,
         Scaffold,
         showDialog,
+        SimpleDialog,
         SingleChildScrollView,
         State,
         StatefulWidget,
@@ -44,13 +45,12 @@ import 'package:flutter/material.dart'
         TextInputType,
         TextStyle,
         Widget;
-import 'package:grade_view/widgets.dart'
-    show BackBar, DropdownFormField, InfoCard;
-import 'package:intl/intl.dart' show DateFormat;
-
 import 'package:grade_view/api.dart'
     show Assignment, Course, Weighting, convertPercentageToLetterGrade;
 import 'package:grade_view/globals.dart' show decoration;
+import 'package:grade_view/widgets.dart'
+    show BackBar, DropdownFormField, InfoCard;
+import 'package:intl/intl.dart' show DateFormat;
 
 class AssignmentPage extends StatelessWidget {
   final Course course;
@@ -93,7 +93,7 @@ class AssignmentPage extends StatelessWidget {
             onTap: () {},
           ),
           InfoCard(
-              left: 'Score',
+              left: 'Score ',
               right: (assignment.achievedScore == null &&
                       assignment.maxScore == null)
                   ? 'N/A'
@@ -102,29 +102,38 @@ class AssignmentPage extends StatelessWidget {
                       assignment.maxScore.toString(),
               onTap: () {}),
           InfoCard(
-              left: 'Points',
+              left: 'Points ',
               right: assignment.achievedPoints.toString() +
                   '/' +
                   assignment.maxPoints.toString(),
               onTap: () {}),
           InfoCard(
-              left: 'Type',
+              left: 'Type ',
               right: assignment.assignmentType ?? 'N/A',
               onTap: () {}),
-          InfoCard(left: 'Teacher', right: course.teacher, onTap: () {}),
+          InfoCard(left: 'Teacher ', right: course.teacher, onTap: () {}),
           InfoCard(
-              left: 'Period', right: course.period.toString(), onTap: () {}),
+              left: 'Period ', right: course.period.toString(), onTap: () {}),
           InfoCard(
-              left: 'Date',
+              left: 'Date ',
               right: assignment.date.toIso8601String().substring(0, 10),
               onTap: () {}),
           InfoCard(
-              left: 'Due Date',
+              left: 'Due Date ',
               right: assignment.dueDate.toIso8601String().substring(0, 10),
               onTap: () {}),
           assignment.notes == null || assignment.notes.isEmpty
               ? Container()
-              : InfoCard(left: 'Notes', right: assignment.notes, onTap: () {})
+              : InfoCard(
+                  left: 'Notes ',
+                  right: assignment.notes,
+                  onTap: () => showDialog(
+                      context: context,
+                      builder: (final BuildContext context) => SimpleDialog(
+                            title: const Text('Notes'),
+                            contentPadding: EdgeInsets.all(24.0),
+                            children: <Widget>[Text(assignment.notes)],
+                          )))
         ]);
 
     final Widget body = Container(

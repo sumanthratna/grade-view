@@ -102,7 +102,7 @@ class API {
   }
 
   static Future<bool> registerDevice(final FirebaseMessaging firebaseMessaging,
-      final String username, final String password) async {
+      final String username, final String password, final bool active) async {
     final String url = '$_base/devices/';
     final String auth =
         'Basic ' + base64Encode(utf8.encode('$username:$password'));
@@ -113,7 +113,7 @@ class API {
         await http.get(url, headers: {'Authorization': auth});
     if (check.body.contains(registrationID)) {
       return setActivationForDevice(
-          firebaseMessaging, username, password, true);
+          firebaseMessaging, username, password, active);
     } else {
       await storage.write(
           key: 'gradeviewfirebaseregistrationid',
@@ -123,8 +123,8 @@ class API {
         'name': 'FCPS GradeView notifications',
         'registration_id':
             await storage.read(key: 'gradeviewfirebaseregistrationid'),
-        'device_id': '', //await FlutterUdid.udid,
-        'active': true.toString(),
+        'device_id': '',
+        'active': active.toString(),
         'type':
             (Platform.isIOS ? 'ios' : (Platform.isAndroid ? 'android' : 'web'))
       };

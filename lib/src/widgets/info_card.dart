@@ -7,7 +7,7 @@ import 'package:flutter/material.dart'
         Colors,
         Container,
         EdgeInsets,
-        Flexible,
+        Expanded,
         FontWeight,
         GestureTapCallback,
         InkWell,
@@ -41,19 +41,24 @@ class InfoCard extends StatelessWidget {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Flexible(
+                    Align(
                         child: Text(left ?? '',
                             softWrap: false,
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
                             style: const TextStyle(
                                 fontSize: 16.0,
                                 color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                            overflow: TextOverflow.fade,
-                            maxLines: 1)),
-                    Align(
-                        child: Text(right ?? '',
-                            style: const TextStyle(
-                                fontSize: 16.0, color: Colors.black)),
-                        alignment: Alignment.centerRight)
+                                fontWeight: FontWeight.bold)),
+                        alignment: Alignment.centerLeft),
+                    Expanded(
+                        child: Align(
+                            child: Text(right ?? '',
+                                softWrap: false,
+                                overflow: TextOverflow.fade,
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    fontSize: 16.0, color: Colors.black)),
+                            alignment: Alignment.centerRight))
                   ]))));
 }

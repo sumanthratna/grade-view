@@ -28,12 +28,7 @@ class User {
         school = json['school_name'],
         grade = json['grade'],
         photo = Image.memory(base64.decode(json['photo']), scale: 0.6),
-        courses = <Course>[] {
-    /*
-    (json['schedule'] as List<dynamic>).forEach((final dynamic f) =>
-        courses.add(Course.fromJson(f as Map<String, dynamic>)));
-        */
-  }
+        courses = <Course>[];
 
   Map<String, String> toJson() =>
       {'username': username, 'school': school, 'grade': grade.toString()};

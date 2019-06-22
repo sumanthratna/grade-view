@@ -11,8 +11,8 @@ import 'package:flutter/material.dart'
         TextEditingController,
         TextFormField,
         TextInputType,
-        Widget,
-        required;
+        required,
+        Widget;
 
 class InputText extends StatelessWidget {
   final TextEditingController controller;

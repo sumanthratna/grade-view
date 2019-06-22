@@ -47,12 +47,11 @@ import 'package:flutter/material.dart'
         TextSpan,
         TextStyle,
         Widget;
+import 'package:grade_view/api.dart' show API, Course;
+import 'package:grade_view/globals.dart' show decoration, storage, user;
+import 'package:grade_view/ui.dart' show CoursePage;
 import 'package:grade_view/widgets.dart'
     show BackBar, InfoCard, LoadingIndicator;
-
-import 'package:grade_view/api.dart' show API, Course;
-import 'package:grade_view/course_page.dart' show CoursePage;
-import 'package:grade_view/globals.dart' show decoration, storage, user;
 
 class GradesTab extends StatelessWidget {
   @override
@@ -99,17 +98,15 @@ class SettingsTab extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     final Widget settings = Column(children: <Widget>[
-      // test adaptive constructor
       SwitchListTile.adaptive(
           title: const Text('Enable push notifications',
               style: TextStyle(color: Colors.white)),
           value: _firebaseDeviceStatus,
-          onChanged: (final bool newValue) async =>
-              await API.setActivationForDevice(
-                  _firebaseMessaging,
-                  user.username,
-                  await storage.read(key: 'gradeviewpassword'),
-                  newValue))
+          onChanged: (final bool newValue) async => await API.registerDevice(
+              _firebaseMessaging,
+              user.username,
+              await storage.read(key: 'gradeviewpassword'),
+              newValue))
     ]);
 
     return Container(
@@ -283,7 +280,7 @@ class _HomePageState extends State<HomePage>
     fetchActive();
     setupTabController();
     firebaseCloudMessagingListeners();
-    clearPassword();
+    // clearPassword();
   }
 
   void iosPermission() {

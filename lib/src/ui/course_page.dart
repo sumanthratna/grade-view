@@ -55,7 +55,7 @@ import 'package:grade_view/api.dart'
         Course,
         setupAssignmentTypeSelector,
         Weighting;
-import 'package:grade_view/assignment_page.dart' show AssignmentPage;
+import 'package:grade_view/ui.dart' show AssignmentPage;
 import 'package:grade_view/widgets.dart'
     show
         AssignmentList,
@@ -66,7 +66,7 @@ import 'package:grade_view/widgets.dart'
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:provider/provider.dart' show ChangeNotifierProvider;
 
-import 'globals.dart' show decoration;
+import 'package:grade_view/globals.dart' show decoration;
 
 class AddAssignmentForm extends StatefulWidget {
   final Course course;
@@ -376,7 +376,6 @@ class _CalculateRequiredScoreFormState
                     Map<String, dynamic> data;
                     if (_assignmentTypeSelector == -1 ||
                         _assignmentTypeSelector == 0) {
-                      // test calculation
                       final Decimal oldCoursePoints = (widget.course.assignments
                             ..removeWhere((final Assignment e) =>
                                 e.achievedPoints == null))
@@ -387,9 +386,9 @@ class _CalculateRequiredScoreFormState
                       final Decimal newCoursePoints =
                           oldCoursePoints + _assignmentMaxPoints;
                       final Decimal necessaryAchievedCoursePoints =
-                          newCoursePoints /
+                          _desiredCoursePercentage /
                               Decimal.fromInt(100) *
-                              _desiredCoursePercentage;
+                              newCoursePoints;
                       final String necessaryAchievedAssignmentPoints =
                           (necessaryAchievedCoursePoints - oldCoursePoints)
                               .toStringAsFixed(
@@ -527,7 +526,7 @@ class _CoursePageState extends State<CoursePage> {
   }
 
   void calculateForGrade(final BuildContext context) async {
-    Map<String, dynamic> data = await showDialog<Map<String, dynamic>>(
+    final Map<String, dynamic> data = await showDialog<Map<String, dynamic>>(
         context: context,
         barrierDismissible: true,
         builder: (final BuildContext context) => AlertDialog(

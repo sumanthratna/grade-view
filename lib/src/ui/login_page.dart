@@ -33,7 +33,7 @@ import 'package:flutter/material.dart'
         TextStyle,
         Widget;
 import 'package:grade_view/api.dart' show API, User;
-import 'package:grade_view/home_page.dart' show HomePage;
+import 'package:grade_view/ui.dart' show HomePage;
 import 'package:grade_view/widgets.dart' show InputText;
 import 'package:http/http.dart' show Response;
 import 'package:modal_progress_hud/modal_progress_hud.dart'

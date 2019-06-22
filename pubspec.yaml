@@ -3,7 +3,7 @@ description:                   'an app for FCPS SIS with lots of additional func
 author:                        'S Ratna <sratna@sumanthratna.gq>'
 repository:                    'https://github.com/sumanthratna/grade-view'
 issue_tracker:                 'https://github.com/sumanthratna/grade-view/issues'
-version:                       1.0.7
+version:                       1.0.8
 environment:
     sdk:                       '>=2.0.0 <3.0.0'
 dependencies:

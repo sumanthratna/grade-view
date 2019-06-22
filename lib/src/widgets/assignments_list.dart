@@ -13,7 +13,7 @@ import 'package:grade_view/api.dart' show Assignment, Course;
 import 'package:grade_view/widgets.dart' show BreakdownTableSource, InfoCard;
 import 'package:provider/provider.dart' show Consumer, Provider;
 
-import '../../assignment_page.dart' show AssignmentPage;
+import '../ui/assignment_page.dart' show AssignmentPage;
 
 class AssignmentList extends StatefulWidget {
   final Course course;
