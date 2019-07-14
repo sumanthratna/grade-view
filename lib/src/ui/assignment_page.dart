@@ -323,19 +323,17 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                 initialValue: widget.assignment.name,
                 decoration:
                     const InputDecoration(labelText: 'Assignment Name*'),
-                validator: (final String value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please Enter a Value';
-                  }
-                },
+                validator: (final String value) =>
+                    value == null || value.isEmpty
+                        ? 'Please Enter a Value'
+                        : null,
                 onSaved: (final String value) => _assignmentName = value),
             DropdownFormField(
                 initialValue: widget.assignment.assignmentType,
-                validator: (final String value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please Select a Value';
-                  }
-                },
+                validator: (final String value) =>
+                    value == null || value.isEmpty
+                        ? 'Please Select a Value'
+                        : null,
                 onSaved: (final String value) => _assignmentType = value,
                 decoration: const InputDecoration(
                   labelText: 'Assignment Type*',
@@ -367,11 +365,10 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
               keyboardType:
                   TextInputType.numberWithOptions(signed: true, decimal: true),
               keyboardAppearance: Brightness.dark,
-              validator: (final String value) {
-                if (value.isNotEmpty && Decimal.tryParse(value) == null) {
-                  return 'Please Enter a Valid Number';
-                }
-              },
+              validator: (final String value) =>
+                  value.isNotEmpty && Decimal.tryParse(value) == null
+                      ? 'Please Enter a Valid Number'
+                      : null,
               onSaved: (final String value) =>
                   _assignmentAchievedScore = Decimal.tryParse(value),
             ),
@@ -381,11 +378,10 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                 keyboardType: TextInputType.numberWithOptions(
                     signed: true, decimal: true),
                 keyboardAppearance: Brightness.dark,
-                validator: (final String value) {
-                  if (value.isNotEmpty && Decimal.tryParse(value) == null) {
-                    return 'Please Enter a Valid Number';
-                  }
-                },
+                validator: (final String value) =>
+                    value.isNotEmpty && Decimal.tryParse(value) == null
+                        ? 'Please Enter a Valid Number'
+                        : null,
                 onSaved: (final String value) =>
                     _assignmentMaxScore = Decimal.tryParse(value)),
             TextFormField(
@@ -402,6 +398,7 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                   if (Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
+                  return null;
                 },
                 onSaved: (final String value) =>
                     _assignmentAchievedPoints = Decimal.tryParse(value)),
@@ -418,6 +415,7 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                   if (Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
+                  return null;
                 },
                 onSaved: (final String value) =>
                     _assignmentMaxPoints = Decimal.tryParse(value)),

@@ -26,11 +26,8 @@ Widget getAssignmentTypeSelector(final int assignmentTypeSelector,
         final Course course, final FormFieldSetter<String> onSaved) =>
     assignmentTypeSelector == 1
         ? DropdownFormField(
-            validator: (final String value) {
-              if (value == null || value.isEmpty) {
-                return 'Please Select a Value';
-              }
-            },
+            validator: (final String value) =>
+                value == null || value.isEmpty ? 'Please Select a Value' : null,
             onSaved: onSaved,
             decoration: const InputDecoration(
               labelText: 'Assignment Type*',

@@ -123,11 +123,10 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                 keyboardAppearance: Brightness.dark,
                 decoration:
                     const InputDecoration(labelText: 'Assignment Name*'),
-                validator: (final String value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please Enter a Value';
-                  }
-                },
+                validator: (final String value) =>
+                    value == null || value.isEmpty
+                        ? 'Please Enter a Value'
+                        : null,
                 onSaved: (final String value) => _assignmentName = value),
             getAssignmentTypeSelector(_assignmentTypeSelector, widget.course,
                 (final String value) => _assignmentType = value),
@@ -148,11 +147,9 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
               keyboardType:
                   TextInputType.numberWithOptions(signed: true, decimal: true),
               keyboardAppearance: Brightness.dark,
-              validator: (final String value) {
-                if (value.isNotEmpty && Decimal.tryParse(value) == null) {
-                  return 'Please Enter a Valid Number';
-                }
-              },
+              validator: (final String value) => value == null || value.isEmpty
+                  ? 'Please Enter a Valid Number'
+                  : null,
               onSaved: (final String value) =>
                   _assignmentAchievedScore = Decimal.tryParse(value),
             ),
@@ -161,11 +158,10 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                 keyboardType: TextInputType.numberWithOptions(
                     signed: true, decimal: true),
                 keyboardAppearance: Brightness.dark,
-                validator: (final String value) {
-                  if (value.isNotEmpty && Decimal.tryParse(value) == null) {
-                    return 'Please Enter a Valid Number';
-                  }
-                },
+                validator: (final String value) =>
+                    value == null || value.isEmpty
+                        ? 'Please Enter a Valid Number'
+                        : null,
                 onSaved: (final String value) =>
                     _assignmentMaxScore = Decimal.tryParse(value)),
             TextFormField(
@@ -181,6 +177,7 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                   if (Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
+                  return null;
                 },
                 onSaved: (final String value) =>
                     _assignmentAchievedPoints = Decimal.tryParse(value)),
@@ -196,6 +193,7 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                   if (Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
+                  return null;
                 },
                 onSaved: (final String value) =>
                     _assignmentMaxPoints = Decimal.tryParse(value)),
@@ -345,6 +343,7 @@ class _CalculateRequiredScoreFormState
                       Decimal.tryParse(value.replaceAll('%', '')) == null) {
                     return 'Please Enter a Valid Number';
                   }
+                  return null;
                 },
                 onSaved: (final String value) => _desiredCoursePercentage =
                     Decimal.tryParse(value.replaceAll('%', '')),
@@ -360,6 +359,7 @@ class _CalculateRequiredScoreFormState
                   if (value.isNotEmpty && Decimal.tryParse(value) == null) {
                     return 'Please Enter a Valid Number';
                   }
+                  return null;
                 },
                 keyboardType: TextInputType.numberWithOptions(
                     signed: true, decimal: true),
