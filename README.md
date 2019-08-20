@@ -1,4 +1,5 @@
 # FCPS SIS GradeView
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ad20713867594ba3a5a3a9eb2627e00a)](https://app.codacy.com/app/sumanthratna/grade_view?utm_source=github.com&utm_medium=referral&utm_content=sumanthratna/grade_view&utm_campaign=Badge_Grade_Dashboard)
 [![Travis Build Status](https://api.travis-ci.org/sumanthratna/grade_view.svg?branch=master)](https://travis-ci.org/sumanthratna/grade_view) [![Codemagic build status](https://api.codemagic.io/apps/5cbcc27533718337908b8cc2/5cbcc27533718337908b8cc1/status_badge.svg)](https://codemagic.io/apps/5cbcc27533718337908b8cc2/5cbcc27533718337908b8cc1/latest_build) [![Bitrise Build Status](https://app.bitrise.io/app/1eb88e8e2f886294/status.svg?token=dbUXfDkBiOLZlYKQiZTgZA&branch=master)](https://app.bitrise.io/app/1eb88e8e2f886294) [![Cirrus-CI Build Status](https://api.cirrus-ci.com/github/sumanthratna/grade_view.svg)](https://cirrus-ci.com/github/sumanthratna/grade_view)
 
 
