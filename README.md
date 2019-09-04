@@ -15,8 +15,5 @@ THIS SECTION IS INCOMPLETE
 
 If you don't have a keystore, create one with `keytool -genkey -v -keystore ~/key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key`. Then copy `android/key.properties.sample` to `android/key.properties` and replace the appropriate values.
 
-### Desktop
-Desktop support is currently provided by [`hover`](https://hover.build), which is in its alpha stages. You can run the app using `hover run`, but after clicking `Submit` on the login page, you will not be able to proceed (infinite loading) due to some plugins not having desktop support. 
-
 ## Usage
 Run the app and enter either your FCPS credentials or the test user credentials. The test user's username is `1234567`. The password field can be left empty (the password does not matter for the test user).
