@@ -1,3 +1,8 @@
+import 'package:flutter/foundation.dart'
+    show debugDefaultTargetPlatformOverride, TargetPlatform;
+
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart'
     show
         BuildContext,
@@ -10,7 +15,18 @@ import 'package:flutter/material.dart'
 
 import 'package:grade_view/ui.dart' show LoginPage;
 
-void main() => runApp(MyApp());
+void main() {
+  TargetPlatform targetPlatform;
+  if (Platform.isMacOS) {
+    targetPlatform = TargetPlatform.iOS;
+  } else if (Platform.isLinux || Platform.isWindows) {
+    targetPlatform = TargetPlatform.android;
+  }
+  if (targetPlatform != null) {
+    debugDefaultTargetPlatformOverride = targetPlatform;
+  }
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

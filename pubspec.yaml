@@ -1,5 +1,5 @@
 name:                          grade_view
-description:                   'an app for FCPS SIS with lots of additional functionality'
+description:                   'An app for FCPS SIS with lots of additional functionality.'
 author:                        'S Ratna <sratna@sumanthratna.gq>'
 repository:                    'https://github.com/sumanthratna/grade-view'
 issue_tracker:                 'https://github.com/sumanthratna/grade-view/issues'
