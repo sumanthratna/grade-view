@@ -13,6 +13,7 @@ SECRETS.bat
 ios/Runner/GoogleService-Info.plist
 gradeview.p12
 GradeView_Distribution.mobileprovision
+flutter_*.png
 
 # IntelliJ related
 *.iml

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart'
         DataRow,
         DataTable,
         DataTableSource,
+        MediaQuery,
+        SizedBox,
         State,
         StatefulWidget,
         Text,
@@ -110,6 +112,8 @@ class _BreakdownTableState extends State<BreakdownTable> {
   List<String> _currentlySelected = <String>[];
 
   @override
-  Widget build(final BuildContext context) =>
-      DataTable(rows: widget.rows, columns: widget.columns, onSelectAll: null);
+  Widget build(final BuildContext context) => SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: DataTable(
+          rows: widget.rows, columns: widget.columns, onSelectAll: null));
 }
