@@ -7,6 +7,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - libstdc++6
+    - libplist-utils
 git:
   depth:       1
 cache:
