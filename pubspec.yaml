@@ -1,27 +1,27 @@
-name:                          grade_view
-description:                   'An app for FCPS SIS with lots of additional functionality.'
-author:                        'S Ratna <sratna@sumanthratna.ml>'
-repository:                    'https://github.com/sumanthratna/grade-view'
-issue_tracker:                 'https://github.com/sumanthratna/grade-view/issues'
-version:                       1.0.8
+name:                        grade_view
+description:                 "An app for FCPS SIS with lots of additional functionality."
+author:                      "S Ratna <sratna04@outlook.com>"
+repository:                  "https://github.com/sumanthratna/grade-view"
+issue_tracker:               "https://github.com/sumanthratna/grade-view/issues"
+version:                     1.0.8
 environment:
-    sdk:                       '>=2.0.0 <3.0.0'
+  sdk:                       ">=2.0.0 <3.0.0"
 dependencies:
-    flutter:
-        sdk:                   flutter
-    http:                      ^0.12.0+2
-    flutter_secure_storage:    ^3.2.1+1
-    firebase_messaging:        ^4.0.0+3
-    modal_progress_hud:        ^0.1.3
-    datetime_picker_formfield: ^0.1.8
-    decimal:                   ^0.3.3
-    cupertino_icons:           ^0.1.2
-    flutter_typeahead:         ^1.5.0
-    provider:                  ^2.0.1
+  flutter:
+    sdk:                     flutter
+  http:                      ^0.12.0+2
+  flutter_secure_storage:    ^3.2.1+1
+  firebase_messaging:        ^4.0.0+3
+  modal_progress_hud:        ^0.1.3
+  datetime_picker_formfield: ^0.1.8
+  decimal:                   ^0.3.3
+  cupertino_icons:           ^0.1.2
+  flutter_typeahead:         ^1.5.0
+  provider:                  ^2.0.1
 dev_dependencies:
-    flutter_test:
-        sdk:                   flutter
+  flutter_test:
+    sdk:                     flutter
 flutter:
-    uses-material-design:      true
-    assets:
-        - assets/fcps.png
+  uses-material-design:      true
+  assets:
+    - assets/fcps.png
