@@ -1,4 +1,4 @@
-language:      minimal
+language:      android
 os:
 - linux
 - osx
@@ -45,4 +45,4 @@ script:
 - ../flutter/bin/flutter build web
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build macos; fi
 # - ../flutter/bin/flutter build windows
-- if [ $TRAVIS_OS_NAME = linux ]; then ./flutter/bin/flutter build linux; fi
+- if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build linux; fi
