@@ -1,7 +1,7 @@
 # FCPS SIS GradeView
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ad20713867594ba3a5a3a9eb2627e00a)](https://app.codacy.com/app/sumanthratna/grade_view?utm_source=github.com&utm_medium=referral&utm_content=sumanthratna/grade_view&utm_campaign=Badge_Grade_Dashboard)
-[![Travis Build Status](https://api.travis-ci.org/sumanthratna/grade_view.svg?branch=master)](https://travis-ci.org/sumanthratna/grade_view) [![Codemagic build status](https://api.codemagic.io/apps/5cbcc27533718337908b8cc2/5cbcc27533718337908b8cc1/status_badge.svg)](https://codemagic.io/apps/5cbcc27533718337908b8cc2/5cbcc27533718337908b8cc1/latest_build) [![Bitrise Build Status](https://app.bitrise.io/app/1eb88e8e2f886294/status.svg?token=dbUXfDkBiOLZlYKQiZTgZA&branch=master)](https://app.bitrise.io/app/1eb88e8e2f886294) [![Cirrus-CI Build Status](https://api.cirrus-ci.com/github/sumanthratna/grade_view.svg)](https://cirrus-ci.com/github/sumanthratna/grade_view)
+[![Travis Build Status](https://api.travis-ci.org/sumanthratna/grade_view.svg?branch=master)](https://travis-ci.org/sumanthratna/grade_view)
 
 An app for FCPS SIS. [` App Store`](https://apps.apple.com/us/app/gradeview/id1459817290) [`Aptoide App Store`](https://gradeview.en.aptoide.com/)
 
@@ -18,6 +18,14 @@ Before running `flutter run` you should copy `ios/Runner/GoogleService-Info-samp
 THIS SECTION IS INCOMPLETE
 
 If you don't have a keystore, create one with `keytool -genkey -v -keystore ~/key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key`. Then copy `android/key.properties.sample` to `android/key.properties` and replace the appropriate values.
+
+### macOS
+
+Since the [`flutter_secure_storage` package](https://github.com/mogol/flutter_secure_storage) does not currently support desktop, the app does not advance beyond the login screen, although authentication functions correctly.
+
+### Web
+
+CORS is currently not enabled on the [unofficial SIS API](https://github.com/ovkulkarni/sis-api). As a result, authentication fails, and you will not be able to advance beyond the login page.
 
 ## Usage
 
