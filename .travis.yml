@@ -1,7 +1,7 @@
+language:      dart
 os:
 - linux
 - osx
-sudo:             false
 addons:
   apt:
     sources:
@@ -10,38 +10,38 @@ addons:
     - libstdc++6
     - fonts-droid
 git:
-  depth:          1
+  depth:       1
 cache:
   directories:
-  - "$HOME/.pub-cache"
+  - $HOME/.pub-cache
 env:
   global:
-  - secure:       mJ08lR5n98p/ep27LxZ/AQwDeGonp/JAZSnROHEuYiQH8Oh9yhbfEBrRcvRLuK9283yIE7gLzEaQ5s9N8EbtDvLQcIq9M48z/lBdqxCdFwQxrt5H3qfjHBfH/dy+ffYDDA7NvNCRry3EUhV9+vyuKaN7uLGWT74Db4cUVjgoo52blPPR37aXfoBNK7eHCoCcQCTA7iEdGmC0yVOnGSLfgmd2aaoY5bVeq9LtfvnKxy67tvOguipFgaELyh4CjTqv2syKCDykQfUo80PCgMQd5hiAFgGWI1fSAx5hkSmW4rhwAHm0gGvZjpYy05PXKeIgqTnMJEoRtvfiyOLD2LffDh4DbD6+fQVuKkSsN0txnUl7QWbPYdTBUEJFSzyywdF70EK0eykGD4JjCyAWwBoKdG9PqKRHDFhUFdv6SqOzZuAwn8Bee+BJa5btv8mS0sErPvAcEj9NctB8xwNbNcQwNbt2R/MClCK0tpNLaXBLQWB6WEpyxsDqsICHz2Ii7XlMZUjI/CcqjHg8e3RXw9ihDk2SK8c26u/QaILHmkoOnnsjfXcpyfyjIO8+ocJ7G+usMFNCys3U7akPCC6eSM/QpeW8PzpUQP6LAhRaDU4b0/ehvI6EXQu2fnEwUNKzgPCx+9Vx+xnmFXFFILQB2qqr972Fx3e3Gd1rc3eN5lsqcbw=
-  - secure:       0HVIfGYiKg7grYmstcSJWxvJop9WATy3s6LT1FJwsqKZMXo2ZJr8ZLBWwsADxwzEBjDqbCHSqYmV6D5bNbFwFyxKxktDlFguV598At7xVBa44ma4DlIsJKDuqrMe0aYP3cxG2Krm9nivJtp8DJtjNQL5PgMCSdDh+YupAw6zNKg2R3ReqViS6rxCJBqykURDJhxBBM0tL1DbjbYdiZgrjWxAhEvHM/w4+eQNAy6esJuRng2vN8RkfYycfO9MLlJolWP/PjGvapxD4I59LtJ7vXMEaR0dkOZdTp0jum2rwXV9vu5+ivRGNJd4MFqmU/yq6pmUqL5mCT4yYRciO8qbQWm826zOFAdVyGv5y7Bpaus0DoK6tQT1b4b4gqGdjMmUbe0cC9dKbrNgSTI48aL+RW4HMdTlS9ZRR5dNOyN2wZ43KxZ1bGrbyQCcsbgxZg2MWOeS5ubSU2cjrJpwVDax5tC7c699wXa2ses4DL+XQ7aMUaE1Lk0xM9+1ZU+X9F+I7ZKSOIE0jdRxgtMuFb/M1ZfnZ46Q+f38hnc2iNGcRfyRwGDaqWNbg93Mp3ephztW3pbUyUlL51mrGQm9vet5ddvjSOOF3fErtq24Pf8MMDqaFFbGwuYGGMxaZvv8fw1hJWHrj0gNVHGxxKX1PN6DEDU+jIDtLo0rEL+B2l3mROM=
-  - secure:       DPTJ+WOUEfYxyPghXOmId6wD88KqWTarB/M3eieLyhB1a3Tipx1fwDBu6NvmS7j02NAJvKW1fWvjDjX3e2F7IV4dSBM3GrfzpQb6CO0nv/Z1gzrVzRC0lt1n2ZugyznHOUoG2SF4ukP6KNfKrUXddBR0vnp19B3CZzDQM0s+GPuhBlu9fPXo5wJ3z8OT5Tx5tg0e9wQPd1+068xLWQR4JRUWrO5Q5/Y49faH/oc3QTqCbOfCQSu0NvEP853Oq61G5DZzUu4AsUFIPB0fiKAlpGsd0y2bxOKXIYWZS6gUTwf0YXM3RmBE8bK+yfeVFgxWsGGGA2g0WdQp/pazdyWonGbaqE41bEhx8a0DoBheMsFvC7k756CYOACBnNMH3VVZF13ChyZsBFZpn9Pb5Seta4SEOzN/amBFvWFJy1Q76kd54IHvrNuts8JtYO6/3KVSLT/xWiErHZLSMEhTVZ6RJZj1XXKgVK7grqJaGTPgaivq4GmYn/WA00bn07o3yooCgYAf2Czm+MUkmgbW0fZZolXwzgVAPyo3gHM7j3fASp4Nifb0vNhzIGyRNu1W2y6Ws+zJ4sbZjW3bC6Tjbn0dcuqlF8TYkAclWVWiWogia2OmXgQFtzupkVWZoXcNfq0tWnMmTk/I2OpaAnPIq2OUsSLIkrKK/s/KbDckVAZTIgY=
+  - secure:    mJ08lR5n98p/ep27LxZ/AQwDeGonp/JAZSnROHEuYiQH8Oh9yhbfEBrRcvRLuK9283yIE7gLzEaQ5s9N8EbtDvLQcIq9M48z/lBdqxCdFwQxrt5H3qfjHBfH/dy+ffYDDA7NvNCRry3EUhV9+vyuKaN7uLGWT74Db4cUVjgoo52blPPR37aXfoBNK7eHCoCcQCTA7iEdGmC0yVOnGSLfgmd2aaoY5bVeq9LtfvnKxy67tvOguipFgaELyh4CjTqv2syKCDykQfUo80PCgMQd5hiAFgGWI1fSAx5hkSmW4rhwAHm0gGvZjpYy05PXKeIgqTnMJEoRtvfiyOLD2LffDh4DbD6+fQVuKkSsN0txnUl7QWbPYdTBUEJFSzyywdF70EK0eykGD4JjCyAWwBoKdG9PqKRHDFhUFdv6SqOzZuAwn8Bee+BJa5btv8mS0sErPvAcEj9NctB8xwNbNcQwNbt2R/MClCK0tpNLaXBLQWB6WEpyxsDqsICHz2Ii7XlMZUjI/CcqjHg8e3RXw9ihDk2SK8c26u/QaILHmkoOnnsjfXcpyfyjIO8+ocJ7G+usMFNCys3U7akPCC6eSM/QpeW8PzpUQP6LAhRaDU4b0/ehvI6EXQu2fnEwUNKzgPCx+9Vx+xnmFXFFILQB2qqr972Fx3e3Gd1rc3eN5lsqcbw=
+  - secure:    0HVIfGYiKg7grYmstcSJWxvJop9WATy3s6LT1FJwsqKZMXo2ZJr8ZLBWwsADxwzEBjDqbCHSqYmV6D5bNbFwFyxKxktDlFguV598At7xVBa44ma4DlIsJKDuqrMe0aYP3cxG2Krm9nivJtp8DJtjNQL5PgMCSdDh+YupAw6zNKg2R3ReqViS6rxCJBqykURDJhxBBM0tL1DbjbYdiZgrjWxAhEvHM/w4+eQNAy6esJuRng2vN8RkfYycfO9MLlJolWP/PjGvapxD4I59LtJ7vXMEaR0dkOZdTp0jum2rwXV9vu5+ivRGNJd4MFqmU/yq6pmUqL5mCT4yYRciO8qbQWm826zOFAdVyGv5y7Bpaus0DoK6tQT1b4b4gqGdjMmUbe0cC9dKbrNgSTI48aL+RW4HMdTlS9ZRR5dNOyN2wZ43KxZ1bGrbyQCcsbgxZg2MWOeS5ubSU2cjrJpwVDax5tC7c699wXa2ses4DL+XQ7aMUaE1Lk0xM9+1ZU+X9F+I7ZKSOIE0jdRxgtMuFb/M1ZfnZ46Q+f38hnc2iNGcRfyRwGDaqWNbg93Mp3ephztW3pbUyUlL51mrGQm9vet5ddvjSOOF3fErtq24Pf8MMDqaFFbGwuYGGMxaZvv8fw1hJWHrj0gNVHGxxKX1PN6DEDU+jIDtLo0rEL+B2l3mROM=
+  - secure:    DPTJ+WOUEfYxyPghXOmId6wD88KqWTarB/M3eieLyhB1a3Tipx1fwDBu6NvmS7j02NAJvKW1fWvjDjX3e2F7IV4dSBM3GrfzpQb6CO0nv/Z1gzrVzRC0lt1n2ZugyznHOUoG2SF4ukP6KNfKrUXddBR0vnp19B3CZzDQM0s+GPuhBlu9fPXo5wJ3z8OT5Tx5tg0e9wQPd1+068xLWQR4JRUWrO5Q5/Y49faH/oc3QTqCbOfCQSu0NvEP853Oq61G5DZzUu4AsUFIPB0fiKAlpGsd0y2bxOKXIYWZS6gUTwf0YXM3RmBE8bK+yfeVFgxWsGGGA2g0WdQp/pazdyWonGbaqE41bEhx8a0DoBheMsFvC7k756CYOACBnNMH3VVZF13ChyZsBFZpn9Pb5Seta4SEOzN/amBFvWFJy1Q76kd54IHvrNuts8JtYO6/3KVSLT/xWiErHZLSMEhTVZ6RJZj1XXKgVK7grqJaGTPgaivq4GmYn/WA00bn07o3yooCgYAf2Czm+MUkmgbW0fZZolXwzgVAPyo3gHM7j3fASp4Nifb0vNhzIGyRNu1W2y6Ws+zJ4sbZjW3bC6Tjbn0dcuqlF8TYkAclWVWiWogia2OmXgQFtzupkVWZoXcNfq0tWnMmTk/I2OpaAnPIq2OUsSLIkrKK/s/KbDckVAZTIgY=
   matrix:
   - FLUTTER_VERSION=master
 before_script:
 - git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
-- "./flutter/bin/flutter config --enable-web"
-- "if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./flutter/bin/flutter config --enable-macos-desktop; fi"
-# - "./flutter/bin/flutter config --enable-windows-desktop"
-- "if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./flutter/bin/flutter config --enable-linux-desktop; fi"
-- "./flutter/bin/flutter doctor"
-- "cp ios/Runner/GoogleService-Info-sample.plist ios/Runner/GoogleService-Info.plist"
-- "plutil -replace API_KEY -string "$FIREBASE_SECRET" ios/Runner/GoogleService-Info.plist"
+- ./flutter/bin/flutter config --enable-web
+- if [ $TRAVIS_OS_NAME = osx ]; then ./flutter/bin/flutter config --enable-macos-desktop; fi
+# - ./flutter/bin/flutter config --enable-windows-desktop
+- if [ $TRAVIS_OS_NAME = linux ]; then ./flutter/bin/flutter config --enable-linux-desktop; fi
+- ./flutter/bin/flutter doctor
+- cp ios/Runner/GoogleService-Info-sample.plist ios/Runner/GoogleService-Info.plist
+- plutil -replace API_KEY -string $FIREBASE_SECRET ios/Runner/GoogleService-Info.plist
 script:
 - ls -alh
-- "./flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run lib/"
-- "./flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run test/"
-- "./flutter/bin/flutter analyze"
-- "./flutter/bin/flutter test"
-- "./flutter/bin/flutter build bundle"
-- "./flutter/bin/flutter build appbundle"
-- "./flutter/bin/flutter build aot"
-- "./flutter/bin/flutter build apk"
-- "if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./flutter/bin/flutter build ios; fi"
-- "./flutter/bin/flutter build web"
-- "if [ "$TRAVIS_OS_NAME" = "osx" ]; then ./flutter/bin/flutter build macos; fi"
-# - "./flutter/bin/flutter build windows"
-- "if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./flutter/bin/flutter build linux; fi"
+- ./flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run lib/
+- ./flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run test/
+- ./flutter/bin/flutter analyze
+- ./flutter/bin/flutter test
+- ./flutter/bin/flutter build bundle
+- ./flutter/bin/flutter build appbundle
+- ./flutter/bin/flutter build aot
+- ./flutter/bin/flutter build apk
+- if [ $TRAVIS_OS_NAME = osx ]; then ./flutter/bin/flutter build ios; fi
+- ./flutter/bin/flutter build web
+- if [ $TRAVIS_OS_NAME = osx ]; then ./flutter/bin/flutter build macos; fi
+# - ./flutter/bin/flutter build windows
+- if [ $TRAVIS_OS_NAME = linux ]; then ./flutter/bin/flutter build linux; fi
