@@ -270,14 +270,14 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                                       .weightingMantissaLength));
                       widget.course.breakdown['TOTAL'].percentage =
                           Decimal.parse((widget.course.breakdown.weightings
-                                  .map((final Weighting f) => f.name == 'TOTAL'
-                                      ? Decimal.fromInt(0)
-                                      : f.percentage)
-                                  .reduce((final Decimal value,
-                                          final Decimal element) =>
-                                      value + element))
-                              .toStringAsFixed(widget.course.breakdown['TOTAL']
-                                  .weightingMantissaLength));
+                              .map((final Weighting f) => f.name == 'TOTAL'
+                                  ? Decimal.fromInt(0)
+                                  : f.percentage)
+                              .reduce((final Decimal value, final Decimal element) =>
+                                  value + element)).toStringAsFixed(widget
+                              .course
+                              .breakdown['TOTAL']
+                              .weightingMantissaLength));
                       widget.course.breakdown[_assignmentType].letterGrade =
                           convertPercentageToLetterGrade(Decimal.fromInt(100) *
                               widget.course.breakdown[_assignmentType]

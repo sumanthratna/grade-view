@@ -22,10 +22,12 @@ env:
   matrix:
   - FLUTTER_VERSION=master
 before_script:
+- yes | sdkmanager "platforms;android-28"
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION && cd grade_view
 - ../flutter/bin/flutter config --enable-web
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter config --enable-macos-desktop; fi
 # - ../flutter/bin/flutter config --enable-windows-desktop
+- if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter precache --linux; fi
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter config --enable-linux-desktop; fi
 - ../flutter/bin/flutter doctor
 - cp ios/Runner/GoogleService-Info-sample.plist ios/Runner/GoogleService-Info.plist
