@@ -33,6 +33,9 @@ env:
 before_script:
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
   cd grade_view
+- echo "weakpass\nweakpass\n\n\n\n\n\n\ny\n" | keytool -genkey -v -keystore android/app/key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
+- openssl aes-256-cbc -K $encrypted_c57c16130b84_key -iv $encrypted_c57c16130b84_iv
+  -in travis.key.properties.enc -out android/key.properties -d
 - "../flutter/bin/flutter config --enable-web"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter config --enable-macos-desktop;
   fi
@@ -58,7 +61,3 @@ script:
 - "../flutter/bin/flutter build web"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build macos; fi
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build linux; fi
-before_install:
-- echo "weakpass\nweakpass\n\n\n\n\n\n\ny\n" | keytool -genkey -v -keystore key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key
-- openssl aes-256-cbc -K $encrypted_c57c16130b84_key -iv $encrypted_c57c16130b84_iv
-  -in travis.key.properties.enc -out android/key.properties -d
