@@ -1,13 +1,14 @@
-language: android
+language: minimal
 jobs:
   include:
   - os: linux
     dist: trusty
+    android:
+      components:
+      - build-tools-28.0.3
+      - android-28
+    language: android
   - os: osx
-android:
-  components:
-  - build-tools-28.0.3
-  - android-28
 addons:
   apt:
     sources:
@@ -57,7 +58,7 @@ script:
 - "../flutter/bin/flutter build bundle"
 - "../flutter/bin/flutter build appbundle"
 - "../flutter/bin/flutter build aot"
-- "../flutter/bin/flutter build apk"
+- "if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build apk; fi"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build ios; fi
 - "../flutter/bin/flutter build web"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build macos; fi
