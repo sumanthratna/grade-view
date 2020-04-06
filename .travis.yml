@@ -10,6 +10,14 @@ jobs:
     language: android
   - os: osx
     osx_image: xcode11.3
+    before_script:
+    - brew update
+    - brew install --HEAD usbmuxd
+    - brew unlink usbmuxd
+    - brew link usbmuxd
+    - brew install --HEAD libimobiledevice
+    - brew install ideviceinstaller
+    - brew install ios-deploy
 addons:
   apt:
     sources:
@@ -60,7 +68,7 @@ script:
 - "if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build appbundle; fi"
 - "../flutter/bin/flutter build aot"
 - "if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build apk; fi"
-- if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build ios; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build ios --no-codesign; fi
 - "../flutter/bin/flutter build web"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build macos; fi
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build linux; fi
