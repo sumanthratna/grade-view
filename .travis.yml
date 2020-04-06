@@ -10,6 +10,7 @@ jobs:
     language: android
   - os: osx
     osx_image: xcode11.3
+  - os: windows
 addons:
   apt:
     sources:
@@ -53,6 +54,9 @@ before_script:
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter config --enable-linux-desktop;
   fi
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter precache --linux; fi
+- if [ $TRAVIS_OS_NAME = windows ]; then ../flutter/bin/flutter config --enable-windows-desktop;
+  fi
+- if [ $TRAVIS_OS_NAME = windows ]; then ../flutter/bin/flutter precache --windows; fi
 - "../flutter/bin/flutter doctor"
 - cp ios/Runner/GoogleService-Info-sample.plist ios/Runner/GoogleService-Info.plist
 - if [ $TRAVIS_OS_NAME = osx ]; then plutil -replace API_KEY -string $FIREBASE_SECRET
@@ -69,3 +73,4 @@ script:
 - "../flutter/bin/flutter build web"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build macos; fi
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build linux; fi
+- if [ $TRAVIS_OS_NAME = windows ]; then ../flutter/bin/flutter build windows; fi
