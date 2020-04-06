@@ -1,6 +1,7 @@
 SECRETS.bat
 ios/Runner/GoogleService-Info.plist
 android/key.properties
+android/travis.key.properties
 gradeview.p12
 GradeView_Distribution.mobileprovision
 flutter_*.png
