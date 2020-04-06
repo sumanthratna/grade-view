@@ -33,7 +33,8 @@ env:
 before_script:
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
   cd grade_view
-- keytool -genkey -v -keystore android/app/key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key -storepass weakpass -keypass weakpass -dname "CN=a" -noprompt
+- keytool -genkey -v -keystore android/app/key.jks -keyalg RSA -keysize 2048 -validity
+  10000 -alias key -storepass weakpass -keypass weakpass -dname "CN=a" -noprompt
 - openssl aes-256-cbc -K $encrypted_c57c16130b84_key -iv $encrypted_c57c16130b84_iv
   -in travis.key.properties.enc -out android/key.properties -d
 - "../flutter/bin/flutter config --enable-web"
@@ -52,7 +53,6 @@ script:
 - ls -alh
 - "../flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run lib/"
 - "../flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run test/"
-# - "../flutter/bin/flutter test"
 - "../flutter/bin/flutter build bundle"
 - "../flutter/bin/flutter build appbundle"
 - "../flutter/bin/flutter build aot"
