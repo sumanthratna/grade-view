@@ -40,9 +40,10 @@ before_script:
 - "../flutter/bin/flutter config --enable-web"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter config --enable-macos-desktop;
   fi
-- if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter precache --linux; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter precache --macos; fi
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter config --enable-linux-desktop;
   fi
+- if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter precache --linux; fi
 - "../flutter/bin/flutter doctor"
 - cp ios/Runner/GoogleService-Info-sample.plist ios/Runner/GoogleService-Info.plist
 - if [ $TRAVIS_OS_NAME = osx ]; then plutil -replace API_KEY -string $FIREBASE_SECRET
