@@ -10,14 +10,6 @@ jobs:
     language: android
   - os: osx
     osx_image: xcode11.3
-    before_script:
-    - brew update
-    - brew install --HEAD usbmuxd
-    - brew unlink usbmuxd
-    - brew link usbmuxd
-    - brew install --HEAD libimobiledevice
-    - brew install ideviceinstaller
-    - brew install ios-deploy
 addons:
   apt:
     sources:
@@ -41,6 +33,13 @@ env:
   matrix:
   - FLUTTER_VERSION=master
 before_script:
+- if [ $TRAVIS_OS_NAME = osx ]; then brew update; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then brew install --HEAD usbmuxd; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then brew unlink usbmuxd; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then brew link usbmuxd; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then brew install --HEAD libimobiledevice; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then brew install ideviceinstaller; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then brew install ios-deploy; fi
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
   cd grade_view
 - keytool -genkey -v -keystore android/app/key.jks -keyalg RSA -keysize 2048 -validity
