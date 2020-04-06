@@ -1,13 +1,13 @@
 language: android
 jobs:
   include:
-    - os: linux
-      dist: trusty
-    - os: osx
+  - os: linux
+    dist: trusty
+  - os: osx
 android:
   components:
-    - build-tools-28.0.3
-    - android-28
+  - build-tools-28.0.3
+  - android-28
 addons:
   apt:
     sources:
@@ -31,7 +31,6 @@ env:
   matrix:
   - FLUTTER_VERSION=master
 before_script:
-# - yes | sdkmanager "platforms;android-28"
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
   cd grade_view
 - "../flutter/bin/flutter config --enable-web"
@@ -59,3 +58,6 @@ script:
 - "../flutter/bin/flutter build web"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build macos; fi
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build linux; fi
+before_install:
+- openssl aes-256-cbc -K $encrypted_b7b931b9eee9_key -iv $encrypted_b7b931b9eee9_iv
+  -in key.properties.enc -out android/key.properties -d
