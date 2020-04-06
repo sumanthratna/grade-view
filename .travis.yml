@@ -57,7 +57,7 @@ script:
 - "../flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run lib/"
 - "../flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run test/"
 - "../flutter/bin/flutter build bundle"
-- "if [ $TRAVIS_OS_NAME = linux ]; ../flutter/bin/flutter build appbundle; fi"
+- "if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build appbundle; fi"
 - "../flutter/bin/flutter build aot"
 - "if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter build apk; fi"
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter build ios; fi
