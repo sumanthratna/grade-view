@@ -42,7 +42,7 @@ before_script:
 - if [ $TRAVIS_OS_NAME = osx ]; then brew install ideviceinstaller; fi
 - if [ $TRAVIS_OS_NAME = osx ]; then brew install ios-deploy; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then choco install jdk8; fi
-- if [ $TRAVIS_OS_NAME = windows ]; then export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_191/bin"; fi
+- if [ $TRAVIS_OS_NAME = windows ]; then eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")'); fi
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
   cd grade_view
 - keytool -genkey -v -keystore android/app/key.jks -keyalg RSA -keysize 2048 -validity
