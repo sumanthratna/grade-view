@@ -45,7 +45,7 @@ before_script:
 - if [ $TRAVIS_OS_NAME = windows ]; then eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")'); fi
 - if [ $TRAVIS_OS_NAME = windows ]; then curl.exe -L -o ubuntu-1804.zip https://aka.ms/wsl-ubuntu-1804; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then powershell.exe -NoProfile -Command "Expand-Archive -Path ubuntu-1804.zip -DestinationPath Ubuntu"; fi
-- Ubuntu/ubuntu1804.exe install --root
+- if [ $TRAVIS_OS_NAME = windows ]; then Ubuntu/ubuntu1804.exe install --root; fi
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
   cd grade_view
 - keytool -genkey -v -keystore android/app/key.jks -keyalg RSA -keysize 2048 -validity
