@@ -46,6 +46,7 @@ before_script:
 - if [ $TRAVIS_OS_NAME = windows ]; then curl.exe -L -o ubuntu-1804.zip https://aka.ms/wsl-ubuntu-1804; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then powershell.exe -NoProfile -Command "Expand-Archive -Path ubuntu-1804.zip -DestinationPath Ubuntu"; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then Ubuntu/ubuntu1804.exe install --root; fi
+- if [ $TRAVIS_OS_NAME = windows ]; then wsl.exe sudo apt-get upgrade; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then wsl.exe sudo apt-get install dos2unix; fi
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
   cd grade_view
