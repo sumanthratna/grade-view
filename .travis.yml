@@ -43,7 +43,7 @@ before_script:
 - if [ $TRAVIS_OS_NAME = osx ]; then brew install ios-deploy; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then choco install jdk8; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")'); fi
-- if [ $TRAVIS_OS_NAME = windows ]; then curl -L -o ubuntu-1804.zip https://aka.ms/wsl-ubuntu-1804; fi
+- if [ $TRAVIS_OS_NAME = windows ]; then curl.exe -L -o ubuntu-1804.zip https://aka.ms/wsl-ubuntu-1804; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then powershell.exe -NoProfile -Command "Expand-Archive -Path ubuntu-1804.zip -DestinationPath Ubuntu"; fi
 - Ubuntu/ubuntu1804.exe install --root
 - cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
