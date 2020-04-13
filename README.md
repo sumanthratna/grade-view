@@ -3,7 +3,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/ad20713867594ba3a5a3a9eb2627e00a)](https://app.codacy.com/app/sumanthratna/grade_view?utm_source=github.com&utm_medium=referral&utm_content=sumanthratna/grade_view&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.com/sumanthratna/grade_view.svg?branch=master)](https://travis-ci.com/sumanthratna/grade_view)
 
-An app for FCPS SIS. [` App Store`](https://apps.apple.com/us/app/gradeview/id1459817290) [`Aptoide App Store`](https://gradeview.en.aptoide.com/)
+An app for FCPS SIS. [`Aptoide App Store`](https://gradeview.en.aptoide.com/)
 
 ## Setup
 

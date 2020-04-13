@@ -41,38 +41,23 @@ before_script:
 - if [ $TRAVIS_OS_NAME = osx ]; then brew install --HEAD libimobiledevice; fi
 - if [ $TRAVIS_OS_NAME = osx ]; then brew install ideviceinstaller; fi
 - if [ $TRAVIS_OS_NAME = osx ]; then brew install ios-deploy; fi
-- if [ $TRAVIS_OS_NAME = windows ]; then choco install jdk8; fi
+- if [ $TRAVIS_OS_NAME = windows ]; then choco install jdk8 openssl dos2unix; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")'); fi
-- if [ $TRAVIS_OS_NAME = windows ]; then curl.exe -L -o ubuntu-1804.zip https://aka.ms/wsl-ubuntu-1804; fi
-- if [ $TRAVIS_OS_NAME = windows ]; then powershell.exe -NoProfile -Command "Expand-Archive -Path ubuntu-1804.zip -DestinationPath Ubuntu"; fi
-- if [ $TRAVIS_OS_NAME = windows ]; then Ubuntu/ubuntu1804.exe install --root; fi
-- if [ $TRAVIS_OS_NAME = windows ]; then wsl.exe sudo apt-get upgrade; fi
-- if [ $TRAVIS_OS_NAME = windows ]; then wsl.exe sudo apt-get install dos2unix; fi
-- cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION &&
-  cd grade_view
-- if [ $TRAVIS_OS_NAME = windows ]; then wsl.exe dos2unix ../flutter/bin/flutter; fi
-- keytool -genkey -v -keystore android/app/key.jks -keyalg RSA -keysize 2048 -validity
-  10000 -alias key -storepass weakpass -keypass weakpass -dname "CN=a" -noprompt
-- if [ $TRAVIS_OS_NAME = windows ]; then wsl.exe openssl aes-256-cbc -K $encrypted_c57c16130b84_key -iv $encrypted_c57c16130b84_iv
-  -in travis.key.properties.enc -out android/key.properties -d; fi
-- openssl aes-256-cbc -K $encrypted_c57c16130b84_key -iv $encrypted_c57c16130b84_iv
-  -in travis.key.properties.enc -out android/key.properties -d
+- cd .. && git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION && cd grade_view
+- if [ $TRAVIS_OS_NAME = windows ]; then unix2dos ../flutter/bin/flutter; fi
+- keytool -genkey -v -keystore android/app/key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias key -storepass weakpass -keypass weakpass -dname "CN=a" -noprompt
+- openssl aes-256-cbc -K $encrypted_c57c16130b84_key -iv $encrypted_c57c16130b84_iv -in travis.key.properties.enc -out android/key.properties -d
 - "../flutter/bin/flutter config --enable-web"
-- if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter config --enable-macos-desktop;
-  fi
+- if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter config --enable-macos-desktop; fi
 - if [ $TRAVIS_OS_NAME = osx ]; then ../flutter/bin/flutter precache --macos; fi
-- if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter config --enable-linux-desktop;
-  fi
+- if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter config --enable-linux-desktop; fi
 - if [ $TRAVIS_OS_NAME = linux ]; then ../flutter/bin/flutter precache --linux; fi
-- if [ $TRAVIS_OS_NAME = windows ]; then ../flutter/bin/flutter config --enable-windows-desktop;
-  fi
+- if [ $TRAVIS_OS_NAME = windows ]; then ../flutter/bin/flutter config --enable-windows-desktop; fi
 - if [ $TRAVIS_OS_NAME = windows ]; then ../flutter/bin/flutter precache --windows; fi
 - "../flutter/bin/flutter doctor"
 - cp ios/Runner/GoogleService-Info-sample.plist ios/Runner/GoogleService-Info.plist
-- if [ $TRAVIS_OS_NAME = osx ]; then plutil -replace API_KEY -string $FIREBASE_SECRET
-  ios/Runner/GoogleService-Info.plist; fi
-- if [ $TRAVIS_OS_NAME = linux ]; then plistutil -replace API_KEY -string $FIREBASE_SECRET
-  ios/Runner/GoogleService-Info.plist; fi
+- if [ $TRAVIS_OS_NAME = osx ]; then plutil -replace API_KEY -string $FIREBASE_SECRET ios/Runner/GoogleService-Info.plist; fi
+- if [ $TRAVIS_OS_NAME = linux ]; then plistutil -replace API_KEY -string $FIREBASE_SECRET ios/Runner/GoogleService-Info.plist; fi
 script:
 - ls -alh
 - "../flutter/bin/cache/dart-sdk/bin/dartfmt --dry-run lib/"
