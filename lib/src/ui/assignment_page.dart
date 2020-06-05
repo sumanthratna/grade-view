@@ -1,5 +1,5 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart'
-    show DateTimePickerFormField, InputType;
+    show DateTimeField;
 import 'package:decimal/decimal.dart' show Decimal;
 import 'package:flutter/material.dart'
     show
@@ -345,18 +345,20 @@ class _EditAssignmentFormState extends State<EditAssignmentForm> {
                     .map((final String f) =>
                         DropdownMenuItem<String>(value: f, child: Text(f)))
                     .toList()),
-            DateTimePickerFormField(
+            DateTimeField(
                 initialValue: widget.assignment.date,
                 format: DateFormat('yyyy-MM-dd'),
-                inputType: InputType.date,
-                editable: true,
+                keyboardType: TextInputType.datetime,
+                enabled: true,
+                readOnly: false,
                 decoration: const InputDecoration(labelText: 'Date'),
                 onSaved: (final DateTime value) => _assignmentDate = value),
-            DateTimePickerFormField(
+            DateTimeField(
                 initialValue: widget.assignment.dueDate,
                 format: DateFormat('yyyy-MM-dd'),
-                inputType: InputType.date,
-                editable: true,
+                keyboardType: TextInputType.datetime,
+                enabled: true,
+                readOnly: false,
                 decoration: const InputDecoration(labelText: 'Due Date'),
                 onSaved: (final DateTime value) => _assignmentDueDate = value),
             TextFormField(

@@ -1,5 +1,5 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart'
-    show DateTimePickerFormField, InputType;
+    show DateTimeField;
 import 'package:decimal/decimal.dart' show Decimal;
 import 'package:flutter/material.dart'
     show
@@ -38,6 +38,7 @@ import 'package:flutter/material.dart'
         RouteSettings,
         Scaffold,
         Scrollbar,
+        showDatePicker,
         showDialog,
         SingleChildScrollView,
         State,
@@ -130,16 +131,34 @@ class _AddAssignmentFormState extends State<AddAssignmentForm> {
                 onSaved: (final String value) => _assignmentName = value),
             getAssignmentTypeSelector(_assignmentTypeSelector, widget.course,
                 (final String value) => _assignmentType = value),
-            DateTimePickerFormField(
+            DateTimeField(
                 format: DateFormat('yyyy-MM-dd'),
-                inputType: InputType.date,
-                editable: true,
+                onShowPicker: (final BuildContext context,
+                        final DateTime currentValue) async =>
+                    showDatePicker(
+                      context: context,
+                      firstDate: DateTime(1900),
+                      initialDate: currentValue ?? DateTime.now(),
+                      lastDate: DateTime(2100),
+                    ),
+                keyboardType: TextInputType.datetime,
+                enabled: true,
+                readOnly: false,
                 decoration: const InputDecoration(labelText: 'Date'),
                 onSaved: (final DateTime value) => _assignmentDate = value),
-            DateTimePickerFormField(
+            DateTimeField(
                 format: DateFormat('yyyy-MM-dd'),
-                inputType: InputType.date,
-                editable: true,
+                onShowPicker: (final BuildContext context,
+                        final DateTime currentValue) async =>
+                    showDatePicker(
+                      context: context,
+                      firstDate: DateTime(1900),
+                      initialDate: currentValue ?? DateTime.now(),
+                      lastDate: DateTime(2100),
+                    ),
+                keyboardType: TextInputType.datetime,
+                enabled: true,
+                readOnly: false,
                 decoration: const InputDecoration(labelText: 'Due Date'),
                 onSaved: (final DateTime value) => _assignmentDueDate = value),
             TextFormField(
@@ -490,8 +509,8 @@ class _CoursePageState extends State<CoursePage> {
         child: Column(children: <Widget>[
           pageTitle,
           Expanded(
-              child: ChangeNotifierProvider<BreakdownTableSource>(
-                  builder: (final BuildContext context) => breakdownTableSource,
+              child: ChangeNotifierProvider<BreakdownTableSource>.value(
+                  value: breakdownTableSource,
                   child: ListView(
                       children: <Widget>[courseBreakdown, courseAssignments],
                       padding: const EdgeInsets.only(bottom: 112.0))))
